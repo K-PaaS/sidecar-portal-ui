@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: cp-portal-ui
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+
+management:
+  security:
+    enabled: false
+
+private:
+  repository:
+    url: ${REPOSITORY_URL}
+
+
+keycloak:
+  oauth:
+    info:
+      uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/userinfo
+    token:
+      check:
+        uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token/introspect
+      access:
+        uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token
+    logout:
+      url: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/logout
+    authorization:
+      uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/auth
+    client:
+      id: ${KEYCLOAK_CP_CLIENT_ID}
+      secret: ${KEYCLOAK_CP_CLIENT_SECRET}
+      scope:
+      superAdminRole: cp-cluster-admin-role
+
+sidecar:
+  rootNamespace: ${SIDECAR_ROOTNAMESPACE}
+  roleAdmin: ${SIDECAR_ROLEADMIN}
+  roleUser: ${SIDECAR_ROLEUSER}
+  portalUrl: ${SC_PORTAL_API_URI}
+
+cpApi:
+  url: ${CP_PORTAL_API_URI}
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  freemarker:
+    template-loader-path: classpath:/templates/
+
+logging:
+  level:
+    ROOT: INFO
+  path: classpath:logback-spring.xml
+  file: logs/application.log
+
+server:
+  port: ${PORT:8090}
+  servlet:
+    session:
+      cookie:
+        name: CPADMINPORTALSESSION
+
+cpApi:
+  url: http://localhost:3333
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  freemarker:
+    template-loader-path: classpath:/templates/
+
+logging:
+  level:
+    ROOT: INFO
+  path: classpath:logback-spring.xml
+  file: logs/application.log
+
+server:
+  port: ${PORT:8090}
+  servlet:
+    session:
+      cookie:
+        name: CPADMINPORTALSESSION
+

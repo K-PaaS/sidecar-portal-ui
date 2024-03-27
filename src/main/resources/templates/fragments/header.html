@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<header th:fragment="headerFragment">
+    <div>
+        <!-- logo -->
+        <h1>
+            <a onclick="movePage(URI_CP_BASE_URL)"><img src="/img/logo.png" alt="K-PaaS- Logo"/></a>
+        </h1>
+        <!-- menu -->
+        <div>
+            <h3 id="clusterTitleDiv">
+                <a href="javascript:;" class="clusterTop"></a>
+                <ul class="clusterUl scroll02" id="clusterListUl">
+                </ul>
+            </h3>
+            <!-- title -->
+            <h3 id="nameSpaceTitleDiv">
+                <a href="javascript:;" class="nameTop"></a>
+                <ul class="nameSpace scroll02" id="namespaceListUl">
+                </ul>
+            </h3>
+
+            <div id="headerSubDiv">
+                <div id="localeLangDiv">
+                    <fieldset>
+                        <select name="u_locale_lang" id="u_locale_lang" onchange="changeLocaleLanguage()">
+                            <option value="ko">Korean</option>
+                            <option value="en">English</option>
+                        </select>
+                    </fieldset>
+                </div>
+                <a href="javascript:;" id="logout" th:text="#{M0809}"></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+</html>

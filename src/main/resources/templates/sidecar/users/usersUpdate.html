@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<div layout:fragment="content">
+    <div id="content" class="sub-page clusters">
+            <article class="location">
+                <ul>
+                    <li><a onclick="movePage(URI_SC_MANAGEMENTS_USERS_ADMIN)">Managements</a></li>
+                    <li><a onclick="movePage(URI_SC_MANAGEMENTS_USERS_ADMIN)">Sidecar Users</a></li>
+                </ul>
+            </article>
+            <article class="base">
+                <div class="creat">
+                    <h3 th:text="|Users #{M0025}|"></h3>
+                    <div>
+                        <dl>
+                            <dt><label for="userId">User ID</label></dt>
+                            <dd>
+                                <input disabled="disabled" id="userId" type="text" />
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt><label for="account">Services Account</label></dt>
+                            <dd>
+                                <input disabled="disabled" id="account" type="text" />
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt><label for="authorityFieldset">Authority</label></dt>
+                            <dd>
+                                <fieldset id="authorityFieldset">
+                                </fieldset>
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt><label for="sidecarRoleFieldset">Sidecar Role #2</label></dt>
+                            <dd>
+                                <fieldset id="sidecarRoleFieldset">
+                                </fieldset>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                <!-- btn -->
+                <div class="btn02">
+                    <button onclick="historyBack()" th:text="#{M0028}"></button>
+                    <div>
+                        <button type="submit" id="modify" th:text="#{M0025}"></button>
+                    </div>
+                </div>
+            </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+
+    window.onload = () => {
+     var userAuthority = '';
+     var userAuthId = '';
+        func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.SIDECAR_USERS);
+
+
+        const userUpdate = {
+            init(){
+                // nameSpace 정보 조회
+                func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/${sessionStorage.getItem('commonName')}`, 'application/json', userUpdate.draw);
+            },
+
+            draw(data){
+
+                // Details data
+                document.getElementById('userId').value = data.userId;
+                document.getElementById('account').value = data.serviceAccountName;
+                ////userAuth
+                userAuthority = data.userType;
+                userAuthId  = data.userAuthId;
+
+                var authSelectHTML =
+                    '<select id="authority" disabled>' +
+                    '<option value='+ AUTH_CLUSTER_ADMIN+'>Cluster Admin</option><option value=' + AUTH_USER+ '>User</option>' +
+                    '</select>';
+
+                document.getElementById('authorityFieldset').innerHTML = authSelectHTML;
+                document.getElementById('authority').value = userAuthority;
+
+                userSidecarRole = "";
+                if(data.items.length > 0){
+                    for(var i=0; i<=data.items.length-1; i++){
+                        if (data.items[i].cpNamespace == SIDECAR_ROOT_NAMESPACE || userAuthority == AUTH_CLUSTER_ADMIN ){
+                            if(data.items[i].roleSetCode == SIDECAR_ROLE_ADMIN ) {
+                                userSidecarRole = data.items[i].roleSetCode;
+                                console.log("userSidecarRole=" + userSidecarRole);
+                                break;
+                            }
+                            else if(data.items[i].roleSetCode == SIDECAR_ROLE_USER) {
+                                userSidecarRole = data.items[i].roleSetCode;
+                            }
+                        };
+                    };
+                };
+
+                var sidecarRoleSelectHTML =
+                    '<select id="sidecarRole" required>' +
+                    '<option value='+ SIDECAR_ROLE_ADMIN+'>Sidecar Admin</option><option value=' + SIDECAR_ROLE_USER+ '>Sidecar User</option><option value="">No Role</option>' +
+                    '</select>';
+
+                document.getElementById('sidecarRoleFieldset').innerHTML = sidecarRoleSelectHTML;
+                document.getElementById('sidecarRole').value = userSidecarRole;
+                console.log("#1 userSidecarRole=" + userSidecarRole);
+                userUpdate.event();
+                console.log("#2");
+            },
+
+            event(){
+                document.getElementById('modify').addEventListener('click', (e) => {
+                    console.log("#3");
+                    var createName = {
+                        "userType": document.getElementById('authority').value,
+                        "userId": document.getElementById('userId').value,
+                        "serviceAccountName": document.getElementById('account').value,
+                        "userAuthId": userAuthId,
+                        "roleSetCode": document.getElementById('sidecarRole').value,
+                        "clusterId": sessionStorage.getItem('cluster'),
+                    };
+
+                    console.log("#4 getElement=" + document.getElementById('sidecarRole'));
+                    console.log("#4 createName.roleSetCode=" + createName.roleSetCode);
+                    /*if (createName.roleSetCode == ""){
+                        alert("Select Sidecar Role");
+                        return;
+                    }*/
+
+                    if (userSidecarRole == "" && createName.roleSetCode != "") {
+                        alert('POST');
+                        func.saveData('POST', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
+                    } else if (userSidecarRole != "" && createName.roleSetCode != "") {
+                        alert('PUT');
+                        func.saveData('PUT', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
+                    } else if (userSidecarRole != "" && createName.roleSetCode == "") {
+                        alert ('DELETE');
+                        createName.roleSetCode = "NOT_ASSIGNED_ROLE"
+                        func.saveData('DELETE', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
+                    }
+                }, false);
+            },
+        }
+
+        userUpdate.init();
+    }
+</script>
+<script>
+    function selectAuthority(obj){
+        if(obj.value == AUTH_CLUSTER_ADMIN){
+            document.getElementById('nsRoleContent').style.display="none";
+        }
+        else if(obj.value == AUTH_USER){
+            document.getElementById('nsRoleContent').style.display="";
+        }
+    }
+</script>
+</th:block>
+</html>

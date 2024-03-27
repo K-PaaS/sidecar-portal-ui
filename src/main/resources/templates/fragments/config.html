@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<span th:fragment="configFragment">
+
+    <script th:inline="javascript">
+
+     var URI_REQUEST_SC_API = [[${@environment.getProperty('sidecar.portalUrl')}]] + '/';
+     var URI_SC_MANAGEMENTS_USERS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_USERS}]];
+     var URI_SC_MANAGEMENTS_USERS_ADMIN = [[${T(org..kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_USERS_ADMIN}]];
+     var URI_SC_MANAGEMENTS_INACTIVE_USERS = [[${T(org..kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_INACTIVE_USERS}]];
+
+     var SIDECAR_ROLE_ADMIN = [[${@environment.getProperty('sidecar.roleAdmin')}]]
+     var SIDECAR_ROLE_USER = [[${@environment.getProperty('sidecar.roleUser')}]]
+     var SIDECAR_ROOT_NAMESPACE = [[${@environment.getProperty('sidecar.rootNamespace')}]]
+
+     // API URI
+     var URI_CP_BASE_URL = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_BASE_URL}]];
+     var URI_CP_INDEX_URL = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_INDEX_URL}]];
+     var URI_CP_CLUSTERS_NAMESPACES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_CLUSTERS_NAMESPACES}]];
+     var URI_CP_CLUSTERS_NODES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_CLUSTERS_NODES}]];
+
+     var URI_CP_WORKLOADS_DEPLOYMENTS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_WORKLOADS_DEPLOYMENTS}]];
+     var URI_CP_WORKLOADS_PODS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_WORKLOADS_PODS}]];
+     var URI_CP_WORKLOADS_REPLICASETS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_WORKLOADS_REPLICASETS}]];
+
+     var URI_CP_SERVICES_SERVICES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_SERVICES_SERVICES}]];
+     var URI_CP_SERVICES_INGRESSES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_SERVICES_INGRESSES}]];
+
+     var URI_CP_STORAGES_STORAGECLASSES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_STORAGES_STORAGECLASSES}]];
+     var URI_CP_STORAGES_PERSISTENTVOLUMES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_STORAGES_PERSISTENTVOLUMES}]];
+     var URI_CP_STORAGES_PERSISTENTVOLUMECLAIMS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_STORAGES_PERSISTENTVOLUMECLAIMS}]];
+
+     var URI_CP_MANAGEMENTS_LIMITRANGES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_LIMITRANGES}]];
+     var URI_CP_MANAGEMENTS_RESOURCEQUOTAS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_RESOURCEQUOTAS}]];
+     var URI_CP_MANAGEMENTS_ROLES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_ROLES}]];
+     var URI_CP_MANAGEMENTS_USERS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_USERS}]];
+     var URI_CP_MANAGEMENTS_USERS_ADMIN = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_USERS_ADMIN}]];
+     var URI_CP_MANAGEMENTS_INACTIVE_USERS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_INACTIVE_USERS}]];
+     var URI_CP_MANAGEMENTS_CONFIGMAPS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_MANAGEMENTS_CONFIGMAPS}]];
+
+     var URI_CP_INFO_ACCESS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_INFO_ACCESS}]];
+     var URI_CP_INFO_PRIVATE_REPOSITORY = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_INFO_PRIVATE_REPOSITORY}]];
+
+     var URI_CP_GLOBAL_CLUSTER = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_GLOBAL_CLUSTERS}]];
+     var URI_CP_GLOBAL_CLOUD_ACCOUNTS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_GLOBAL_CLOUD_ACCOUNTS}]];
+     var URI_CP_GLOBAL_INSTANCE_CODE_TEMPLATES = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_GLOBAL_INSTANCE_CODE_TEMPLATES}]];
+
+     var URI_CP_LIST = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_LIST}]];
+     var URI_CP_DETAILS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_DETAILS}]];
+     var URI_CP_CREATE = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_CREATE}]];
+     var URI_CP_UPDATE = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_UPDATE}]];
+     var URI_CP_LOGS = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_LOGS}]];
+     var URI_CP_POPUP = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_POPUP}]];
+
+     var URI_REQUEST_CP_API = [[${@environment.getProperty('cpApi.url')}]] + '/';
+     //사용자 로그인 데이터 조회
+     var URI_CP_GET_USER_LOGIN_DATA =  [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_GET_USER_LOGIN_DATA}]];
+     var URI_CP_REFRESH_TOKEN = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_REFRESH_TOKEN}]];
+
+     var URI_CP_LOGOUT = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_LOGOUT}]];
+
+     var URL_API_LOCALE_LANGUAGE = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URL_API_LOCALE_LANGUAGE}]];
+     var URL_API_CHANGE_LOCALE_PARAM = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URL_API_CHANGE_LOCALE_PARAM}]];
+     var LANG_KO = [[${T(org.container.platform.web.ui.common.ConstantsUrl).LANG_KO}]];
+     var LANG_EN = [[${T(org.container.platform.web.ui.common.ConstantsUrl).LANG_EN}]];
+
+     var URI_API_SET_CLUSTER_AUTHORITY = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_API_SET_CLUSTER_AUTHORITY}]];
+
+
+     var RESULT_STATUS_SUCCESS = [[${T(org.container.platform.web.ui.common.Constants).RESULT_STATUS_SUCCESS}]];
+     var RESULT_STATUS_FAIL = [[${T(org.container.platform.web.ui.common.Constants).RESULT_STATUS_FAIL}]];
+
+     // VALUE
+     var NAMESPACE_ALL_VALUE ='ALL';
+
+     var AUTH_SUPER_ADMIN = "SUPER_ADMIN";
+     var AUTH_CLUSTER_ADMIN = "CLUSTER_ADMIN";
+     var AUTH_USER = "USER";
+
+     var AUTH_SUPER_ADMIN_CG = "Super Admin";
+     var AUTH_CLUSTER_ADMIN_CG = "Cluster Admin";
+     var AUTH_USER_CG = "User";
+
+
+     var AUTH_ADMIN_LST =[AUTH_SUPER_ADMIN, AUTH_CLUSTER_ADMIN];
+
+
+
+
+     var SELECTED_ADMINISTRATOR = "administrator";
+     var SELECTED_USER = "user";
+
+     //GLOBAL
+     const MASKED_DATA = "*********************";
+
+     // NAMESPACE PROPERTIES
+     var MSG_ENTER_THE_NAMESPACE = [[#{M0010}]];
+     var MSG_NO_LIST = 	[[#{M0011}]];
+     var MSG_NO_NAMESPACE_ADMINISTRATOR	= [[#{M0012}]];
+     var MSG_CANNOT_SELECT_SAME_NAMESPACE =  [[#{M0013}]];
+     var MSG_WANT_TO_SIGN_OUT = [[#{M0015}]];
+     var MSG_INTEGRATED_SIGN_OUT_TAKES_PLACE = [[#{M0016}]];
+     var MSG_ENTER_SEARCH_WORD = [[#{M0017}]];
+     var MSG_CHECK_TO_DELETE =  [[#{M0018}]];
+     var MSG_CHECK_TO_SAVE =  [[#{M0020}]];
+
+     //INGRESS PROPERTIES
+     var MSG_NO_NAMESPACE = [[#{M0816}]];
+     var ADD_PATH = [[#{M0817}]];
+     var ADD_RULE = [[#{M0818}]];
+     var DELETE_RULE = [[#{M0819}]];
+
+     // MESSAGE PROPERTIES
+     var MSG_CONFIRM = [[#{M0022}]];
+     var MSG_CLOSE = [[#{M0023}]];
+     var MSG_CREATE	= [[#{M0024}]];
+     var MSG_EDIT = [[#{M0025}]];
+     var MSG_DELETE	= [[#{M0026}]];
+     var MSG_SELECT	= [[#{M0027}]];
+     var MSG_PREVIOUS = [[#{M0028}]];
+     var MSG_CANCEL	= [[#{M0029}]];
+     var MSG_SAVE	= [[#{M0030}]];
+     var MSG_SEARCH	= [[#{M0031}]];
+     var MSG_UPDATE	= [[#{M0032}]];
+     var MSG_SELECTION_COMPLETE	= [[#{M0033}]];
+     var MSG_CONFIRM_DELETION	= [[#{M0034}]];
+     var MSG_CONFIRM_SAVE = [[#{M0035}]];
+     var MSG_PAAS_TA_LOGO = [[#{M0036}]];
+     var MSG_INVALID_FORMAT = "형식이 올바르지 않습니다.";
+     var MSG_SELECTED_NAMESPACE_ALL = [[#{M0843}]];
+     var MSG_REQUEST_VALUE_IS_MISSING = [[#{M0844}]];
+
+     var MSG_SIGN_OUT = [[#{M0809}]];
+
+     var CURRENT_LOCALE_LANGUAGE = '';
+
+     var IS_RELOAD = false;
+     var IS_NAMELOAD = false;
+     var IS_GLOBAL = false;
+     var IS_INDEX = false;
+     var IS_VCHK = false;
+
+     // COPY PROPERTIES
+     var COPY_TEXT = [[#{M0071}]];
+     var UNCOPY_TEXT = [[#{M0072}]];
+     var ALERT = [[#{M0073}]];
+
+     var CPU_UNIT = "m";
+     var MEMORY_UNIT = "Mi";
+
+     //CLUSTERS
+
+     var MSG_CLUSTER_STATUS_UNABLE_CHECK =  [[#{M0846}]];
+     var MSG_CLUSTER_STATUS_CREATION_COMPLETED =  [[#{M0847}]];
+     var MSG_CLUSTER_STATUS_CREATING =  [[#{M0848}]];
+
+     var MSG_DAYS =  [[#{M0830}]];
+     var MSG_HOURS =  [[#{M0831}]];
+     var MSG_MINS =  [[#{M0832}]];
+     var MSG_SECS =  [[#{M0833}]];
+     var MSG_AGO =  [[#{M0834}]];
+
+
+     const TIMES = {
+         MIN : 60,
+         HOUR : 60*60,
+         DAY : 60*60*24
+     }
+
+
+     var ASIDE_DP1 = {
+         RESOURCES : 'resources',
+         GLOBAL : 'global',
+         CLUSTERS: 'clusters',
+         WORKLOADS: 'workloads',
+         SERVICES: 'services',
+         STORAGES: 'storages',
+         CONFIGMAPS: 'configmaps',
+         MANAGEMENTS: 'managements',
+         INFO: 'info'
+     }
+
+     var ASIDE_DP2 = {
+         APPS: 'apps',
+         DOMAINS: 'domains',
+         ROUTES: 'routes',
+         ORGANIZATIONS: 'organizations',
+         SIDECAR_USERS: 'sidecar_users',
+         G_OVERVIEW : 'g_overview',
+         CLUSTERS: 'clusters',
+         CLOUD_ACCOUNT: 'cloud_account',
+         INSTANCE_CODE_TEMPLATE : 'instance_code_template',
+         C_OVERVIEW : 'c_overview',
+         NODES: 'nodes',
+         NAMESPACES: 'namespaces',
+         DEPLOYMENTS: 'deployments',
+         PODS: 'pods',
+         REPLICASETS: 'replicasets',
+         SERVICES: 'services',
+         INGRESSES: 'ingresses',
+         PERSISTENT_VOLUMES: 'persistent_volumes',
+         PERSISTENT_VOLUME_CLAIMS: 'persistent_volume_claims',
+         STORAGE_CLASSES: 'storage_classes',
+         USERS: 'users',
+         ROLES: 'roles',
+         RESOURCE_QUOTAS: 'resource_quotas',
+         LIMIT_RANGES: 'limit_ranges',
+         CONFIGMAPS: 'configmaps',
+         ACCESS: 'access',
+         PRIVATE_REPOSITORY: 'private_repository'
+     }
+</script>
+
+
+<script>
+ function movePage(locationName) {
+     location.href = locationName;
+ }
+
+ function historyBack() {
+     window.history.back();
+
+ }
+
+ function convertUserTypeString(userType) {
+     if(userType == AUTH_SUPER_ADMIN) {
+         return AUTH_SUPER_ADMIN_CG;
+     }
+     else if(userType == AUTH_CLUSTER_ADMIN) {
+         return AUTH_CLUSTER_ADMIN_CG;
+     }
+     else {
+         return AUTH_USER_CG;
+     }
+ }
+
+ function changeLocaleLanguage() {
+     var u_locale_lang = document.getElementById("u_locale_lang").value;
+     var reqUrl =  URL_API_LOCALE_LANGUAGE+"?"+ URL_API_CHANGE_LOCALE_PARAM + "=" + u_locale_lang;
+     func.setLocaleLang(reqUrl);
+ }
+
+ function activeEdit(id, buttonId) {
+     document.getElementById(id).readOnly = false;
+     document.getElementById(buttonId).style.display = 'none';
+ }
+
+ function setSelectValue(id, val) {
+     document.getElementById(id).value = val;
+ }
+
+ function reloadPage() {
+     location.reload();
+ }
+
+ function callbackFuncNameLoad() {
+     /*  var items = document.querySelectorAll('.scroll02');
+        for (var i = 0, len = items.length; i < len; i++) {
+             items[i].classList.toggle('hidden', isHidden);
+        }*/
+     IS_NAMELOAD = true;
+
+ }
+
+ function isEmpty(str){
+     if(typeof str == "undefined" || str == null || str == "")
+         return true;
+     else
+         return false ;
+ }
+
+ function chunkString(str, length) {
+     return str.match(new RegExp('.{1,' + length + '}', 'g'));
+ }
+</script>
+</span>
+
+</html>

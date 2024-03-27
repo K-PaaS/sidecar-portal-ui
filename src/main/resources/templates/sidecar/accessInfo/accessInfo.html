@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:cursor="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layouts/layout}">
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_CP_INFO_ACCESS)">Info</a></li>
+                <li><a onclick="movePage(URI_CP_INFO_ACCESS)">Access</a></li>
+            </ul>
+            <!-- Click event class="on" -->
+        </article>
+        <article class="base-top">
+            <div class="notice">
+                <h3>User Info</h3>
+                <div class="table_style01">
+                    <div class="creat creat-type2">
+                        <div class="info-section">
+                            <dl>
+                                <dt><label>User Name</label></dt>
+                                <dd>
+                                    <input name="user_name" id="user_name" type="text" disabled/>
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt><label>Role</label></dt>
+                                <dd>
+                                    <input name="role" id="role" type="text" disabled/>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article class="base-top">
+            <div class="notice">
+                <h3>How to Access</h3>
+                <div class="table_style01">
+                    <div class="custom-access-title">
+                        <p>1.
+                            <a style="text-decoration: underline" th:text="#{M0060}" onclick="window.open('https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl')"></a>
+                        </p>
+                    </div>
+                    <div class="custom-access-title">
+                        <p>2. <span th:text="#{M0061}"></span></p>
+                    </div>
+                    <div class="custom-access-contents-wrap">
+                        <div>
+                            <p>※ For Linux</p>
+                        </div>
+                        <div class="custom-access-contents">
+                            <div id="cpEnvironmentsForLinux" class="cpEnvironments">
+                                <pre><code class="bash">export CP_SERVICE_CLUSTER_NAME=""</code></pre>
+                                <pre><code class="bash">export CP_SERVICE_CLUSTER_SERVER=""</code></pre>
+                                <pre><code class="bash">export CP_SERVICE_USER_NAME=""</code></pre>
+                                <pre><code class="bash">export CP_SERVICE_CONTEXT_NAME=""</code></pre>
+                                <pre><code class="bash xNamespace">export CP_SERVICE_NAMESPACE_NAME=""</code></pre>
+                                <pre><code class="bash" style="white-space: normal">export CP_SERVICE_CREDENTIALS_TOKEN=""</code></pre>
+                            </div>
+                            <div class="fa-pull-right">
+                                <i class="fas fa-copy custom-access-button" about="cpEnvironmentsForLinux" onclick="btnCopy(this.id)"></i>
+                            </div>
+                        </div>
+                        <div class="maT10">
+                            <p>※ For Windows</p>
+                        </div>
+                        <div class="custom-access-contents">
+                            <div id="cpEnvironmentsForWindows" class="cpEnvironments">
+                                <pre><code class="bash">set CP_SERVICE_CLUSTER_NAME=""</code></pre>
+                                <pre><code class="bash">set CP_SERVICE_CLUSTER_SERVER=""</code></pre>
+                                <pre><code class="bash">set CP_SERVICE_USER_NAME=""</code></pre>
+                                <pre><code class="bash">set CP_SERVICE_CONTEXT_NAME=""</code></pre>
+                                <pre><code class="bash xNamespace">set CP_SERVICE_NAMESPACE_NAME=""</code></pre>
+                                <pre><code class="bash" style="white-space: normal">set CP_SERVICE_CREDENTIALS_TOKEN=""</code></pre>
+                            </div>
+                            <div class="fa-pull-right">
+                                <i class="fas fa-copy custom-access-button" about="cpEnvironmentsForWindows" onclick="btnCopy(this.id)"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap">
+                        <div class="custom-access-title-wrap">
+                            <div class="custom-access-title">
+                                <p>3. <span th:text="#{M0062}"></span></p>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="custom-access-contents-wrap">
+                            <div>
+                                <p>※ For Linux</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpClusterForLinux">
+                                    <pre><code class="bash">kubectl config set-cluster ${CP_SERVICE_CLUSTER_NAME} --server=${CP_SERVICE_CLUSTER_SERVER} --insecure-skip-tls-verify</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpClusterForLinux" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                            <div class="maT10">
+                                <p>※ For Windows</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpClusterForWindows">
+                                    <pre><code class="bash">kubectl config set-cluster %CP_SERVICE_CLUSTER_NAME% --server=%CP_SERVICE_CLUSTER_SERVER% --insecure-skip-tls-verify</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpClusterForWindows" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap">
+                        <div class="custom-access-title-wrap">
+                            <div class="custom-access-title">
+                                <p>4. <span th:text="#{M0063}"></span></p>
+                            </div>
+                        </div>
+                        <div class="custom-access-title-caution">
+                            <p style="color: red;"><i class="fas fa-info-circle"></i>&nbsp;&nbsp;<span th:text="#{M0064}"></span></p>
+                        </div>
+                        <div class="custom-access-contents-wrap">
+                            <div class="maT10">
+                                <p>※ For Linux</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpCredentialForLinux">
+                                    <pre><code class="bash">kubectl config set-credentials <span class="hljs-variable"> ${CP_SERVICE_USER_NAME}</span> --token=${CP_SERVICE_CREDENTIALS_TOKEN}</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpCredentialForLinux" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                            <div class="maT10">
+                                <p>※ For Windows</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpCredentialForWindows">
+                                    <pre><code class="bash">kubectl config set-credentials <span class="hljs-variable">%CP_SERVICE_USER_NAME%</span> --token=%CP_SERVICE_CREDENTIALS_TOKEN%</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpCredentialForWindows" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap">
+                        <div class="custom-access-title">
+                            <p>5. <span th:text="#{M0065}"></span></p>
+                        </div>
+                        <div class="custom-access-contents-wrap">
+                            <div>
+                                <p>※ For Linux</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpContextForLinux">
+                                    <p>kubectl config set-context <span style="color:#d91e18">${CP_SERVICE_CONTEXT_NAME}</span><span> --user=</span><span style="color:#d91e18">${CP_SERVICE_USER_NAME}</span><span> --cluster=</span><span style="color:#d91e18">${CP_SERVICE_CLUSTER_NAME}</span><span class="optNamespace"> --namespace=</span><span class="optNamespace" style="color:#d91e18">${CP_SERVICE_NAMESPACE_NAME}</span></p>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpContextForLinux" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                            <div class="maT10">
+                                <p>※ For Windows</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpContextForWindows">
+                                    <p>kubectl config set-context %CP_SERVICE_CONTEXT_NAME% --user=%CP_SERVICE_USER_NAME% --cluster=%CP_SERVICE_CLUSTER_NAME%<span class="optNamespace"> --namespace=%CP_SERVICE_NAMESPACE_NAME%</span></p>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpContextForWindows" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap">
+                        <div class="custom-access-title">
+                            <p>6. <span th:text="#{M0066}"></span></p>
+                        </div>
+                        <div class="custom-access-contents-wrap">
+                            <div>
+                                <p>※ For Linux</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpContextUseForLinux">
+                                    <pre><code class="bash">kubectl config use-context ${CP_SERVICE_CONTEXT_NAME}</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpContextUseForLinux" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                            <div class="maT10">
+                                <p>※ For Windows</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpContextUseForWindows">
+                                    <pre><code class="bash">kubectl config use-context %CP_SERVICE_CONTEXT_NAME%</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpContextUseForWindows" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap">
+                        <div class="custom-access-title">
+                            <p>7. <span th:text="#{M0067}"></span></p>
+                        </div>
+                        <div class="custom-access-contents-wrap">
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpConfigCheck">
+                                    <pre><code class="bash">kubectl config view</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpConfigCheck" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-access-wrap custom-paB40">
+                        <div class="custom-access-title">
+                            <p>8. <span th:text="#{M0066}"></span></p>
+                        </div>
+                        <div class="custom-access-contents-wrap">
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="cpResourceCheck">
+                                    <pre><code class="bash">kubectl get all</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="cpResourceCheck" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <textarea id="out_a" title="" readonly>
+    </textarea>
+        </article>
+    </div>
+</div>
+<th:block layout:fragment="script">
+</th:block>
+</html>
+<script type="text/javascript">
+    window.onload = () => {
+
+        func.init(ASIDE_DP1.INFO, ASIDE_DP2.ACCESS);
+
+        const accessInfo = {
+
+            init(){
+
+                let copy = document.getElementsByClassName('custom-access-button');
+                for (var i = 0 ; i < copy.length; i++) {
+                    copy[i].setAttribute('id', 'copy_'+`${i}`);
+                }
+
+                var hljsString=document.getElementsByClassName('hljs-string');
+                for (let i = 0 ; i <= 11; i++) {
+                    if (i == 0 || i == 6) {
+                        hljsString[i].setAttribute('class','hljs-string cpClusterName');
+                    } else if (i == 1 || i == 7) {
+                        hljsString[i].setAttribute('class','hljs-string cpClusterServer');
+                    } else if (i == 2 || i == 8) {
+                        hljsString[i].setAttribute('class','hljs-string cpUserName');
+                    } else if (i == 3 || i == 9) {
+                        hljsString[i].setAttribute('class','hljs-string cpContextName');
+                    } else if (i == 4 || i == 10) {
+                        hljsString[i].setAttribute('class','hljs-string cpNamespace xNamespace');
+                    } else if (i == 5 || i == 11) {
+                        hljsString[i].setAttribute('class','hljs-string cpCredentialsToken');
+                    }
+                }
+
+                func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/namespaces/${sessionStorage.getItem('nameSpace')}/accessesInfo`, 'application/json', accessInfo.drawUser);
+            },
+
+            drawUser(data){
+
+                document.getElementById('user_name').value = data.userId;
+                document.getElementById('role').value = data.roleSetCode;
+
+                var cpEnvironments = document.getElementsByClassName('cpEnvironments');
+                for (var i = 0; i <= cpEnvironments.length - 1; i++) {
+                    document.getElementsByClassName('cpUserName')[i].innerText = data.userId;
+                    document.getElementsByClassName('cpContextName')[i].innerText = data.userId + "-context";
+                    document.getElementsByClassName('cpClusterServer')[i].innerText = data.clusterApiUrl;
+                    document.getElementsByClassName('cpClusterName')[i].innerText = data.clusterName;
+                    document.getElementsByClassName('cpCredentialsToken')[i].innerText = data.clusterToken;
+
+                    if (data.userType === 'USER') {
+                        if (data.cpNamespace === sessionStorage.getItem('nameSpace')) {
+                            document.getElementsByClassName('cpNamespace')[i].innerText = data.cpNamespace;
+                        }
+                    } else if (data.userType === 'SUPER_ADMIN' || data.userType === 'CLUSTER_ADMIN') {
+                        let xNamespace = document.getElementsByClassName('xNamespace');
+                        let optNamespace = document.getElementsByClassName('optNamespace');
+
+                        for (var j = 0; j < xNamespace.length; j++) {
+                            xNamespace[j].style.display = 'none';
+                        }
+                        for (var k = 0; k < optNamespace.length; k++) {
+                            optNamespace[k].style.display = 'none';
+                        }
+                    }
+                }
+
+            },
+
+        };
+
+        accessInfo.init();
+    };
+
+    function btnCopy (id) {
+        var item = document.getElementById(`${id}`).getAttribute('about');
+        var text = document.getElementById(`${item}`);
+        var reqValue = text.innerText || text.textContent;
+        var target = document.getElementById('out_a');
+        target.value = reqValue;
+
+        if (reqValue === '') {
+            func.alertPopup(ALERT, UNCOPY_TEXT, true, MSG_CONFIRM, 'closed');
+        } else {
+            target.select();
+            document.execCommand('copy');
+            target.value = '';
+            func.alertPopup(ALERT, COPY_TEXT, true, MSG_CONFIRM, 'closed');
+        }
+
+    }
+</script>
+<style>
+    pre code.hljs {padding: 0; background: #eeeeee;}
+</style>

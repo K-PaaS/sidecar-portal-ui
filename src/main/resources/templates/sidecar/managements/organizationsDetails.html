@@ -1,0 +1,347 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/layout}"
+>
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)">Managements</a></li>
+                <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)">Organizations</a></li>
+            </ul>
+        </article>
+        <article class="base detail">
+            <div class="notice">
+                <h4>Details</h4>
+                <div class="table_style01">
+                    <table>
+                        <caption>
+                            Details
+                        </caption>
+                        <colgroup>
+                            <col width="20%" />
+                            <col width="80%" />
+                        </colgroup>
+                        <tbody class="listTable">
+                        <tr>
+                            <th scope="row" class="left">Name</th>
+                            <td class="left" id="name"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Domain</th>
+                            <td class="left" id="domain"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--          <label for="search-box">
+                            <strong>검색</strong>
+                          </label>
+                          <input type="search" id="search-box" />-->
+                <br />
+                <div class="table_style01" style="max-height: 220px">
+                    <table>
+                        <caption>
+                            Details
+                        </caption>
+                        <colgroup>
+                            <col width="80%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Spaces</th>
+                        </tr>
+                        </thead>
+                        <tbody
+                                class="detailList1"
+                                style="
+                  display: block;
+                  max-height: 180px;
+                  overflow-y: auto;
+                  width: 1070px;
+                "
+                        ></tbody>
+                    </table>
+                </div>
+                <!--          <label for="search-box2">
+                            <strong>검색</strong>
+                          </label>
+                          <input type="search" id="search-box2" />-->
+                <br />
+                <div class="table_style01">
+                    <table id="table">
+                        <caption>
+                            Details
+                        </caption>
+                        <colgroup>
+                            <col width="7%" />
+                            <col width="20%" />
+                            <col width="35%" />
+                            <col width="38%" />
+                            <col width="0%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Account</th>
+                            <th scope="col">User ID</th>
+                            <th scope="col">Services Account</th>
+                            <th scope="col">Role</th>
+                            <th scope="col" style="display: none">RoleGuid</th>
+                        </tr>
+                        </thead>
+                        <tbody
+                                class="detailList"
+                                style="
+                  display: block;
+                  max-height: 300px;
+                  overflow-y: auto;
+                  width: 1070px;
+                "
+                        ></tbody>
+                    </table>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+<th:block layout:fragment="script"> </th:block>
+</html>
+<script type="text/javascript">
+    window.onload = () => {
+        func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.ORGANIZATIONS);
+        callbackFuncNameLoad();
+
+        const detail = {
+            offset: 0, // 로드 페이지 넘버
+            limit: 10, // 로드 게시물 개수
+            allItemCount: 0, //게시물 총 개수
+            type: "user",
+            users: "",
+            init() {func.nameLoad = detail.reset; detail.load(); },
+            reset() {func.removeHtml(document.querySelector(".listTable")); detail.offset = 0; detail.load(); },
+            load() {
+                func.loading();
+                document.getElementById("name").innerText = sessionStorage.getItem("commonName");
+                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("orgGuid")}/getDefaultDomain`, "application/json", detail.domain);
+                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.space);
+                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.user);
+            },
+            domain(data) {document.getElementById("domain").innerText = data.name; },
+            space(data) {
+                func.removeHtml(document.querySelector(".detailList1"));
+                if (data.pagination.total_results > 0) {
+                    for (var i = 0; i < data.pagination.total_results; i++) {
+                        var html = `<tr><td class="left" style="width: 1070px">${data.resources[i].name}</td></tr>`;
+                        func.appendHtml(document.querySelector(".detailList1"), html, "tbody", );
+                    }
+                } else {
+                    var html = "<tr><td style='width: 1070px'>No Data.</td></tr>";
+                    func.appendHtml(document.querySelector(".detailList1"), html, "tbody", );
+                }
+            },
+            async user(sidecar_data) {
+                func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (data) => {
+                    cluster_user(data);
+                    console.log("5 - fin");
+                })
+                function cluster_user(cluster_data) {
+                    console.log("cluster_user start!");
+                    if (sidecar_data.pagination.total_results > 0) {
+                        var dataArray = [];
+                        for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
+                            var userCheckbox = sidecar_data.resources[i].type === "organization_user" ? "checked" : "";
+                            var managerCheckbox = sidecar_data.resources[i].type === "organization_manager" ? "checked" : "";
+                            var auditorrCheckbox = sidecar_data.resources[i].type === "organization_auditor" ? "checked" : "";
+                            var roleGuid = sidecar_data.resources[i].guid;
+
+                            var userId = sidecar_data.resources[i].relationships.user.data.guid;
+                            var split = userId.split(":");
+                            var userLastPart = split[split.length - 1];
+
+                            detail.users = sidecar_data.resources[i].relationships.user.data.guid;
+
+                            if (!userId.startsWith("system:serviceaccount:")) {    // UA
+                                var account = "UA";
+                                var serviceAccountName = "-";
+                                dataArray[i] = [account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                            } else {  //SA
+                                var condition = false;
+                                var account = "SA";
+
+                                for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
+                                    var serviceAccountName = cluster_data.items[j].serviceAccountName;
+
+                                    if (serviceAccountName === userLastPart) {       // SA(Portal)
+                                        var userId = cluster_data.items[j].userId;
+                                        dataArray[i] = [account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                                        condition = true;
+                                        break;
+                                    }
+
+                                    if (!condition) {          // SA(CLI)
+                                        var userId = "-";
+                                        dataArray[i] = [account,userId,userLastPart,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                                    }
+                                }
+                            }
+                        }
+// qodufdp checked checked로 만들어놓고 그다음에 for문 돌리면서 뿌려주기
+
+                        for (var i = 0; i < dataArray.length; i++) {
+                            var row = dataArray[i];
+                            console.log("row" + i + " : " + row);
+
+                            var account = row[0];
+                            var userId = row[1];
+                            var serviceAccount = row[2];
+                            var userCheckbox = row[3];
+                            var managerCheckbox = row[4];
+                            var auditorrCheckbox = row[5];
+                            var roleGuid = row[6];
+                            var users = row[7];
+
+                            var oldUserId = document.getElementById(userId);
+
+                            if (oldUserId && oldUserId.textContent !== '-') {
+                                console.log("oldUserId : " + oldUserId.textContent);
+                                // var tdElements = document.querySelectorAll('td[id="' + userId + '"]');
+                                // console.log("tdElements2 : " + tdElements[0].textContent);
+                                var row = oldUserId.parentElement;
+                                var checkboxes = row.querySelectorAll('input[type="checkbox"]');
+                                var user = row.querySelectorAll('input[type="checkbox"][name="organization_user"]');
+                                var manager = row.querySelectorAll('input[type="checkbox"][name="organization_manager"]');
+                                var auditor = row.querySelectorAll('input[type="checkbox"][name="organization_auditor"]');
+
+                                checkboxes.forEach(function(checkbox) {
+                                    console.log("## " + userCheckbox + ",  " + managerCheckbox + ",  " + auditorrCheckbox + "  ##");
+                                    /*
+
+                                                      if (checkbox.checked) {
+                                                        console.log("@@" + checkbox.id + ' is checked.');
+                                                        if(userCheckbox === 'checked') {
+
+                                                          console.log("1");
+                                                        }
+                                                        if(managerCheckbox === 'checked') {
+
+                                                          console.log("2");
+                                                        }
+                                                        if(auditorrCheckbox === 'checked') {
+
+                                                          console.log("3");
+                                                        }
+                                                      }*/
+
+                                    /* else {
+                                    // console.log("@@" + checkbox.id + ' is not checked.');
+                                   }
+                  */
+
+                                    /*
+                                                     if(userCheckbox === 'checked') {
+                                                     console.log("## userCheckbox is " + userCheckbox);
+                                                     console.log(checkbox.id + ' is checked.');
+                                                     checkboxes.checked = true;               }
+
+                                                     if(managerCheckbox === 'checked') {
+                                                       console.log("## managerCheckbox is " + managerCheckbox);
+                                                       console.log(checkbox.id + ' is checked.');
+                                                       checkboxes.checked = true;
+                                                     }
+
+                                                     if(auditorrCheckbox === 'checked') {
+                                                       console.log("## auditorrCheckbox is " + auditorrCheckbox);
+                                                       console.log(checkbox.id + ' is checked.');
+                                                       checkboxes.checked = true;
+                                                     }
+                                    */
+
+
+                                })
+
+                            }
+                            // else {
+
+                            var html = `<tr>
+                              <td style="width: 74.89px">${account}</td>
+                              <td style="width: 214px" id=${userId}>${userId}</td>
+                              <td style="width: 374.5px">${serviceAccount}</td>
+                              <td style="width: 406.61px">
+                                <input type="checkbox" id="${users}_user" ${userCheckbox} name="organization_user">
+                                <label name="organization_user" for="${users}_user" style="margin-right: 25px;">User</label>
+                                <input type="checkbox" id="${users}_manager" ${managerCheckbox} name="organization_manager">
+                                <label for="${users}_manager" style="margin-right: 25px;">Manager</label>
+                                <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} name="organization_auditor" disabled >
+                                <label for="${users}_auditor">Auditor</label>
+                              </td>
+                              <td style="width: 0px; display: none;">
+                                <label id="${roleGuid}"></label>
+                              </td>
+                            </tr>`;
+
+                            //  }
+                            func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
+                        }
+                    } else {
+                        var html = "<tr><td style='width: 1070px'>No Data.</td></tr>";
+                        func.appendHtml(document.querySelector(".detailList"), html, "tbody", );
+                    }
+                    console.log("cluster_user fin!!");
+                }
+
+                if (document.getElementById("loading")) {
+                    document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                }
+            },
+        };
+
+        detail.init();
+        function checkboxChange(event) {
+            const checkbox = event.target;
+            if (checkbox.checked) {
+                console.log("checked!");
+
+                var type = checkbox.getAttribute("name");
+                var user = checkbox.id.replace("_user", "").replace("_manager", "").replace("_auditor", "");
+                var orgGuid = sessionStorage.getItem("orgGuid");
+
+                console.log("User: " + user);
+                console.log("OrgGuid: " + orgGuid);
+                console.log("Input Name:" + type);
+
+                var data = {
+                    "orgGuid": orgGuid,
+                    "type": type,
+                    "user": user
+                }
+
+                console.log("data : " + data);
+                console.log("data.Json : " + JSON.stringify(data));
+
+                funcsidecar.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
+            } else {
+                console.log("unchecked!");
+                const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
+                const roleGuid = roleLabel.getAttribute("id");
+                var type = checkbox.getAttribute("name");
+                var user = checkbox.id.replace("_user", "").replace("_manager", "").replace("_auditor", "");
+                var orgGuid = sessionStorage.getItem("orgGuid");
+
+                console.log("User: " + user);
+                console.log("OrgGuid: " + orgGuid);
+                console.log("Input Name:" + type);
+                console.log("roleGuid:", roleGuid);
+
+                funcsidecar.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
+            }
+        };
+        document.addEventListener("change", function(event) {
+            const target = event.target;
+            if (target.matches("input[type='checkbox']")) {
+                checkboxChange(event);
+            }
+        });
+    };
+</script>

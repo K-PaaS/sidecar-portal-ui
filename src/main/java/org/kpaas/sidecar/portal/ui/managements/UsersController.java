@@ -1,4 +1,4 @@
-package org.kpaas.sidecar.portal.ui.management.users;
+package org.kpaas.sidecar.portal.ui.managements;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Api(value = "UserController v1")
 @PreAuthorize("@authSecurity.checkIsClusterAdmin()")
 @Controller
-public class UserController {
+public class UsersController {
 
-    private static final String BASE_URL = "sidecar/users/";
+    private static final String BASE_URL = "sidecar/managements/";
 
 
     /**

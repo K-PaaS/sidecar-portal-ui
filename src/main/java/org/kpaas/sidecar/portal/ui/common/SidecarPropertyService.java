@@ -26,4 +26,5 @@ public class SidecarPropertyService {
 
     @Value("${sidecar.roleUser}")
     private String sidecarRoleUser;
+
 }

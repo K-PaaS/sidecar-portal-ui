@@ -1,0 +1,197 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/layout}"
+>
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)">Managements</a></li>
+                <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)">Organizations</a></li>
+            </ul>
+            <fieldset>
+                <input
+                        type="text"
+                        name="keyword"
+                        id="searchText"
+                        autocomplete="off"
+                        th:placeholder="#{M0017}"
+                />
+                <button type="submit" id="search" th:text="#{M0031}"></button>
+            </fieldset>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <h3>List</h3>
+                <div class="table_style01">
+                    <table>
+                        <caption>
+                            Organizations List
+                        </caption>
+                        <colgroup>
+                            <col width="100%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable"></tbody>
+                    </table>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.ORGANIZATIONS);
+            callbackFuncNameLoad();
+
+            const org = {
+                offset: 0,
+                limit: 10,
+                total_results: 0,
+                init() {
+                    func.nameLoad = org.reset;
+                    org.load();
+                    org.event();
+                },
+                reset() {
+                    func.removeHtml(document.querySelector(".listTable"));
+                    org.offset = 0;
+                    org.load();
+                },
+                load() {
+                    func.loading();
+                  //  funcsidecar.loadDataSidecar(
+                    func.loadData(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/organizations/list`,
+                        "application/json",
+                        org.draw,
+                    );
+                },
+                draw(data) {
+                    if (org.offset == 0)
+                        org.total_results = data.pagination.total_results;
+
+                    if (data.resources.length > 0) {
+                        for (var i = 0; i <= data.resources.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < org.limit) {
+                                var html = `<tr><td class="left" id=${trId}><a href="javascript:;" data-name="${data.resources[i].name}" data-guid="${data.resources[i].guid}">${data.resources[i].name}</a></td></tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}><td class="left"><a href="javascript:;" data-name="${data.resources[i].name}" data-guid="${data.resources[i].guid}">${data.resources[i].name}</a></td></tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (org.offset + 1) * org.limit,
+                        org.total_results,
+                    );
+
+                    if (endIndex < org.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                    org.listEvent();
+                },
+                more() {
+                    var startIndex = org.offset * org.limit;
+                    var endIndex = Math.min(
+                        (org.offset + 1) * org.limit,
+                        org.total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < org.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event() {
+                    // more 버튼 event
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (org.limit < org.total_results) {
+                                org.offset++;
+                                org.more();
+                            }
+                        },
+                        false,
+                    );
+                    /*
+                            document.querySelector('.create').addEventListener('click', (e) => {
+                                sessionStorage.setItem('commonName', '');
+
+                                //func.create('Create', 'orgs', MSG_SAVE);
+                            }, false);*/
+                },
+                listEvent() {
+                    var listAll = document
+                        .querySelector(".listTable")
+                        .querySelectorAll("a");
+
+                    for (var i = org.offset * 10; i <= listAll.length - 1; i++) {
+                        listAll[i].addEventListener(
+                            "click",
+                            (e) => {
+                                sessionStorage.setItem(
+                                    "commonName",
+                                    e.target.getAttribute("data-name"),
+                                );
+                                sessionStorage.setItem(
+                                    "orgGuid",
+                                    e.target.getAttribute("data-guid"),
+                                );
+                                document.location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS + URI_SC_DETAILS;
+                            },
+                            true,
+                        );
+                    }
+                },
+            };
+            org.init();
+        };
+    </script>
+</th:block>
+</html>

@@ -7,13 +7,28 @@
     <script th:inline="javascript">
 
      var URI_REQUEST_SC_API = [[${@environment.getProperty('sidecar.portalUrl')}]] + '/';
+
+     var URI_SC_WORKLOADS_APPS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_WORKLOADS_APPS}]];
+
+     var URI_SC_RESOURCES_DOMAINS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_RESOURCES_DOMAINS}]];
+     var URI_SC_RESOURCES_ROUTES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_RESOURCES_ROUTES}]];
+     var URI_SC_RESOURCES_SERVICES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_RESOURCES_SERVICES}]];
+
      var URI_SC_MANAGEMENTS_USERS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_USERS}]];
      var URI_SC_MANAGEMENTS_USERS_ADMIN = [[${T(org..kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_USERS_ADMIN}]];
      var URI_SC_MANAGEMENTS_INACTIVE_USERS = [[${T(org..kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_INACTIVE_USERS}]];
+     var URI_SC_MANAGEMENTS_ORGANIZATIONS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_MANAGEMENTS_ORGANIZATIONS}]];
 
-     var SIDECAR_ROLE_ADMIN = [[${@environment.getProperty('sidecar.roleAdmin')}]]
-     var SIDECAR_ROLE_USER = [[${@environment.getProperty('sidecar.roleUser')}]]
-     var SIDECAR_ROOT_NAMESPACE = [[${@environment.getProperty('sidecar.rootNamespace')}]]
+     var URI_SC_INFO_ACCESS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_INFO_ACCESS}]];
+
+     var SIDECAR_ROLE_ADMIN = [[${@environment.getProperty('sidecar.roleAdmin')}]];
+     var SIDECAR_ROLE_USER = [[${@environment.getProperty('sidecar.roleUser')}]];
+     var SIDECAR_ROOT_NAMESPACE = [[${@environment.getProperty('sidecar.rootNamespace')}]];
+
+
+     var URI_SC_LIST = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_LIST}]];
+     var URI_SC_DETAILS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS}]];
+
 
      // API URI
      var URI_CP_BASE_URL = [[${T(org.container.platform.web.ui.common.ConstantsUrl).URI_CP_BASE_URL}]];
@@ -209,7 +224,8 @@
          LIMIT_RANGES: 'limit_ranges',
          CONFIGMAPS: 'configmaps',
          ACCESS: 'access',
-         PRIVATE_REPOSITORY: 'private_repository'
+         PRIVATE_REPOSITORY: 'private_repository',
+         ORGANIZATIONS: 'organizations'
      }
 </script>
 

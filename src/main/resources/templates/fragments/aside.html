@@ -13,28 +13,28 @@
             <li class="plus" aside_d1="workloads">
                 <a href="javascript:" class="dep01">Workloads</a>
                 <ul class="sub">
-                    <li><a onclick="movePage(URI_CP_WORKLOADS_PODS)" aside_d2="apps">Apps</a></li>
-                    <li><a onclick="movePage(URI_CP_WORKLOADS_REPLICASETS)" aside_d2="services">Services</a></li>
+                    <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)" aside_d2="apps">Apps</a></li>
                 </ul>
             </li>
             <li class="plus" aside_d1="resources">
                 <a href="javascript:" class="dep01">Resources</a>
                 <ul class="sub">
-                    <li><a onclick="movePage(URI_CP_STORAGES_PERSISTENTVOLUMES)" sec:authorize="!hasAnyAuthority('USER')" aside_d2="organizations">Organizations</a></li>
-                    <li><a onclick="movePage(URI_CP_STORAGES_PERSISTENTVOLUMES)" sec:authorize="!hasAnyAuthority('USER')" aside_d2="domains">Domains</a></li>
-                    <li><a onclick="movePage(URI_CP_STORAGES_PERSISTENTVOLUMECLAIMS)" aside_d2="routes">Routes</a></li>
+                    <li><a onclick="movePage(URI_SC_RESOURCES_DOMAINS)" aside_d2="domains">Domains</a></li>
+                    <li><a onclick="movePage(URI_SC_RESOURCES_ROUTES)" aside_d2="routes">Routes</a></li>
+                    <li><a onclick="movePage(URI_SC_RESOURCES_SERVICES)" aside_d2="services">Services</a></li>
                 </ul>
             </li>
             <li class="plus" aside_d1="managements">
                 <a href="javascript:" class="dep01">Managements</a>
                 <ul class="sub">
                     <li><a onclick="movePage(URI_SC_MANAGEMENTS_USERS_ADMIN)" sec:authorize="!hasAnyAuthority('USER')" aside_d2="sidecar_users">Sidecar Users</a></li>
+                    <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)" aside_d2="organizations">Organizations</a></li>
                 </ul>
             </li>
             <li class="plus" aside_d1="info">
                 <a href="javascript:" class="dep01">Info</a>
                 <ul class="sub">
-                    <li><a onclick="movePage(URI_CP_INFO_ACCESS)" aside_d2="access">Access</a></li>
+                    <li><a onclick="movePage(URI_SC_INFO_ACCESS)" aside_d2="access">Access</a></li>
                 </ul>
             </li>
         </ul>

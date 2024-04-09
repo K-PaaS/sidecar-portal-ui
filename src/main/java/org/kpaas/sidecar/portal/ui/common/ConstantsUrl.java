@@ -13,4 +13,5 @@ public class ConstantsUrl extends org.container.platform.web.ui.common.Constants
 
     public static final String URI_SC_LIST = "/list";
     public static final String URI_SC_DETAILS = "/details";
+    public static final String URI_SC_UPDATE = "/update";
 }

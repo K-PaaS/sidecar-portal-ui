@@ -124,9 +124,10 @@
             load() {
                 func.loading();
                 document.getElementById("name").innerText = sessionStorage.getItem("commonName");
-                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("orgGuid")}/getDefaultDomain`, "application/json", detail.domain);
-                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.space);
-                funcsidecar.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("orgGuid")}/getDefaultDomain`, "application/json", detail.domain);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("orgGuid")}`, "application/json", detail.space);
+
             },
             domain(data) {document.getElementById("domain").innerText = data.name; },
             space(data) {
@@ -141,7 +142,7 @@
                     func.appendHtml(document.querySelector(".detailList1"), html, "tbody", );
                 }
             },
-            async user(sidecar_data) {
+            user(sidecar_data) {
                 func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (data) => {
                     cluster_user(data);
                     console.log("5 - fin");
@@ -320,7 +321,7 @@
                 console.log("data : " + data);
                 console.log("data.Json : " + JSON.stringify(data));
 
-                funcsidecar.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
+                func.saveData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
             } else {
                 console.log("unchecked!");
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
@@ -334,7 +335,7 @@
                 console.log("Input Name:" + type);
                 console.log("roleGuid:", roleGuid);
 
-                funcsidecar.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
+                func.saveData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
             }
         };
         document.addEventListener("change", function(event) {

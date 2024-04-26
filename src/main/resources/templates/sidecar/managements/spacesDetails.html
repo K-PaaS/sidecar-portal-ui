@@ -241,7 +241,7 @@
                 }, false);
             },
             spaceDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, '', true, 'application/json', func.historyBack);
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, '', true, 'application/json', location.href='/sidecar/organizations');
             }
         };
         detail.init();

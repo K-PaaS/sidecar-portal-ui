@@ -155,7 +155,6 @@
                                         condition = true;
                                         break;
                                     }
-
                                     if (!condition) {          // SA(CLI)
                                         var userId = "-";
                                         dataArray[i] = [account,userId,userLastPart,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
@@ -295,7 +294,7 @@
                 }, false);
             },
             orgDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, '', true, 'application/json', func.historyBack); // refresh 된 목록 나오는지 확인
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, '', true, 'application/json', func.historyBack );
             }
         };
 
@@ -320,7 +319,8 @@
                 const roleGuid = roleLabel.getAttribute("id");
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
             }
-        };
+        }
+
         document.addEventListener("change", function(event) {
             const target = event.target;
             if (target.matches("input[type='checkbox']")) {

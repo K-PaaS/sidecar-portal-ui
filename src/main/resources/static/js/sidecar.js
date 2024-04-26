@@ -328,6 +328,5 @@ const funcsc = {
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/domains`, sendData, true, 'application/json', func.refresh);
             }
         }, false);
-    }
-
+    },
 }

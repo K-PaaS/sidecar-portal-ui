@@ -35,4 +35,15 @@ public class OrganizationsController {
     public String getOrganizationsDetails() {
         return BASE_URL + "organizationsDetails";
     }
+
+    /**
+     * Spaces 상세 페이지 이동(Go to the spaces details page)
+     *
+     * @return the view
+     */
+    @ApiOperation(value = "Spaces 상세 페이지 이동(Go to the spaces details page)", nickname = "getOrganizationsDetails")
+    @GetMapping(value = ConstantsUrl.URI_SC_MANAGEMENTS_SPACES + URI_SC_DETAILS)
+    public String getSpacesDetails() {
+        return BASE_URL + "spacesDetails";
+    }
 }

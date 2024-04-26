@@ -1,9 +1,5 @@
-<!doctype html>
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layouts/layout}"
->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
 <div layout:fragment="content">
     <div id="content" class="sub-page">
         <article class="location">
@@ -12,13 +8,7 @@
                 <li><a onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS)">Organizations</a></li>
             </ul>
             <fieldset>
-                <input
-                        type="text"
-                        name="keyword"
-                        id="searchText"
-                        autocomplete="off"
-                        th:placeholder="#{M0017}"
-                />
+                <input type="text" name="keyword" id="searchText" autocomplete="off" th:placeholder="#{M0017}"/>
                 <button type="submit" id="search" th:text="#{M0031}"></button>
             </fieldset>
         </article>
@@ -158,34 +148,18 @@
                         },
                         false,
                     );
-                    /*
-                            document.querySelector('.create').addEventListener('click', (e) => {
-                                sessionStorage.setItem('commonName', '');
-
-                                //func.create('Create', 'orgs', MSG_SAVE);
-                            }, false);*/
                 },
                 listEvent() {
-                    var listAll = document
-                        .querySelector(".listTable")
-                        .querySelectorAll("a");
+                    var listAll = document.querySelector(".listTable").querySelectorAll("a");
 
                     for (var i = org.offset * 10; i <= listAll.length - 1; i++) {
-                        listAll[i].addEventListener(
-                            "click",
-                            (e) => {
-                                sessionStorage.setItem(
-                                    "commonName",
-                                    e.target.getAttribute("data-name"),
-                                );
-                                sessionStorage.setItem(
-                                    "orgGuid",
-                                    e.target.getAttribute("data-guid"),
-                                );
-                                document.location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS + URI_SC_DETAILS;
-                            },
-                            true,
-                        );
+                        listAll[i].addEventListener("click", (e) => {
+                            console.log("listevent!3");
+
+                            sessionStorage.setItem("org_name", e.target.getAttribute("data-name"), );
+                            sessionStorage.setItem("org_guid", e.target.getAttribute("data-guid"), );
+                            document.location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS + URI_SC_DETAILS;
+                        }, true,);
                     }
                 },
             };

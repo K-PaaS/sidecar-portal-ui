@@ -9,6 +9,7 @@ public class ConstantsUrl extends org.container.platform.web.ui.common.Constants
     public static final String URI_SC_MANAGEMENTS_USERS = "/sidecar/users";
     public static final String URI_SC_MANAGEMENTS_INACTIVE_USERS = "/sidecar/inactiveUsers";
     public static final String URI_SC_MANAGEMENTS_ORGANIZATIONS = "/sidecar/organizations";
+    public static final String URI_SC_MANAGEMENTS_SPACES= "/sidecar/spaces";
     public static final String URI_SC_INFO_ACCESS = "/sidecar/access";
 
     public static final String URI_SC_LIST = "/list";

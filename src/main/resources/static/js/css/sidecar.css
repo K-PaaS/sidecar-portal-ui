@@ -1,0 +1,19 @@
+.detail_table {
+    position: relative;
+}
+.list_table {
+    position: relative;
+}
+.create-button {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    color: #ffffff;
+    padding: 11px 13px 7px 13px;
+    background-color: #0556c0;
+    border-radius: 2px;
+}
+.trashcan {
+    width: 20%;
+    height: 20%;
+}

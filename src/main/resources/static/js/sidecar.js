@@ -2,59 +2,6 @@ const funcsc = {
 
     sidecarUrl: URI_REQUEST_SC_API,
 
-    loadDataAsyncSidecar(method, url, header, list) {
-        return new Promise(function (resolve) {
-            if (sessionStorage.getItem('token') == null) {
-                func.loginCheck();
-            }
-
-            if (url == null) {
-                resolve(false);
-                return;
-            }
-
-            var request = new XMLHttpRequest();
-
-            request.open(method, url, false);
-            request.setRequestHeader('Content-type', header);
-            request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
-            request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
-
-            request.onreadystatechange = () => {
-                if (request.readyState === XMLHttpRequest.DONE) {
-                    if (request.status === 200 && request.responseText != '') {
-                        var resultMessage = JSON.parse(request.responseText).resultMessage;
-                        var resultCode = JSON.parse(request.responseText).resultCode;
-                        var detailMessage = JSON.parse(request.responseText).detailMessage;
-
-                        //토큰 만료 검사
-                        if (resultMessage == 'TOKEN_EXPIRED') {
-                            func.refreshToken();
-                            return funcsc.loadDataSidecar(method, url, header, callbackFunction, list);
-                        } else if (resultMessage == 'TOKEN_FAILED') {
-                            func.loginCheck();
-                            return funcsc.loadDataSidecar(method, url, header, callbackFunction, list);
-                        } else if (resultCode == RESULT_STATUS_FAIL) {
-                            if (document.getElementById('loading')) {
-                                document.getElementById('wrap').removeChild(document.getElementById('loading'));
-                            }
-                            ;
-                            func.alertPopup('ERROR', detailMessage, true, MSG_CONFIRM, 'closed');
-                        } else {
-                            resolve(JSON.parse(request.responseText), list);
-                            return;
-                        }
-
-                    } else if (JSON.parse(request.responseText).httpStatusCode === 500) {
-                        sessionStorage.clear();
-                        func.loginCheck();
-                    }
-                }
-            };
-            request.send();
-        });
-    },
-
     loadDataSidecar(method, url, header, callbackFunction, list) {
         if (sessionStorage.getItem('token') == null) {
             func.loginCheck();
@@ -79,18 +26,28 @@ const funcsc = {
                         var resultMessage = JSON.parse(request.responseText).resultMessage;
                         var resultCode = JSON.parse(request.responseText).resultCode;
                         var detailMessage = JSON.parse(request.responseText).detailMessage;
+                        var httpStatusCode = JSON.parse(request.responseText).httpStatusCode;
 
                         //토큰 만료 검사
                         if( resultMessage == 'TOKEN_EXPIRED') {
                             func.refreshToken();
                             return func.loadData(method, url, header, callbackFunction, list);
-                        }
-                        else if(resultMessage == 'TOKEN_FAILED') {
+                        } else if(resultMessage == 'TOKEN_FAILED') {
                             func.loginCheck();
                             return func.loadData(method, url, header, callbackFunction, list);
-                        }
-                        else if(resultCode == RESULT_STATUS_FAIL) {
+                        } else if(httpStatusCode === 404) {
                             if(document.getElementById('loading')){
+                                console.log("loadDataSidecar success!");
+                                document.getElementById('wrap').removeChild(document.getElementById('loading'));
+                            }
+
+                            func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrgList);
+                   //         func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrg);
+
+
+                        } else if(resultCode == RESULT_STATUS_FAIL) {
+                            if(document.getElementById('loading')){
+                                console.log("loadDataSidecar success!");
                                 document.getElementById('wrap').removeChild(document.getElementById('loading'));
                             };
                             func.alertPopup('ERROR', detailMessage, true, MSG_CONFIRM, 'closed');
@@ -110,26 +67,150 @@ const funcsc = {
             request.send();
         }, 0);
     },
-    postData(method, url, data, bull, header, callFunc){
-        func.loading();
-        console.log("1");
-        if(sessionStorage.getItem('token') == null){
+    loadDataSidecarSpace(method, url, header, callbackFunction, list) {
+        if (sessionStorage.getItem('token') == null) {
             func.loginCheck();
-        };
+        }
+
+        if (url == null) {
+            callbackFunction();
+            return false;
+        }
 
         var request = new XMLHttpRequest();
-        console.log("2");
+
+        setTimeout(function () {
+            request.open(method, url, false);
+            request.setRequestHeader('Content-type', header);
+            request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
+            request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
+
+            request.onreadystatechange = () => {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    if (request.status === 200 && request.responseText != '') {
+                        var resultMessage = JSON.parse(request.responseText).resultMessage;
+                        var resultCode = JSON.parse(request.responseText).resultCode;
+                        var detailMessage = JSON.parse(request.responseText).detailMessage;
+                        var httpStatusCode = JSON.parse(request.responseText).httpStatusCode;
+
+                        //토큰 만료 검사
+                        if( resultMessage == 'TOKEN_EXPIRED') {
+                            func.refreshToken();
+                            return func.loadData(method, url, header, callbackFunction, list);
+                        } else if(resultMessage == 'TOKEN_FAILED') {
+                            func.loginCheck();
+                            return func.loadData(method, url, header, callbackFunction, list);
+                        } else if(httpStatusCode === 404) {
+                            if(document.getElementById('loading')){
+                                console.log("loadDataSidecar success!");
+                                document.getElementById('wrap').removeChild(document.getElementById('loading'));
+                            }
+
+                      //      func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrgList);
+                            func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrg);
+
+
+                        } else if(resultCode == RESULT_STATUS_FAIL) {
+                            if(document.getElementById('loading')){
+                                console.log("loadDataSidecar success!");
+                                document.getElementById('wrap').removeChild(document.getElementById('loading'));
+                            };
+                            func.alertPopup('ERROR', detailMessage, true, MSG_CONFIRM, 'closed');
+                        }
+                        else {
+                            callbackFunction(JSON.parse(request.responseText), list);
+                        }
+
+                    } else if (JSON.parse(request.responseText).httpStatusCode === 500) {
+                        console.log("500!!!");
+                        sessionStorage.clear();
+                        func.loginCheck();
+                    }
+                    ;
+                }
+            };
+            request.send();
+        }, 0);
+    },
+    loadDataSidecarJob(method, url, header, callbackFunction, list) {
+        if (sessionStorage.getItem('token') == null) {func.loginCheck();}
+
+        if (url == null) {callbackFunction(); return false;}
+
+        var request = new XMLHttpRequest();
+
+        setTimeout(function () {
+            request.open(method, url, false);
+            request.setRequestHeader('Content-type', header);
+            request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
+            request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
+
+            request.onreadystatechange = () => {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    if (request.status === 200 && request.responseText != '') {
+                        var resultMessage = JSON.parse(request.responseText).resultMessage;
+                        var resultCode = JSON.parse(request.responseText).resultCode;
+                        var detailMessage = JSON.parse(request.responseText).detailMessage;
+                        var httpStatusCode = JSON.parse(request.responseText).httpStatusCode;
+
+                        console.log("resultMessage : " + resultMessage);
+                        console.log("resultCode : " + resultCode);
+                        console.log("detailMessage : " + detailMessage);
+                        console.log("httpStatusCode : " + httpStatusCode);
+
+                        //토큰 만료 검사
+                        if( resultMessage == 'TOKEN_EXPIRED') {
+                            func.refreshToken();
+                            return func.loadData(method, url, header, callbackFunction, list);
+                        }
+                        else if(resultMessage == 'TOKEN_FAILED') {
+                            func.loginCheck();
+                            return func.loadData(method, url, header, callbackFunction, list);
+                        }
+                        else if(resultCode != RESULT_STATUS_FAIL) {
+                            if(document.getElementById('loading')){
+                                document.getElementById('wrap').removeChild(document.getElementById('loading'));
+                            }
+
+                            const data = JSON.parse(request.responseText);
+
+                            if (data.state == "PROCESSING") {
+                                funcsc.alertPopup('SUCCESS', ALERT_POPUP_DELETE_REQUEST, true, MSG_CONFIRM, callbackFunction);
+                            } else if (data.state == "COMPLETE") {
+                                funcsc.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callbackFunction);
+                            } else if (data.state == "FAILED") {
+                                var errorMessage = data.errors[0].detail.split(', ');
+                                funcsc.alertPopup('FAIL', ALERT_POPUP_DELETE_FAIL + errorMessage[1], true, MSG_CONFIRM, callbackFunction);
+                            }
+                        }
+                        else {
+                            callbackFunction(JSON.parse(request.responseText), list);
+                        }
+
+                    } else if (JSON.parse(request.responseText).httpStatusCode === 500) {
+                        console.log("500!!!");
+                        sessionStorage.clear();
+                        func.loginCheck();
+                    }
+                }
+            };
+            request.send();
+        }, 0);
+    },
+    postData(method, url, data, bull, header, callFunc){
+        func.loading();
+        if(sessionStorage.getItem('token') == null){func.loginCheck(); }
+
+        var request = new XMLHttpRequest();
+
         setTimeout(function() {
             request.open(method, url, false);
             request.setRequestHeader('Content-type', header);
             request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
             request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
             request.onreadystatechange = () => {
-                console.log("4");
                 if (request.readyState === XMLHttpRequest.DONE){
-                    console.log("5");
                     if(request.status === 200 && request.responseText != ''){
-                        console.log("6");
                         //토큰 만료 검사
                         if(JSON.parse(request.responseText).resultMessage == 'TOKEN_EXPIRED') {
                             func.refreshToken();
@@ -140,7 +221,6 @@ const funcsc = {
                             return func.loadData(method, url, header, callbackFunction, list);
                         }
                         else {
-                            console.log("7");
                             document.getElementById('wrap').removeChild(document.getElementById('loading'));
                             var response = JSON.parse(request.responseText);
                             console.log("============");
@@ -155,10 +235,20 @@ const funcsc = {
                                         func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
                                     }else if (method == 'DELETE') {
                                         console.log("SUCCESS! DELETE");
-                                        func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
+                                   //     func.alertPopup('SUCCESS', ALERT_POPUP_DELETE_REQUEST, true, MSG_CONFIRM, callFunc);
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
+
                                     }
-                                }
-                                else {
+                                } else if (response.resultCode == RESULT_STATUS_FAIL && method == 'DELETE') {
+                                    console.log("loadDataSidecar 가기전 postdata");
+                                    if(data == 'space') {
+                                        console.log("space 지우기");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
+                                    }else if (data = 'org') {
+                                        console.log("org 지우기");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
+                                    }
+                                } else {
                                     console.log("ERROR!");
                                     func.alertPopup('ERROR', ALERT_POPUP_ERROR, true, MSG_CONFIRM, 'closed');
                                 }
@@ -329,4 +419,41 @@ const funcsc = {
             }
         }, false);
     },
+    /////////////////////////////////////////////////////////////////////////////////////
+    // 공통 경고 팝업 - alertPopup(title, text, bull, name, fn)
+    // (제목, 문구, 버튼유무, 버튼이름, 콜백함수)
+    /////////////////////////////////////////////////////////////////////////////////////
+    alertPopup(title, text, bull, name, callback){
+        var html = `<div class='modal-wrap' id='alertModal'><div class='modal'><h5>${title}</h5><p>${text}</p>`;
+        if(bull){
+            html += `<a class='confirm' href='javascript:;'>${name}</a>`;
+        };
+        html += `<a class='close' href='javascript:;'>` + MSG_CLOSE + `</a></div></div>`;
+
+        if(document.getElementById('alertModal') !== null) {
+            document.getElementById('wrap').removeChild(document.getElementById('alertModal'));
+        }
+
+        func.appendHtml(document.getElementById('wrap'), html, 'div');
+
+        document.getElementById('alertModal').querySelector('.close').addEventListener('click', (e) => {
+            document.getElementById('wrap').removeChild(document.getElementById('alertModal'));
+        }, false);
+
+        if(callback){
+            document.getElementById('alertModal').querySelector('.confirm').addEventListener('click', (e) => {
+                if(callback != 'closed'){
+                    callback();
+                }
+                if(!IS_VCHK) {
+                    document.getElementById('wrap').removeChild(document.getElementById('alertModal'));}
+            }, false);
+        }
+    },
+    movePageToOrg() {
+        location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS + URI_SC_DETAILS;
+    },
+    movePageToOrgList() {
+        location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS;
+    }
 }

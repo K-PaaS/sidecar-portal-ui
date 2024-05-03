@@ -150,12 +150,11 @@
                         var   list = document.getElementById(data.resources[i].guid);
                         console.log("data.resources : " + data.resources[i].guid);
                         console.log("list = : " + list);
-
-                        document.getElementById(data.resources[i].guid).addEventListener("click", (e) => {
-                            console.log("????")
-                            func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, domain.domainDelete(guids));
-                        }, true,);
                     }
+                    document.querySelector(data.resources[i].guid).addEventListener("click", (e) => {
+                        console.log("i : " + i);
+                        func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, domain.domainDelete(guids));
+                    }, false,);
                 },
                 domainDelete(data) {
                     console.log("@@@@@")

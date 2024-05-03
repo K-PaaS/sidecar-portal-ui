@@ -82,12 +82,15 @@
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
                 document.getElementById("space_name").innerText = sessionStorage.getItem("space_name")
                // funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecarSpace("GET", `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}/get`, "application/json", detail.space);
+
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
-
-
+            },
+            space(){
+              console.log("delete test");
             },
             user(sidecar_data) {
-                func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (data) => {
+                funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (data) => {
                     cluster_user(data);
                 })
                 function cluster_user(cluster_data) {
@@ -139,7 +142,6 @@
                                     }
                                 }
                             }
-
                             for (var i = 0; i < dataArray.length; i++) {
                                 var row = dataArray[i];
                                 var account = row[0];
@@ -228,21 +230,22 @@
                             func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                         }
                     }
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
                 }
-                if (document.getElementById("loading")) {
-                    document.getElementById("wrap").removeChild(document.getElementById("loading"));
-                }
-
                 detail.eventDelete();
             },
             eventDelete() {
                 document.getElementById('deleteSpace').addEventListener('click', (e) => {
-                    func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.spaceDelete);
+                    funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.spaceDelete);
                 }, false);
             },
             spaceDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, '', true, 'application/json', location.href='/sidecar/organizations');
-            }
+                console.log("spaceDelete");
+                const data = 'space';
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, data, true, 'application/json', funcsc.movePageToOrg );
+            },
         };
         detail.init();
         function checkboxChange(event) {

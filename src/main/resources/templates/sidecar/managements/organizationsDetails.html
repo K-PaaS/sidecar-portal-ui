@@ -274,7 +274,7 @@
 
                         document.location.href = URI_SC_MANAGEMENTS_SPACES + URI_SC_DETAILS;
                         console.log("document.location.href : " + document.location.href);
-                    }, false, );
+                    }, true, );
                 }
             },
             eventSpace() {
@@ -290,11 +290,16 @@
             },
             eventDelete() {
                 document.getElementById('deleteOrg').addEventListener('click', (e) => {
-                    func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.orgDelete);
+                    funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.orgDelete);
                 }, false);
             },
             orgDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, '', true, 'application/json', func.historyBack );
+                console.log("orgDelete");
+                const data = 'org';
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, data, true, 'application/json',  funcsc.movePageToOrgList);
+            },
+            movePage() {
+                location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS;
             }
         };
 

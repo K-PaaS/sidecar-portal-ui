@@ -235,12 +235,14 @@ const funcsc = {
                                         func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
                                     }else if (method == 'DELETE') {
                                         console.log("SUCCESS! DELETE");
-                                   //     func.alertPopup('SUCCESS', ALERT_POPUP_DELETE_REQUEST, true, MSG_CONFIRM, callFunc);
-                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
-
+                                        if(data == 'space') {
+                                            funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
+                                        }else if (data = 'org') {
+                                            console.log("org delete!!")
+                                            funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
+                                        }
                                     }
                                 } else if (response.resultCode == RESULT_STATUS_FAIL && method == 'DELETE') {
-                                    console.log("loadDataSidecar 가기전 postdata");
                                     if(data == 'space') {
                                         console.log("space 지우기");
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);

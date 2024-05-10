@@ -1,12 +1,12 @@
 .detail_table {
     position: relative;
+    margin-bottom: 80px;
+    max-height: 320px
 }
-.list_table {
-    position: relative;
-}
+
 .create-button {
     position: absolute;
-    top: -50px;
+    top: -45px;
     right: 0;
     color: #ffffff;
     padding: 11px 13px 7px 13px;
@@ -14,6 +14,55 @@
     border-radius: 2px;
 }
 .trashcan {
-    width: 20%;
-    height: 20%;
+    width: 25%;
+    height: 25%;
+}
+.create-button-listPage {
+    position: absolute;
+    top: 55px;
+    right: 40px;
+    color: #ffffff;
+    padding: 11px 13px 7px 13px;
+    background-color: #0556c0;
+    border-radius: 2px;
+}
+.space_table {
+    display: block;
+    max-height: 180px;
+    overflow-y: auto;
+    width: 1070px;
+}
+.detailList {
+    display: block;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 1070px;
+}
+.left {
+    width: 1070px;
+}
+.table-no-data{
+    width: 1070px;
+}
+.checkbox-label {
+    margin-right: 25px;
+}
+.user-info-td1 {
+    width: 74.89px;
+}
+.user-info-td2 {
+    width: 214px;
+}
+.user-info-td3 {
+    width: 374.5px;
+}
+.user-info-td4 {
+    width: 406.61px;
+}
+.user-info-td5 {
+    width: 0px;
+    display: none;
+}
+.user-info-col5 {
+    display: none;
 }

@@ -30,6 +30,7 @@
                         </thead>
                         <tbody class="listTable"></tbody>
                     </table>
+                    <a class="create-button-listPage addOrg" href="javascript:" th:text="#{M0223}"></a>
                     <a class="more" href="javascript:">more</a>
                 </div>
             </div>
@@ -48,23 +49,11 @@
                 limit: 10,
                 total_results: 0,
                 init() {
-                    func.nameLoad = org.reset;
-                    org.load();
-                    org.event();
-                },
-                reset() {
-                    func.removeHtml(document.querySelector(".listTable"));
-                    org.offset = 0;
-                    org.load();
-                },
+                    func.nameLoad = org.reset; org.load(); org.event(); org.eventOrg(); },
+                reset() {func.removeHtml(document.querySelector(".listTable")); org.offset = 0; org.load(); },
                 load() {
                     func.loading();
-                    funcsc.loadDataSidecar(
-                        "GET",
-                        `${funcsc.sidecarUrl}sidecar/organizations/list`,
-                        "application/json",
-                        org.draw,
-                    );
+                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/list`, "application/json", org.draw, );
                 },
                 draw(data) {
                     if (org.offset == 0)
@@ -157,10 +146,14 @@
                             sessionStorage.setItem("org_name", e.target.getAttribute("data-name"), );
                             sessionStorage.setItem("org_guid", e.target.getAttribute("data-guid"), );
                             document.location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS + URI_SC_DETAILS;
-                            console.log("organizations.html listEvent")
                         }, true,);
                     }
                 },
+                eventOrg() {
+                    document.querySelector('.addOrg').addEventListener('click', (e) => {
+                        funcsc.addOrg('Create Org', 'orgs', MSG_SAVE);
+                    })
+                }
             };
             org.init();
         };

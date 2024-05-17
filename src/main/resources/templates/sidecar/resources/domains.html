@@ -59,7 +59,7 @@
                 },
                 load() {
                     func.loading();
-                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/domains/list`, "application/json", domain.draw, );
+                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/domains/list`, "application/json", domain.draw);
                 },
                 draw(data) {
                     if (domain.offset == 0)

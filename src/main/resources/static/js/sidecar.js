@@ -1,7 +1,7 @@
 const funcsc = {
     sidecarUrl: URI_REQUEST_SC_API,
 
-    loadDataSidecar(method, url, header, callbackFunction, list) {
+    loadDataSidecar(method, url, header, callbackFunction, list, data) {
         if (sessionStorage.getItem('token') == null) {
             func.loginCheck();
         }
@@ -11,15 +11,13 @@ const funcsc = {
         }
 
         var request = new XMLHttpRequest();
+        console.log("data : ", data)
 
         setTimeout(function () {
             request.open(method, url, false);
             request.setRequestHeader('Content-type', header);
             request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
             request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
-            console.log("request.status : ", request.status);
-            console.log("request.status : ", request.responseText);
-
 
             request.onreadystatechange = () => {
                 if (request.readyState === XMLHttpRequest.DONE) {
@@ -28,10 +26,6 @@ const funcsc = {
                         var resultCode = JSON.parse(request.responseText).resultCode;
                         var detailMessage = JSON.parse(request.responseText).detailMessage;
                         var httpStatusCode = JSON.parse(request.responseText).httpStatusCode;
-                        console.log("resultMessage : ", resultMessage);
-                        console.log("resultCode : ", resultCode);
-                        console.log("detailMessage : ", detailMessage);
-                        console.log("httpStatusCode : ", httpStatusCode);
 
                         if( resultMessage === 'TOKEN_EXPIRED') {
                             func.refreshToken();
@@ -43,9 +37,12 @@ const funcsc = {
                             if(document.getElementById('loading')){
                                 document.getElementById('wrap').removeChild(document.getElementById('loading'));
                             }
-
-                            func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrgList);
-                   //         func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrg);
+                            console.log("data 404 : ", data)
+                            if(data === 'org') {
+                                func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrgList);
+                            }else if(data === 'space') {
+                                func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrg);
+                            }
 
                         } else if(resultCode === RESULT_STATUS_FAIL) {
                             if(document.getElementById('loading')){
@@ -170,7 +167,6 @@ const funcsc = {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/domain.delete~${data}`, "application/json", callFunc);
                                 }
                             } else {
-                                console.log("detailMessage : ", response.detailMessage);
                                 func.alertPopup('ERROR', ALERT_POPUP_FAIL + response.detailMessage, true, MSG_CONFIRM, 'closed');
                             }
                         }
@@ -186,7 +182,7 @@ const funcsc = {
 				<dl>
 				    <dt>Org Name</dt>
 					<dd>
-						<input style="width: 100%; height: 100%;" type="text" id="orgName" placeholder="${PLACEHOLDER_CREATE_ORG}" required>
+						<input class="popup_add_input" type="text" id="orgName" placeholder="${PLACEHOLDER_CREATE_ORG}" required>
 					</dd>
 				</dl>
 				<a class="confirm" href="javascript:;">` + BUTTON_ADD+ `</a>
@@ -217,7 +213,7 @@ const funcsc = {
 				<dl>
 				    <dt>Space Name</dt>
 					<dd>
-						<input style="width: 100%; height: 100%;" type="text" id="spaceName" placeholder="${PLACEHOLDER_CREATE_SPACE}" required>
+						<input class="popup_add_input" type="text" id="spaceName" placeholder="${PLACEHOLDER_CREATE_SPACE}" required>
 					</dd>
 				</dl>
 				<a class="confirm" href="javascript:;">` + BUTTON_ADD + `</a>
@@ -258,9 +254,9 @@ const funcsc = {
 						</fieldset>
 					</dd>
 				</dl>
-				<dl style="margin-bottom: 10px;">
-					<dt style="line-height: 50px;">Type</dt>
-					<dd style="display: flex; gap: 50px; justify-content: center; align-items: center;" >
+				<dl class="popup_add_user_dl">
+					<dt id="popup_add_user_dt">Type</dt>
+					<dd class="popup_add_user_dd" >
 					        <input type="radio" id="organization_user" name="organization" value="organization_user">
                             <label for="organization_user">User</label>
                             <input type="radio" id="organization_manager" name="organization" value="organization_manager">
@@ -331,9 +327,9 @@ const funcsc = {
 			<div class="modal midium">
 				<h5>${title}</h5>
 				<dl>
-				    <dt>Domain 이름</dt>
+				    <dt>Domain Name</dt>
 					<dd>
-						<input style="width: 100%; height: 100%;" type="text" id="domainName" placeholder="${PLACEHOLDER_CREATE_DOMAIN}" required>
+						<input class="popup_add_input" type="text" id="domainName" placeholder="${PLACEHOLDER_CREATE_DOMAIN}" required>
 					</dd>
 				</dl>
 				<a class="confirm" href="javascript:;">` + BUTTON_ADD+ `</a>
@@ -353,7 +349,6 @@ const funcsc = {
                 alert(ALERT_DOMAIN_ENTER);
                 return;
             }else {
-                console.log('domainName : ' + domainName);
                 var sendData = JSON.stringify({
                     "name": domainName
                 });

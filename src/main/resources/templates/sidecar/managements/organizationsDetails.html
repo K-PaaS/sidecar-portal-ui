@@ -103,6 +103,10 @@
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}/getDefaultDomain`, "application/json", detail.domain);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.space);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}/get`, "application/json", detail.get(), '','org');
+
+            },
+            get() {
 
             },
             domain(data) {document.getElementById("domain").innerText = data.name; },
@@ -178,55 +182,7 @@
                             if (oldUserId && oldUserId.textContent !== '-') {
                                 var row = oldUserId.parentElement;
                                 var checkboxes = row.querySelectorAll('input[type="checkbox"]');
-
-                                checkboxes.forEach(function(checkbox) {
-                                 //   console.log("## " + userCheckbox + ",  " + managerCheckbox + ",  " + auditorrCheckbox + "  ##");
-                                    /*
-
-                                                      if (checkbox.checked) {
-                                                        console.log("@@" + checkbox.id + ' is checked.');
-                                                        if(userCheckbox === 'checked') {
-
-                                                          console.log("1");
-                                                        }
-                                                        if(managerCheckbox === 'checked') {
-
-                                                          console.log("2");
-                                                        }
-                                                        if(auditorrCheckbox === 'checked') {
-
-                                                          console.log("3");
-                                                        }
-                                                      }*/
-
-                                    /* else {
-                                    // console.log("@@" + checkbox.id + ' is not checked.');
-                                   }
-                  */
-
-                                    /*
-                                                     if(userCheckbox === 'checked') {
-                                                     console.log("## userCheckbox is " + userCheckbox);
-                                                     console.log(checkbox.id + ' is checked.');
-                                                     checkboxes.checked = true;               }
-
-                                                     if(managerCheckbox === 'checked') {
-                                                       console.log("## managerCheckbox is " + managerCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-
-                                                     if(auditorrCheckbox === 'checked') {
-                                                       console.log("## auditorrCheckbox is " + auditorrCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-                                    */
-
-
-                                })
                             }
-                            // else {
                             var html = `<tr>
                               <td class="user-info-td1">${account}</td>
                               <td class="user-info-td2" id=${userId}>${userId}</td>
@@ -243,7 +199,6 @@
                                 <label id="${roleGuid}"></label>
                               </td>
                             </tr>`;
-                            //  }
                             func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                         }
                     } else {

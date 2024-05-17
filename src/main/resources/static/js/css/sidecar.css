@@ -66,3 +66,19 @@
 .user-info-col5 {
     display: none;
 }
+.popup_add_input{
+    width: 100%;
+    height: 100%;
+}
+.popup_add_user_dl{
+    margin-bottom: 10px;
+}
+#popup_add_user_dt{
+    line-height: 50px;
+}
+.popup_add_user_dd{
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+    align-items: center;
+}

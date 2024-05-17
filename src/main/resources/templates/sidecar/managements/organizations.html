@@ -53,7 +53,7 @@
                 reset() {func.removeHtml(document.querySelector(".listTable")); org.offset = 0; org.load(); },
                 load() {
                     func.loading();
-                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/list`, "application/json", org.draw, );
+                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/list`, "application/json", org.draw);
                 },
                 draw(data) {
                     if (org.offset == 0)

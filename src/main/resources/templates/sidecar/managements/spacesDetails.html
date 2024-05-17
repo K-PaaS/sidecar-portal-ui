@@ -82,18 +82,14 @@
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
                 document.getElementById("space_name").innerText = sessionStorage.getItem("space_name");
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}/get`, "application/json", '', '', 'space');
 
-               // funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
             },
             user(space_data) {
                 funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (cluster_data) => {
                     space_user(cluster_data);
                 })
                 function space_user(cluster_data) {
-                    console.log("space_data : ", space_data);
-                    console.log("cluster_data : ", cluster_data);
-
-
                     if (space_data.pagination.total_results > 0) {
                         var dataArray = [];
                         for (var i = 0; i < space_data.pagination.total_results; i++) {
@@ -149,56 +145,7 @@
                             if (oldUserId && oldUserId.textContent !== '-') {
                                 var row = oldUserId.parentElement;
                                 var checkboxes = row.querySelectorAll('input[type="checkbox"]');
-
-                                checkboxes.forEach(function (checkbox) {
-                                    //   console.log("## " + developerCheckbox + ",  " + managerCheckbox + ",  " + auditorrCheckbox + "  ##");
-                                    /*
-
-                                                      if (checkbox.checked) {
-                                                        console.log("@@" + checkbox.id + ' is checked.');
-                                                        if(developerCheckbox === 'checked') {
-
-                                                          console.log("1");
-                                                        }
-                                                        if(managerCheckbox === 'checked') {
-
-                                                          console.log("2");
-                                                        }
-                                                        if(auditorrCheckbox === 'checked') {
-
-                                                          console.log("3");
-                                                        }
-                                                      }*/
-
-                                    /* else {
-                                    // console.log("@@" + checkbox.id + ' is not checked.');
-                                   }
-                  */
-
-/*
-
-                                                     if(developerCheckbox === 'checked') {
-                                                     console.log("## developerCheckbox is " + developerCheckbox);
-                                                     console.log(checkbox.id + ' is checked.');
-                                                     checkboxes.checked = true;               }
-
-                                                     if(managerCheckbox === 'checked') {
-                                                       console.log("## managerCheckbox is " + managerCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-
-                                                     if(auditorrCheckbox === 'checked') {
-                                                       console.log("## auditorrCheckbox is " + auditorrCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-
-*/
-                                })
                             }
-                            console.log("dataArray : ", dataArray);
-                            // else {
                             var html = `<tr>
                                   <td class="user-info-td1">${account}</td>
                                   <td class="user-info-td2" id=${userId}>${userId}</td>
@@ -215,7 +162,6 @@
                                     <label id="${roleGuid}"></label>
                                   </td>
                                 </tr>`;
-                            //  }
                             func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                         }
                     } else {
@@ -226,7 +172,6 @@
                 if (document.getElementById("loading")) {
                     document.getElementById("wrap").removeChild(document.getElementById("loading"));
                 }
-
                 detail.eventDelete();
             },
             eventDelete() {
@@ -243,7 +188,6 @@
         function checkboxChange(event) {
             const checkbox = event.target;
             if (checkbox.checked) {
-                console.log("checked!");
                 var orgGuid = sessionStorage.getItem("orgGuid");
                 var type = checkbox.getAttribute("name");
                 var user = checkbox.id.replace("_developer", "").replace("_manager", "").replace("_auditor", "");
@@ -252,10 +196,8 @@
                     "type": type,
                     "user": user
                 }
-                console.log("data.Json : " + JSON.stringify(data));
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
             } else {
-                console.log("unchecked!");
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);

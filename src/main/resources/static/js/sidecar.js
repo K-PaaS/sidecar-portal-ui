@@ -11,8 +11,6 @@ const funcsc = {
         }
 
         var request = new XMLHttpRequest();
-        console.log("data : ", data)
-
         setTimeout(function () {
             request.open(method, url, false);
             request.setRequestHeader('Content-type', header);
@@ -37,7 +35,6 @@ const funcsc = {
                             if(document.getElementById('loading')){
                                 document.getElementById('wrap').removeChild(document.getElementById('loading'));
                             }
-                            console.log("data 404 : ", data)
                             if(data === 'org') {
                                 func.alertPopup('ERROR', ALERT_POPUP_DELETE, true, MSG_CONFIRM, funcsc.movePageToOrgList);
                             }else if(data === 'space') {

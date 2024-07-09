@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/sidecar}">
 <div layout:fragment="content">
     <div id="content" class="sub-page">
         <article class="location">
@@ -40,6 +40,7 @@
     <script type="text/javascript">
         window.onload = () => {
             func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.DOMAINS);
+            funcsc.initOrgsSpaces();
             callbackFuncNameLoad();
 
             const domain = {

@@ -1,6 +1,109 @@
 const funcsc = {
     sidecarUrl: URI_REQUEST_SC_API,
 
+    initOrgsSpaces(){
+        // sidecar org & space
+        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/organizations/list`, 'application/json', funcsc.organizations);
+    },
+
+    organizations(data){
+        var html ='';
+        for(var i=0 ; i <= data.resources.length-1 ; i++){
+            html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
+        };
+
+        document.getElementById("orgListUl").innerHTML = html;
+
+        /////////////////////
+        if(sessionStorage.getItem('org_guid') != null){
+            document.querySelector('.orgTop').innerText = sessionStorage.getItem('org_name');
+        } else {
+            if (data.resources.length > 0) {
+                document.querySelector('.orgTop').innerText = data.resources[0].name;
+                sessionStorage.setItem('org_guid', data.resources[0].guid);
+                sessionStorage.setItem('org_name', data.resources[0].name);
+            }else {
+                document.querySelector('.orgTop').innerText = MSG_NO_ORGS;
+                document.querySelector('.spaceTop').innerText = MSG_NO_SPACES;
+                exit;
+            }
+        };
+
+        var name = document.querySelector('.orgUl').querySelectorAll('a');
+
+        //org click event
+        for(var i=0 ; i<name.length; i++){
+            name[i].addEventListener('click', (e) => {
+                sessionStorage.setItem('org_guid' , e.target.getAttribute('data-name'));
+                sessionStorage.setItem('org_name', e.target.innerText);
+                document.querySelector('.orgTop').innerText = e.target.innerText;
+                sessionStorage.removeItem('space_guid');
+                sessionStorage.removeItem('space_name');
+                IS_RELOAD = true;
+                funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+            }, false);
+        };
+
+        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+    },
+
+    spaces(data){
+        var html = '';
+        if(document.querySelector('.spaceUl')){
+            for(var i=0; i <= data.resources.length-1 ; i++){
+                html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
+            };
+
+            document.getElementById("spaceListUl").innerHTML = html;
+
+            if(sessionStorage.getItem('space_guid') != null){
+                document.querySelector('.spaceTop').innerText = sessionStorage.getItem('space_name');
+            } else {
+                if (data.resources.length > 0) {
+                    document.querySelector('.spaceTop').innerText = data.resources[0].name;
+                    sessionStorage.setItem('space_guid', data.resources[0].guid);
+                    sessionStorage.setItem('space_name', data.resources[0].name);
+                }else {
+                    document.querySelector('.spaceTop').innerText = "No spaces found";
+                }
+            };
+
+            var name = document.querySelector('.spaceUl').querySelectorAll('a');
+
+            for(var i=0 ; i < name.length ; i++){
+                name[i].addEventListener('click', (e) => {
+                    sessionStorage.setItem('space_guid' , e.target.getAttribute('data-name'));
+                    sessionStorage.setItem('space_name', e.target.innerText);
+                    document.querySelector('.spaceTop').innerText = e.target.innerText;
+                    IS_RELOAD = true;
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+                }, false);
+            };
+
+            if(IS_RELOAD) {
+                if(IS_NAMELOAD) {
+                    funcsc.loadDataSidecar('GET', null, 'application/json', func.nameLoad);
+                }
+                else {
+                    movePage(URI_CP_INDEX_URL);
+                }
+            }
+            if(IS_INDEX) {
+                funcsc.loadDataSidecar('GET', null, 'application/json', func.nameLoad);
+            }
+
+            /*
+            document.querySelector('.clusterTop').style.display = "none";
+            document.getElementById("clusterListUl").style.display = "none";
+            //document.getElementById("clusterListUl").setAttribute("hidden", "hidden");
+
+            document.querySelector('.nameTop').style.display = "none";
+            document.getElementById("namespaceListUl").style.display = "none";
+            //document.getElementById("namespaceListUl").setAttribute("hidden", "hidden");
+            */
+        };
+    },
+
     loadDataSidecar(method, url, header, callbackFunction, list, data) {
         if (sessionStorage.getItem('token') == null) {
             func.loginCheck();
@@ -151,6 +254,12 @@ const funcsc = {
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
                                     }else if (data === 'org') {
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
+                                    }else if (data.includes("service")) {
+                                        data = data.replace("service","");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/service.delete~${data}`, "application/json", callFunc);
+                                    }else if (data.includes("binding")) {
+                                        data = data.replace("binding","");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/binding.delete~${data}`, "application/json", callFunc);
                                     }else {
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/domain.delete~${data}`, "application/json", callFunc);
                                     }
@@ -160,6 +269,12 @@ const funcsc = {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
                                 }else if (data === 'org') {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
+                                }else if (data.includes("service")) {
+                                    data = data.replace("service","");
+                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/service.delete~${data}`, "application/json", callFunc);
+                                }else if (data.includes("binding")) {
+                                    data = data.replace("binding","");
+                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/binding.delete~${data}`, "application/json", callFunc);
                                 }else {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/domain.delete~${data}`, "application/json", callFunc);
                                 }

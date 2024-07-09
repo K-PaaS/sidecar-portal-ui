@@ -134,13 +134,10 @@
                     }*/
 
                     if (userSidecarRole == "" && createName.roleSetCode != "") {
-                        alert('POST');
                         func.saveData('POST', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
                     } else if (userSidecarRole != "" && createName.roleSetCode != "") {
-                        alert('PUT');
                         func.saveData('PUT', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
                     } else if (userSidecarRole != "" && createName.roleSetCode == "") {
-                        alert ('DELETE');
                         createName.roleSetCode = "NOT_ASSIGNED_ROLE"
                         func.saveData('DELETE', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
                     }

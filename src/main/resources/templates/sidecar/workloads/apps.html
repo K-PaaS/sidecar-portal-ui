@@ -1,10 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-APPS
-</body>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <h3>List</h3>
+                <a href="javascript:" class="create-button addApp">추가</a>
+                <div class="table_style01">
+                    <table>
+                        <caption>
+                            Application List
+                        </caption>
+                        <colgroup>
+                            <col width="30%" />
+                            <col width="10%" />
+                            <col width="10%" />
+                            <col width="10%" />
+                            <col width="10%" />
+                            <col width="30%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Instances</th>
+                            <th scope="col">Memory</th>
+                            <th scope="col">Disk</th>
+                            <th scope="col">Route</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable"></tbody>
+                    </table>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+            callbackFuncNameLoad();
+
+            const apps = {
+                offset: 0,
+                limit: 10,
+                total_results: 0,
+                init() {
+                    func.nameLoad = apps.reset;
+                    apps.load();
+                    apps.event();
+                },
+                reset() {
+                    func.removeHtml(document.querySelector(".listTable"));
+                    apps.offset = 0;
+                    apps.load();
+                },
+                load() {
+                    func.loading();
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/apps/customList?spaceGuid=cf-space-04b00c0f-0965-4317-ad7c-ed7b993ac434`,
+                        "application/json",
+                        apps.draw,
+                    );
+                },
+                draw(data) {
+                    if (apps.offset == 0)
+                        apps.total_results = data.length;
+
+                    if (data.length > 0) {
+                        for (var i = 0; i <= data.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < apps.limit) {
+                                var html = `<tr>`
+                                + `<td class="left" id=${trId}>`
+                                + `<a href="javascript:;" data-name="${data[i].name}" data-guid="${data[i].guid}">${data[i].name}</a>`
+                                + `</td>`
+                                + `<td class="${data[i].state.toLowerCase()}">`
+                                + `${data[i].state}`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].max_instances}`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].memory_in_mb}MB`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].disk_in_mb}MB`
+                                + `</td>`
+                                + `<td class="left">`
+                                + `<a target='_blank' href="https://${data[i].urls[0]}" data-name="${data[i].urls[0]}" data-guid="${data[i].urls[0]}">${data[i].urls[0]}</a>`
+                                + `</td>`
+                                + `</tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}>`
+                                + `<td class="left" id=${trId}>`
+                                + `<a href="javascript:;" data-name="${data[i].name}" data-guid="${data[i].guid}">${data[i].name}</a>`
+                                + `</td>`
+                                + `<td class="${data[i].state.toLowerCase()}">`
+                                + `${data[i].state}`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].max_instances}`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].memory_in_mb}MB`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${data[i].disk_in_mb}MB`
+                                + `</td>`
+                                + `<td class="left">`
+                                + `<a target='_blank' href="https://${data[i].urls[0]}" data-name="${data[i].urls[0]}" data-guid="${data[i].urls[0]}">${data[i].urls[0]}</a>`
+                                + `</td>`
+                                + `</tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (apps.offset + 1) * apps.limit,
+                        apps.total_results,
+                    );
+
+                    if (endIndex < apps.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                    apps.listEvent();
+                },
+                more() {
+                    var startIndex = apps.offset * apps.limit;
+                    var endIndex = Math.min(
+                        (apps.offset + 1) * apps.limit,
+                        apps.total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < apps.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event() {
+                    // more 버튼 event
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (apps.limit < apps.total_results) {
+                                apps.offset++;
+                                apps.more();
+                            }
+                        },
+                        false,
+                    );
+                },
+                listEvent() {
+                    var listAll = document.getElementsByTagName("tbody");
+                    var trs = listAll[0].getElementsByTagName("tr");
+
+                    for (var i = apps.offset * 10; i < trs.length; i++) {
+                        tds = trs[i].getElementsByTagName("td");
+                        atag = tds[0].getElementsByTagName("a");
+                        atag[0].addEventListener("click", (e) => {
+                            sessionStorage.setItem("spaceGuid", "cf-space-04b00c0f-0965-4317-ad7c-ed7b993ac434", );
+                            sessionStorage.setItem("appGuid", e.target.getAttribute("data-guid"), );
+                            document.location.href = URI_SC_DETAILS_INSTANCES;
+                        }, true,);
+                    }
+                },
+            };
+            apps.init();
+        };
+    </script>
+</th:block>
 </html>

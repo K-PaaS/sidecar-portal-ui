@@ -143,19 +143,52 @@ const funcsc = {
                             console.log("7");
                             document.getElementById('wrap').removeChild(document.getElementById('loading'));
                             var response = JSON.parse(request.responseText);
-                            console.log("============");
-                            console.log("response.resultCode : " + response.resultCode);
-                            console.log("httpstatuscode : " + response.httpStatusCode);
-                            console.log("request.status : " + request.status);
-                         //   if (response.status == 200) {
+                            let url_tmp = URI_REQUEST_SC_API+"sidecar/";
+                            let urlPath = request.responseURL.split(url_tmp);
+                            let urlPath2 = urlPath[1].split('/');
+                            let urlPath3 = 0;
+                            let urlCategory = 0;
+                            urlCategory = urlPath2[0];
+                            if (urlPath2.length%2== 0){
+                                urlPath3 = urlPath2[urlPath2.length -2];
+
+                            }else{
+                                urlPath3 = urlPath2[urlPath2.length -1];
+                            }
+                            console.log(urlPath3);
                                 if(response.resultCode != RESULT_STATUS_FAIL) {
                                     console.log("SUCCESS!");
                                     if(method == 'POST') {
-                                        console.log("SUCCESS! POST");
-                                        func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
+                                        if((urlCategory == "processes" && urlPath3 == "scale") || (urlCategory == "apps" && urlPath3 == "start" ) || (urlCategory == "apps" && urlPath3 == "stop" )){
+                                            console.log("SUCCESS! SCALE");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }else if ((urlCategory == "serviceBindings" && urlPath3 == "serviceBindings" ) || (urlCategory == "routes" && urlPath3 == "insertDestinations" )){
+                                            console.log("SUCCESS! CONNECT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CONNECT, true, MSG_CONFIRM, callFunc);
+                                        }else if ((urlCategory == "apps" && urlPath3 == "start" ) || (urlCategory == "routes" && urlPath3 == "insertDestinations" )){
+                                            console.log("SUCCESS! START");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CONNECT, true, MSG_CONFIRM, callFunc);
+                                        }
+                                        else{
+                                            console.log("SUCCESS! POST");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
+                                        }
                                     }else if (method == 'DELETE') {
-                                        console.log("SUCCESS! DELETE");
-                                        func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
+                                        if ((urlCategory == "serviceBindings" && urlPath3 == "serviceBindings" ) || (urlCategory == "routes" && urlPath3 == "removeDestinations" )){
+                                            console.log("SUCCESS! DISCONNECT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_DISCONNECT, true, MSG_CONFIRM, callFunc);
+                                        }else {
+                                            console.log("SUCCESS! DELETE");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
+                                        }
+                                    }else if (method == 'PATCH') {
+                                        if(urlCategory == "apps" && urlPath3 == "updateEnvironmentVariables"){
+                                            console.log("SUCCESS! UPDATE ENVIRONMENT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }else{
+                                            console.log("SUCCESS! PATCH");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }
                                     }
                                 }
                                 else {

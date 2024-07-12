@@ -32,6 +32,6 @@ public class AccessController {
     @ApiOperation(value = "Access 상세 페이지 이동(Go to the access details page)", nickname = "getAccessDetails")
     @GetMapping(value = ConstantsUrl.URI_SC_INFO_ACCESS + URI_SC_DETAILS)
     public String getAccessDetails() {
-        return BASE_URL + "accessDetails";
+        return BASE_URL + "accessDetailsInstances";
     }
 }

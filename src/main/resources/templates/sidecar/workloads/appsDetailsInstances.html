@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/appsLayout}">
+
+
+    <div id="content" class="sub-page users">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <div layout:fragment="content">
+                    <div class="title">
+                        <ul id="tabParent">
+                            <li class="on">
+                                <a onclick="movePage(URI_SC_DETAILS_INSTANCES)" class="tabBtn">Instances</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_SERVICES)">Services</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_ENVIRONMENT)" class="tabBtn">Environment</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_ROUTES)">Routes</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
+                            </li>
+                        </ul>
+                    </div>
+                <div class="table_style01 on">
+                    <table>
+                        <caption>Instances</caption>
+                        <colgroup >
+                            <col width="20%" />
+                            <col width="30%" />
+                            <col width="30%" />
+                            <col width="20%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Index</th>
+                            <th scope="col">CPU</th>
+                            <th scope="col">Memory</th>
+                            <th scope="col">State</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable instances"></tbody>
+                    </table>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+            <!-- btn -->
+            <div class="btn02">
+                <div>
+                    <a href="javascript:;" id="modify" data-role="pods" th:text="#{M0025}"></a>
+                    <a onclick="movePage(URI_SC_WORKLOADS_APPS)" th:text="#{M0028}"></a>
+                </div>
+            </div>
+            </div>
+        </article>
+    </div>
+</div>
+<div layout:fragment="modal">
+    <div class="modal-wrap" style="display:none;">
+        <div class="modal">
+            <h5 th:text="#{M0034}"></h5>
+            <p th:text="#{M0018}"></p>
+            <button class="confirm" type="submit" th:text="#{M0026}"></button>
+            <a class="close" href="javascript:;" th:text="#{M0023}"></a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+            //var apps;
+            //var processes;
+            var instances;
+            var offset=0;
+            var limit=5;
+            var total_results=0;
+
+            const appsDetailsInstance = {
+
+                init(){
+                    appsDetailsInstance.getInstanceStats();
+                },
+                getInstanceStats(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/getStatistics`, 'application/json', appsDetailsInstance.drawInstances);
+                },
+                drawInstances(data){
+                    instances = data.resources;
+
+                    if (offset == 0)
+                        total_results = instances.length;
+                    if (instances.length > 0 && apps.state == "STARTED") {
+                        for (var i = 0; i <= instances.length - 1; i++) {
+                            var trId = "tr" + i;
+                            var initmem = instances[i].usage.mem/1024/1024;
+                            var mem = Math.floor(initmem);
+                            if (i < limit) {
+                                var html = `<tr>`
+                                + `<td class="fs-14" id=${trId}>`
+                                + i
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${instances[i].usage.cpu} %`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + mem+' MB'
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${instances[i].state}`
+                                + `</td>`
+                                + `</tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}>`
+                                + `<td class="fs-14">`
+                                + i
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${instances[i].usage.cpu} %`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + mem+' MB'
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `${instances[i].state}`
+                                + `</td>`
+                                + `</tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable.instances"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="4">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable.instances"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+
+
+
+
+
+                    appsDetailsInstance.event();
+                },
+                event(){
+                // more 버튼 event
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (limit < total_results) {
+                                offset++;
+                                appsDetailsInstance.more();
+                            }
+                        },
+                        false,
+                    );
+                },
+                more() {
+                    var startIndex = offset * limit;
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                delete(){
+                },
+            }
+
+            appsDetailsInstance.init();
+        }
+    </script>
+</th:block>
+</html>

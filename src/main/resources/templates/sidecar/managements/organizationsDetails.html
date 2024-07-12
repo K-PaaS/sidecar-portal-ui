@@ -11,7 +11,7 @@
         <article class="base detail">
             <div class="notice">
                 <h4>Org Details</h4>
-                <div class="table_style01">
+                <div class="table_style01 detail_table">
                     <table>
                         <caption>Org Details</caption>
                         <colgroup>
@@ -30,7 +30,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="table_style01 detail_table" style="max-height: 220px">
+                <div class="table_style01 detail_table">
                     <table>
                         <caption>
                             Details
@@ -43,9 +43,9 @@
                             <th scope="col">Spaces</th>
                         </tr>
                         </thead>
-                        <tbody class="space_table" style="display: block; max-height: 180px; overflow-y: auto; width: 1070px;"></tbody>
-                        <a href="javascript:" class="create-button addSpace">추가</a>
+                        <tbody class="space_table"></tbody>
                     </table>
+                    <a href="javascript:" class="create-button addSpace" th:text="#{M0223}"></a>
                 </div>
                 <div class="table_style01 detail_table">
                     <table id="table">
@@ -65,18 +65,18 @@
                             <th scope="col">User ID</th>
                             <th scope="col">Services Account</th>
                             <th scope="col">Org Role</th>
-                            <th scope="col" style="display: none">RoleGuid</th>
+                            <th scope="col" class="user-info-col5">RoleGuid</th>
                         </tr>
                         </thead>
-                        <tbody class="detailList" style="display: block; max-height: 300px; overflow-y: auto; width: 1070px;"></tbody>
-                        <a href="javascript:" class="create-button addUser">추가</a>
+                        <tbody class="detailList"></tbody>
                     </table>
+                    <a href="javascript:" class="create-button addUser" th:text="#{M0223}"></a>
                 </div>
             </div>
             <div class="btn02">
-                <button onclick="historyBack()">이전</button>
+                <button onclick="historyBack()" th:text="#{M0028}"></button>
                 <div>
-                    <button type="delete" id="deleteOrg">삭제</button>
+                    <button type="delete" id="deleteOrg" th:text="#{M0026}"></button>
                 </div>
             </div>
         </article>
@@ -100,9 +100,13 @@
             load() {
                 func.loading();
                 document.getElementById("name").innerText = sessionStorage.getItem("org_name");
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}/getDefaultDomain`, "application/json", detail.domain);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.space);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}/get`, "application/json", detail.get(), '','org');
+
+            },
+            get() {
 
             },
             domain(data) {document.getElementById("domain").innerText = data.name; },
@@ -110,11 +114,11 @@
                 func.removeHtml(document.querySelector(".space_table"));
                 if (data.pagination.total_results > 0) {
                     for (var i = 0; i < data.pagination.total_results; i++) {
-                        var html = `<tr><td class="left" style="width: 1070px"><a href="javascript:;" data-name="${data.resources[i].name}" data-guid="${data.resources[i].guid}">${data.resources[i].name}</a></td></tr>`;
+                        var html = `<tr><td class="left"><a href="javascript:;" data-name="${data.resources[i].name}" data-guid="${data.resources[i].guid}">${data.resources[i].name}</a></td></tr>`;
                         func.appendHtml(document.querySelector(".space_table"), html, "tbody", );
                     }
                 } else {
-                    var html = "<tr><td style='width: 1070px'>No Data.</td></tr>";
+                    var html = "<tr><td class='table-no-data'>No Data.</td></tr>";
                     func.appendHtml(document.querySelector(".space_table"), html, "tbody", );
                 }
                detail.listEvent();
@@ -155,7 +159,6 @@
                                         condition = true;
                                         break;
                                     }
-
                                     if (!condition) {          // SA(CLI)
                                         var userId = "-";
                                         dataArray[i] = [account,userId,userLastPart,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
@@ -179,76 +182,27 @@
                             if (oldUserId && oldUserId.textContent !== '-') {
                                 var row = oldUserId.parentElement;
                                 var checkboxes = row.querySelectorAll('input[type="checkbox"]');
-
-                                checkboxes.forEach(function(checkbox) {
-                                 //   console.log("## " + userCheckbox + ",  " + managerCheckbox + ",  " + auditorrCheckbox + "  ##");
-                                    /*
-
-                                                      if (checkbox.checked) {
-                                                        console.log("@@" + checkbox.id + ' is checked.');
-                                                        if(userCheckbox === 'checked') {
-
-                                                          console.log("1");
-                                                        }
-                                                        if(managerCheckbox === 'checked') {
-
-                                                          console.log("2");
-                                                        }
-                                                        if(auditorrCheckbox === 'checked') {
-
-                                                          console.log("3");
-                                                        }
-                                                      }*/
-
-                                    /* else {
-                                    // console.log("@@" + checkbox.id + ' is not checked.');
-                                   }
-                  */
-
-                                    /*
-                                                     if(userCheckbox === 'checked') {
-                                                     console.log("## userCheckbox is " + userCheckbox);
-                                                     console.log(checkbox.id + ' is checked.');
-                                                     checkboxes.checked = true;               }
-
-                                                     if(managerCheckbox === 'checked') {
-                                                       console.log("## managerCheckbox is " + managerCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-
-                                                     if(auditorrCheckbox === 'checked') {
-                                                       console.log("## auditorrCheckbox is " + auditorrCheckbox);
-                                                       console.log(checkbox.id + ' is checked.');
-                                                       checkboxes.checked = true;
-                                                     }
-                                    */
-
-
-                                })
                             }
-                            // else {
                             var html = `<tr>
-                              <td style="width: 74.89px">${account}</td>
-                              <td style="width: 214px" id=${userId}>${userId}</td>
-                              <td style="width: 374.5px">${serviceAccount}</td>
-                              <td style="width: 406.61px">
+                              <td class="user-info-td1">${account}</td>
+                              <td class="user-info-td2" id=${userId}>${userId}</td>
+                              <td class="user-info-td3">${serviceAccount}</td>
+                              <td class="user-info-td4">
                                 <input type="checkbox" id="${users}_user" ${userCheckbox} name="organization_user">
-                                <label for="${users}_user" style="margin-right: 25px;">User</label>
+                                <label for="${users}_user" class="checkbox-label">User</label>
                                 <input type="checkbox" id="${users}_manager" ${managerCheckbox} name="organization_manager">
-                                <label for="${users}_manager" style="margin-right: 25px;">Manager</label>
+                                <label for="${users}_manager" class="checkbox-label">Manager</label>
                                 <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} name="organization_auditor" disabled >
                                 <label for="${users}_auditor">Auditor</label>
                               </td>
-                              <td style="width: 0px; display: none;">
+                              <td class="user-info-td5">
                                 <label id="${roleGuid}"></label>
                               </td>
                             </tr>`;
-                            //  }
                             func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                         }
                     } else {
-                        var html = "<tr><td style='width: 1070px'>No Data.</td></tr>";
+                        var html = "<tr><td class='table-no-data'>No Data.</td></tr>";
                         func.appendHtml(document.querySelector(".detailList"), html, "tbody", );
                     }
                 }
@@ -268,14 +222,8 @@
                         sessionStorage.setItem("space_name", e.target.getAttribute("data-name"), );
                         sessionStorage.setItem("space_guid", e.target.getAttribute("data-guid"), );
 
-                        console.log("org_name : " + sessionStorage.setItem("org_name", sessionStorage.getItem("org_name"), ));
-                        console.log("org_guid : " + sessionStorage.setItem("org_guid", sessionStorage.getItem("org_guid"), ));
-                        console.log("space_name : " + sessionStorage.setItem("space_name", e.target.getAttribute("data-name"), ));
-                        console.log("space_guid : " + sessionStorage.setItem("space_guid", e.target.getAttribute("data-guid"), ));
-
                         document.location.href = URI_SC_MANAGEMENTS_SPACES + URI_SC_DETAILS;
-                        console.log("document.location.href : " + document.location.href);
-                    }, false, );
+                    }, true, );
                 }
             },
             eventSpace() {
@@ -285,17 +233,20 @@
             },
             eventUser() {
                 document.querySelector('.addUser').addEventListener('click', (e) => {
-                    sessionStorage.setItem('org_name', '');
                     funcsc.addUser('User List', 'orgs', MSG_SAVE);
                 }, false);
             },
             eventDelete() {
                 document.getElementById('deleteOrg').addEventListener('click', (e) => {
-                    func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.orgDelete);
+                    funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.orgDelete);
                 }, false);
             },
             orgDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, '', true, 'application/json', func.historyBack); // refresh 된 목록 나오는지 확인
+                const data = 'org';
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}`, data, true, 'application/json',  funcsc.movePageToOrgList);
+            },
+            movePage() {
+                location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS;
             }
         };
 
@@ -303,7 +254,6 @@
         function checkboxChange(event) {
             const checkbox = event.target;
             if (checkbox.checked) {
-                console.log("checked!");
                 var orgGuid = sessionStorage.getItem("org_guid");
                 var type = checkbox.getAttribute("name");
                 var user = checkbox.id.replace("_user", "").replace("_manager", "").replace("_auditor", "");
@@ -312,15 +262,13 @@
                     "type": type,
                     "user": user
                 }
-                console.log("data.Json : " + JSON.stringify(data));
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
             } else {
-                console.log("unchecked!");
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
             }
-        };
+        }
         document.addEventListener("change", function(event) {
             const target = event.target;
             if (target.matches("input[type='checkbox']")) {

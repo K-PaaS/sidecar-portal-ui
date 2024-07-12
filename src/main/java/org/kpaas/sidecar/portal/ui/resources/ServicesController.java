@@ -11,7 +11,7 @@ import static org.kpaas.sidecar.portal.ui.common.ConstantsUrl.URI_SC_DETAILS;
 @Api(value = "ServicesController v1")
 @Controller
 public class ServicesController {
-    private static final String BASE_URL = "sidecar/services/";
+    private static final String BASE_URL = "sidecar/resources/";
 
     /**
      * Services 목록 페이지 이동(Go to the services list page)

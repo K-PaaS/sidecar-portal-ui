@@ -1,10 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-services
-</body>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/sidecar}">
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_RESOURCES_SERVICES)">Resources</a></li>
+                <li><a onclick="movePage(URI_SC_RESOURCES_SERVICES)">Services</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <h3>List</h3>
+                <div class="table_style01 left">
+                    <table>
+                        <caption>
+                            ServiceInstances List
+                        </caption>
+                        <colgroup>
+                            <col width="90%" />
+                            <col width="10%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable"></tbody>
+                    </table>
+                    <a href="javascript:" class="create-button-listPage addServiceInstance" th:text="#{M0223}"></a>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.SERVICES);
+            funcsc.initOrgsSpaces();
+            callbackFuncNameLoad();
+
+            const serviceInstance = {
+                offset: 0,
+                limit: 10,
+                total_results: 0,
+                delete_tg_guid : 0,
+                init() {
+                    func.nameLoad = serviceInstance.reset;
+                    serviceInstance.load();
+                    serviceInstance.event();
+                },
+                reset() {
+                    func.removeHtml(document.querySelector(".listTable"));
+                    serviceInstance.offset = 0;
+                    serviceInstance.load();
+                },
+                load() {
+                    func.loading();
+                    setTimeout(() => funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", serviceInstance.draw), 500);
+                },
+                draw(data) {
+                    if (serviceInstance.offset == 0)
+                        serviceInstance.total_results = data.pagination.total_results;
+
+                    if (data.resources.length > 0) {
+                        for (var i = 0; i <= data.resources.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < serviceInstance.limit) {
+                                var html = `<tr><td class="left" id=${trId} ><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></td><td><svg class="trashcan" id="${data.resources[i].guid}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg></td></tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}><td class="left"><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></td><td><svg class="trashcan" id="${data.resources[i].guid}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg></td></tr>`;
+                            }
+                            func.appendHtml(document.querySelector(".listTable"), html, "tbody",);
+                        }
+                    } else {
+                        var html = `<tr><td colspan="2">No Data.</td></tr>`;
+                        func.appendHtml(document.querySelector(".listTable"), html, "tbody", );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (serviceInstance.offset + 1) * serviceInstance.limit,
+                        serviceInstance.total_results,
+                    );
+
+                    if (endIndex < serviceInstance.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
+                    serviceInstance.listEvent(data);
+                },
+                more() {
+                    var startIndex = serviceInstance.offset * serviceInstance.limit;
+                    var endIndex = Math.min(
+                        (serviceInstance.offset + 1) * serviceInstance.limit,
+                        serviceInstance.total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < serviceInstance.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event() {
+                    document.querySelector(".more").addEventListener("click", (e) => {
+                        if (serviceInstance.limit < serviceInstance.total_results) {
+                            serviceInstance.offset++;
+                            serviceInstance.more();
+                        }
+                    }, false,);
+
+                    document.querySelector('.addServiceInstance').addEventListener('click', (e) => {
+                        this.addServiceInstance('Create ServiceInstance', 'serviceInstances', MSG_SAVE);
+                    }, false,);
+                },
+                listEvent(data) {
+                    var listAll = document.querySelector('.listTable').querySelectorAll('a');
+                    for(let i=0 ; i<= listAll.length-1 ; i++){
+                        listAll[i].addEventListener('click', (e) => {
+                            sessionStorage.setItem('commonName', e.target.innerText);
+                            sessionStorage.setItem('commonGuid', e.target.getAttribute("data-name"));
+                            document.location.href = URI_SC_RESOURCES_SERVICES + URI_SC_DETAILS;
+                            //this.viewServiceInstance('Service Detail', data.resources[i].name, data.resources[i].guid);
+                        }, true);
+                    };
+
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                serviceInstance.delete_tg_guid = data.resources[i].guid;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceInstance.serviceDelete);
+                            }, false);
+                        }
+                    }
+                    test();
+                },
+                serviceDelete() {
+                    const data = "service"+serviceInstance.delete_tg_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceInstance.delete_tg_guid}`, data, true, 'application/json', func.refresh);
+                },
+
+                addServiceInstance(title, url, name) {
+                    var html = `<div class="modal-wrap" id="modal">
+			<div class="modal midium">
+				<h5>${title}</h5>
+				<dl>
+				    <dt>Service Name</dt>
+					<dd>
+						<input class="popup_add_input" type="text" id="serviceInstanceName" placeholder="${PLACEHOLDER_CREATE_SERVICE}" required>
+					</dd>
+				</dl>
+				<dl>
+				    <dt class="popup_add_user_dt">Credentials</dt>
+					<dd>
+						<input class="popup_add_input" type="text" id="credentials" placeholder=${PLACEHOLDER_CREATE_CREDENCIALS} required>
+					</dd>
+				</dl>
+				<a class="confirm" href="javascript:;">` + BUTTON_ADD+ `</a>
+				<a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			</div>
+		</div>`;
+
+                    func.appendHtml(document.getElementById('wrap'), html, 'div');
+                    document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                        document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                    }, false);
+                    document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                        const serviceInstanceName = document.getElementById('serviceInstanceName').value;
+                        const credentials = document.getElementById('credentials').value;
+                        const orgGuid = sessionStorage.getItem("org_guid");
+                        const spaceGuid = sessionStorage.getItem("space_guid");
+
+                        if(!serviceInstanceName) {
+                            alert(ALERT_SERVICE_ENTER);
+                            return;
+                        }else if(!credentials) {
+                            alert(ALERT_CREDENTIALS_ENTER);
+                            return;
+                        }else {
+                            var sendData = JSON.stringify({
+                                "name": serviceInstanceName,
+                                "spaceGuid": spaceGuid,
+                                "credentials": credentials
+                            });
+                            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/serviceInstances`, sendData, true, 'application/json', func.refresh);
+                        }
+                    }, false);
+                }
+            };
+            serviceInstance.init();
+        };
+    </script>
+</th:block>
 </html>

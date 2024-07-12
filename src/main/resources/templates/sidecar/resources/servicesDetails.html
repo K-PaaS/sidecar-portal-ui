@@ -1,10 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-servicesDetails
-</body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/sidecar}">
+
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_RESOURCES_SERVICES)">Resources</a></li>
+                <li><a onclick="movePage(URI_SC_RESOURCES_SERVICES)">Services</a></li>
+            </ul>
+        </article>
+        <article class="base detail">
+            <div class="notice">
+                <h4>Details</h4>
+                <div class="table_style01">
+                    <table>
+                        <caption>Details</caption>
+                        <colgroup >
+                            <col width="20%" />
+                            <col width="80%" />
+                        </colgroup>
+                        <tbody class="listTable">
+                        <tr>
+                            <th scope="row" class="left">Organization</th>
+                            <td class="left customBorderTop" id="organization"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Space</th>
+                            <td class="left" id="space"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Service Name</th>
+                            <td class="left" id="serviceName"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Credentials</th>
+                            <td class="left" id="credentials"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Type</th>
+                            <td class="left" id="serviceType"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Status</th>
+                            <td class="left" id="status"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Message</th>
+                            <td class="left" id="message"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Started</th>
+                            <td class="left" id="created"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table_style01">
+                    <table>
+                        <caption>Details</caption>
+                        <colgroup >
+                            <col width="25%" />
+                            <col width="25%" />
+                            <col width="25%" />
+                            <col width="25%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">App name</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody class="detailList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- btn -->
+            <div class="btn02">
+                <div>
+                    <a href="javascript:;" id="delete" th:text="#{M0026}"></a>
+                    <a class="beforeBtn" onclick="movePage(URI_SC_RESOURCES_SERVICES)" th:text="#{M0028}"></a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.SERVICES);
+            funcsc.initOrgsSpaces();
+            callbackFuncNameLoad();
+
+            const serviceDetail = {
+                delete_si_guid : 0,
+                delete_sb_guid : 0,
+
+                init(){
+
+                    func.loading();
+
+                    serviceDetail.delete_si_guid = sessionStorage.getItem('commonGuid');
+                    //Detail
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem('space_guid')}&serviceInstanceNames=${sessionStorage.getItem('commonName')}`, 'application/json', serviceDetail.draw);
+                    func.nameLoad = this.movePageToServices;
+                },
+
+                draw(data){
+
+                    // Details data
+                    if(data.resources.length > 0) {
+                        document.getElementById('organization').innerText = sessionStorage.getItem('org_name');
+                        document.getElementById('space').innerText = sessionStorage.getItem('space_name');
+                        document.getElementById('serviceName').innerText = data.resources[0].name;
+                        //document.getElementById('credentials').innerText = data.resources[0].guid;
+                        document.getElementById('serviceType').innerText = data.resources[0].type;
+                        document.getElementById('status').innerText = data.resources[0].last_operation.type + " " + data.resources[0].last_operation.state;
+                        document.getElementById('message').innerText = data.resources[0].last_operation.description;
+                        document.getElementById('created').innerText = data.resources[0].created_at;
+
+                        //Detail/Credentials
+                        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/${sessionStorage.getItem('commonGuid')}/getCredential?spaceGuid=${sessionStorage.getItem('space_guid')}`, 'application/json', serviceDetail.drawCredential);
+                    }
+                    //document.getElementById('wrap').removeChild(document.getElementById('loading'));
+
+                    //serviceDetail.event();
+                    document.getElementById('delete').addEventListener('click', (e) => {
+                        const data = "service"+serviceDetail.delete_si_guid;
+                        //funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, data, true, 'application/json', func.refresh);
+                        funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceInstanceDelete);
+                    }, false);
+                },
+
+                drawCredential(data) {
+                    // Details/Credential
+                    document.getElementById('credentials').innerText = JSON.stringify(data);
+
+                    //binding Apps
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceBindings/list?spaceGuids=${sessionStorage.getItem('space_guid')}&serviceInstanceGuids=${sessionStorage.getItem('commonGuid')}`, 'application/json', serviceDetail.drawApps);
+                },
+
+                drawApps(data){
+
+                    if(data.resources.length > 0){
+                        for(var i=0; i<=data.resources.length-1; i++){
+                            var trId = "tr" + i;
+                            var html = `<tr>
+								<td class="left">${data.resources[i].guid}</td>
+								<td class="left">${data.resources[i].last_operation.state}</td>
+                                <td class="left">${data.resources[i].created_at}</td>
+                                <td class="left" align="center"><svg class="trashcan" id="${data.resources[i].guid}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg></td>`;  // trashcan
+                           func.appendHtml(document.querySelector('.detailList'), html, 'tbody');
+                        };
+                    } else {
+                        var html = '<tr><td class="table-no-data">No Data.</td></tr>';
+
+                        func.appendHtml(document.querySelector('.detailList'), html, 'tbody');
+                    };
+
+                    document.getElementById('wrap').removeChild(document.getElementById('loading'));
+
+                    serviceDetail.event();
+                    //serviceDetail.bindingsEvent(data);
+
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                serviceDetail.delete_sb_guid = e.currentTarget.id;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceBindingDelete);
+                            }, false);
+                        }
+                    }
+                    test();
+                },
+
+                event(){
+                    document.getElementById('delete').addEventListener('click', (e) => {
+                        const data = "service"+serviceDetail.delete_si_guid;
+                        //funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, data, true, 'application/json', func.refresh);
+                        funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceInstanceDelete);
+                    }, false);
+                },
+
+                bindingsEvent(data) {
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                serviceDetail.delete_sb_guid = e.currentTarget.id;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceBindingDelete);
+                            }, false);
+                        }
+                    }
+                    test();
+                },
+
+                serviceInstanceDelete() {
+                    guid = serviceDetail.delete_si_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, "binding"+guid, true, 'application/json', movePage(URI_SC_RESOURCES_SERVICES));
+                },
+
+                serviceBindingDelete() {
+                    guid = serviceDetail.delete_sb_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceBindings/${guid}`, "binding"+guid, true, 'application/json', func.refresh);
+                },
+                movePageToServices() {
+                    location.href = URI_SC_RESOURCES_SERVICES;
+                }
+            }
+
+            serviceDetail.init();
+        }
+    </script>
+</th:block>
 </html>

@@ -1,11 +1,159 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-HI
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/sidecar}">
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_RESOURCES_DOMAINS)">Resources</a></li>
+                <li><a onclick="movePage(URI_SC_RESOURCES_DOMAINS)">Domains</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <h3>List</h3>
+                <div class="table_style01 left">
+                    <table>
+                        <caption>
+                            Domains List
+                        </caption>
+                        <colgroup>
+                            <col width="90%" />
+                            <col width="10%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable"></tbody>
+                    </table>
+                    <a href="javascript:" class="create-button-listPage addDomain" th:text="#{M0223}"></a>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
 
-</body>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.DOMAINS);
+            funcsc.initOrgsSpaces();
+            callbackFuncNameLoad();
+
+            const domain = {
+                offset: 0,
+                limit: 10,
+                total_results: 0,
+                delete_tg_guid : 0,
+                init() {
+                    func.nameLoad = domain.reset;
+                    domain.load();
+                    domain.event();
+                },
+                reset() {
+                    func.removeHtml(document.querySelector(".listTable"));
+                    domain.offset = 0;
+                    domain.load();
+                },
+                load() {
+                    func.loading();
+                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/domains/list`, "application/json", domain.draw);
+                },
+                draw(data) {
+                    if (domain.offset == 0)
+                        domain.total_results = data.pagination.total_results;
+
+                    if (data.resources.length > 0) {
+                        for (var i = 0; i <= data.resources.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < domain.limit) {
+                                var html = `<tr><td class="left" id=${trId} >${data.resources[i].name}</td><td><svg class="trashcan" id="${data.resources[i].guid}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg></td></tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}><td class="left">${data.resources[i].name}</td><td><svg class="trashcan" id="${data.resources[i].guid}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg></td></tr>`;
+                            }
+                            func.appendHtml(document.querySelector(".listTable"), html, "tbody",);
+                        }
+                    } else {
+                        var html = `<tr><td colspan="2">No Data.</td></tr>`;
+                        func.appendHtml(document.querySelector(".listTable"), html, "tbody", );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (domain.offset + 1) * domain.limit,
+                        domain.total_results,
+                    );
+
+                    if (endIndex < domain.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
+                    domain.listEvent(data);
+                },
+                more() {
+                    var startIndex = domain.offset * domain.limit;
+                    var endIndex = Math.min(
+                        (domain.offset + 1) * domain.limit,
+                        domain.total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < domain.total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event() {
+                    document.querySelector(".more").addEventListener("click", (e) => {
+                            if (domain.limit < domain.total_results) {
+                                domain.offset++;
+                                domain.more();
+                            }
+                    }, false,);
+
+                    document.querySelector('.addDomain').addEventListener('click', (e) => {
+                        funcsc.addDomain('Create Domain', 'domains', MSG_SAVE);
+                    }, false,);
+                },
+                listEvent(data) {
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                domain.delete_tg_guid = data.resources[i].guid;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, domain.domainDelete);
+                            }, false);
+                        }
+                    }
+
+                    test();
+                },
+                domainDelete() {
+                    const data = domain.delete_tg_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/domains/${domain.delete_tg_guid}`, data, true, 'application/json', func.refresh);
+                }
+            };
+            domain.init();
+        };
+    </script>
+</th:block>
 </html>

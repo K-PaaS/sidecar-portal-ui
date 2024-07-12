@@ -46,17 +46,17 @@
                             <th scope="col">User ID</th>
                             <th scope="col">Services Account</th>
                             <th scope="col">Space Role</th>
-                            <th scope="col" style="display: none">RoleGuid</th>
+                            <th scope="col" class="user-info-col5">RoleGuid</th>
                         </tr>
                         </thead>
-                        <tbody class="detailList" style="display: block; max-height: 300px; overflow-y: auto; width: 1070px;"></tbody>
+                        <tbody class="detailList"></tbody>
                     </table>
                 </div>
             </div>
             <div class="btn02">
-                <button onclick="historyBack()">이전</button>
+                <button onclick="historyBack()" th:text="#{M0028}"></button>
                 <div>
-                    <button type="delete" id="deleteSpace">삭제</button>
+                    <button type="delete" id="deleteSpace" th:text="#{M0026}"></button>
                 </div>
             </div>
         </article>
@@ -80,175 +80,114 @@
             load() {
                 func.loading();
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
-                document.getElementById("space_name").innerText = sessionStorage.getItem("space_name")
-               // funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
-
+                document.getElementById("space_name").innerText = sessionStorage.getItem("space_name");
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}/get`, "application/json", '', '', 'space');
 
             },
-            user(sidecar_data) {
-                func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (data) => {
-                    cluster_user(data);
+            user(space_data) {
+                funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (cluster_data) => {
+                    space_user(cluster_data);
                 })
-                function cluster_user(cluster_data) {
-                    funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", (space_data) => {
-                        sidecar_space_data(space_data);
-                    })
+                function space_user(cluster_data) {
+                    if (space_data.pagination.total_results > 0) {
+                        var dataArray = [];
+                        for (var i = 0; i < space_data.pagination.total_results; i++) {
+                            var developerCheckbox = space_data.resources[i].type === "space_developer" ? "checked" : "";
+                            var managerCheckbox = space_data.resources[i].type === "space_manager" ? "checked" : "";
+                            var auditorrCheckbox = space_data.resources[i].type === "space_auditor" ? "checked" : "";
+                            var roleGuid = space_data.resources[i].guid;
 
-                    function sidecar_space_data(space_data) {
+                            var userId = space_data.resources[i].relationships.user.data.guid;
+                            var split = userId.split(":");
+                            var userLastPart = split[split.length - 1];
 
-                        if (sidecar_data.pagination.total_results > 0) {
-                            var dataArray = [];
-                            for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
+                            detail.users = space_data.resources[i].relationships.user.data.guid;
 
-                               // var developerCheckbox = space_data.resources[i].type === "space_developer" ? "checked" : "";
-                               // var managerCheckbox = space_data.resources[i].type === "space_manager" ? "checked" : "";
-                               // var auditorrCheckbox = space_data.resources[i].type === "space_auditor" ? "checked" : "";
-                                var roleGuid = sidecar_data.resources[i].guid;
+                            if (!userId.startsWith("system:serviceaccount:")) {    // UA
+                                var account = "UA";
+                                var serviceAccountName = "-";
+                                dataArray[i] = [account, userId, serviceAccountName, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
 
-                                var userId = sidecar_data.resources[i].relationships.user.data.guid;
-                                var split = userId.split(":");
-                                var userLastPart = split[split.length - 1];
+                            } else {  //SA
+                                var condition = false;
+                                var account = "SA";
 
-                                detail.users = sidecar_data.resources[i].relationships.user.data.guid;
+                                for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
+                                    var serviceAccountName = cluster_data.items[j].serviceAccountName;
 
-                                if (!userId.startsWith("system:serviceaccount:")) {    // UA
-                                    var account = "UA";
-                                    var serviceAccountName = "-";
-                                   // dataArray[i] = [account, userId, serviceAccountName, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
-                                    dataArray[i] = [account, userId, serviceAccountName, roleGuid, detail.users];
+                                    if (serviceAccountName === userLastPart) {       // SA(Portal)
+                                        var userId = cluster_data.items[j].userId;
+                                        dataArray[i] = [account, userId, serviceAccountName, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
+                                        condition = true;
+                                        break;
+                                    }
 
-                                } else {  //SA
-                                    var condition = false;
-                                    var account = "SA";
-
-                                    for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
-                                        var serviceAccountName = cluster_data.items[j].serviceAccountName;
-
-                                        if (serviceAccountName === userLastPart) {       // SA(Portal)
-                                            var userId = cluster_data.items[j].userId;
-                                            dataArray[i] = [account, userId, serviceAccountName, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
-                                            condition = true;
-                                            break;
-                                        }
-
-                                        if (!condition) {          // SA(CLI)
-                                            var userId = "-";
-                                            dataArray[i] = [account, userId, userLastPart, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
-                                        }
+                                    if (!condition) {          // SA(CLI)
+                                        var userId = "-";
+                                        dataArray[i] = [account, userId, userLastPart, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
                                     }
                                 }
                             }
+                        }
+                        for (var i = 0; i < dataArray.length; i++) {
+                            var row = dataArray[i];
+                            var account = row[0];
+                            var userId = row[1];
+                            var serviceAccount = row[2];
+                            var developerCheckbox = row[3];
+                            var managerCheckbox = row[4];
+                            var auditorrCheckbox = row[5];
+                            var roleGuid = row[6];
+                            var users = row[7];
+                            var oldUserId = document.getElementById(userId);
 
-                            for (var i = 0; i < dataArray.length; i++) {
-                                var row = dataArray[i];
-                                var account = row[0];
-                                var userId = row[1];
-                                var serviceAccount = row[2];
-                                var developerCheckbox = row[3];
-                                var managerCheckbox = row[4];
-                                var auditorrCheckbox = row[5];
-                                var roleGuid = row[6];
-                                var users = row[7];
-                                var oldUserId = document.getElementById(userId);
-
-                                if (oldUserId && oldUserId.textContent !== '-') {
-                                    var row = oldUserId.parentElement;
-                                    var checkboxes = row.querySelectorAll('input[type="checkbox"]');
-
-                                    checkboxes.forEach(function (checkbox) {
-                                        //   console.log("## " + developerCheckbox + ",  " + managerCheckbox + ",  " + auditorrCheckbox + "  ##");
-                                        /*
-
-                                                          if (checkbox.checked) {
-                                                            console.log("@@" + checkbox.id + ' is checked.');
-                                                            if(developerCheckbox === 'checked') {
-
-                                                              console.log("1");
-                                                            }
-                                                            if(managerCheckbox === 'checked') {
-
-                                                              console.log("2");
-                                                            }
-                                                            if(auditorrCheckbox === 'checked') {
-
-                                                              console.log("3");
-                                                            }
-                                                          }*/
-
-                                        /* else {
-                                        // console.log("@@" + checkbox.id + ' is not checked.');
-                                       }
-                      */
-
-                                        /*
-                                                         if(developerCheckbox === 'checked') {
-                                                         console.log("## developerCheckbox is " + developerCheckbox);
-                                                         console.log(checkbox.id + ' is checked.');
-                                                         checkboxes.checked = true;               }
-
-                                                         if(managerCheckbox === 'checked') {
-                                                           console.log("## managerCheckbox is " + managerCheckbox);
-                                                           console.log(checkbox.id + ' is checked.');
-                                                           checkboxes.checked = true;
-                                                         }
-
-                                                         if(auditorrCheckbox === 'checked') {
-                                                           console.log("## auditorrCheckbox is " + auditorrCheckbox);
-                                                           console.log(checkbox.id + ' is checked.');
-                                                           checkboxes.checked = true;
-                                                         }
-                                        */
-
-
-                                    })
-                                }
-                                // else {
-                                var html = `<tr>
-                                  <td style="width: 74.89px">${account}</td>
-                                  <td style="width: 214px" id=${userId}>${userId}</td>
-                                  <td style="width: 374.5px">${serviceAccount}</td>
-                                  <td style="width: 406.61px">
+                            if (oldUserId && oldUserId.textContent !== '-') {
+                                var row = oldUserId.parentElement;
+                                var checkboxes = row.querySelectorAll('input[type="checkbox"]');
+                            }
+                            var html = `<tr>
+                                  <td class="user-info-td1">${account}</td>
+                                  <td class="user-info-td2" id=${userId}>${userId}</td>
+                                  <td class="user-info-td3">${serviceAccount}</td>
+                                  <td class="user-info-td4">
                                     <input type="checkbox" id="${users}_developer" ${developerCheckbox} name="space_developer">
-                                    <label for="${users}_developer" style="margin-right: 25px;">Developer</label>
+                                    <label for="${users}_developer" class="checkbox-label">Developer</label>
                                     <input type="checkbox" id="${users}_manager" ${managerCheckbox} name="space_manager">
-                                    <label for="${users}_manager" style="margin-right: 25px;">Manager</label>
+                                    <label for="${users}_manager" class="checkbox-label"">Manager</label>
                                     <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} name="space_auditor" disabled >
                                     <label for="${users}_auditor">Auditor</label>
                                   </td>
-                                  <td style="width: 0px; display: none;">
+                                  <td class="user-info-td5">
                                     <label id="${roleGuid}"></label>
                                   </td>
                                 </tr>`;
-                                //  }
-                                func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
-                            }
-                        } else {
-                            var html = "<tr><td style='width: 1070px'>No Data.</td></tr>";
                             func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                         }
+                    } else {
+                        var html = "<tr><td class='table-no-data'>No Data.</td></tr>";
+                        func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                     }
                 }
                 if (document.getElementById("loading")) {
                     document.getElementById("wrap").removeChild(document.getElementById("loading"));
                 }
-
                 detail.eventDelete();
             },
             eventDelete() {
                 document.getElementById('deleteSpace').addEventListener('click', (e) => {
-                    func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.spaceDelete);
+                    funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, detail.spaceDelete);
                 }, false);
             },
             spaceDelete() {
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, '', true, 'application/json', func.historyBack);
-            }
+                const data = 'space';
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, data, true, 'application/json', funcsc.movePageToOrg );
+            },
         };
         detail.init();
         function checkboxChange(event) {
             const checkbox = event.target;
             if (checkbox.checked) {
-                console.log("checked!");
                 var orgGuid = sessionStorage.getItem("orgGuid");
                 var type = checkbox.getAttribute("name");
                 var user = checkbox.id.replace("_developer", "").replace("_manager", "").replace("_auditor", "");
@@ -257,10 +196,8 @@
                     "type": type,
                     "user": user
                 }
-                console.log("data.Json : " + JSON.stringify(data));
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
             } else {
-                console.log("unchecked!");
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);

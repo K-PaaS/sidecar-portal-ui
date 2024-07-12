@@ -9,6 +9,11 @@
      var URI_REQUEST_SC_API = [[${@environment.getProperty('sidecar.portalUrl')}]] + '/';
 
      var URI_SC_WORKLOADS_APPS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_WORKLOADS_APPS}]];
+     var URI_SC_DETAILS_INSTANCES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS_INSTANCES}]];
+     var URI_SC_DETAILS_SERVICES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS_SERVICES}]];
+     var URI_SC_DETAILS_ENVIRONMENT = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS_ENVIRONMENT}]];
+     var URI_SC_DETAILS_ROUTES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS_ROUTES}]];
+     var URI_SC_DETAILS_LOG = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_DETAILS_LOG}]];
 
      var URI_SC_RESOURCES_DOMAINS = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_RESOURCES_DOMAINS}]];
      var URI_SC_RESOURCES_ROUTES = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_RESOURCES_ROUTES}]];
@@ -115,11 +120,12 @@
      var ALERT_SERVICE_ENTER = [[#{M0872}]];
      var ALERT_CREDENTIALS_ENTER = [[#{M0873}]];
 
-
      var ALERT_POPUP_CREATE = [[#{M0860}]];
      var ALERT_POPUP_DELETE = [[#{M0861}]];
      var ALERT_POPUP_FAIL = [[#{M0862}]];
-
+     var ALERT_POPUP_PATCH = "적용되었습니다.";
+     var ALERT_POPUP_CONNECT = "연결되었습니다.";
+     var ALERT_POPUP_DISCONNECT = "연결 해제되었습니다.";
 
      var ALERT_POPUP_DELETE_REQUEST = [[#{M0867}]]+"<br>"+[[#{M0868}]];
      var ALERT_POPUP_DELETE_FAIL = [[#{M0869}]]+"<br>";
@@ -150,6 +156,10 @@
      var MSG_ENTER_SEARCH_WORD = [[#{M0017}]];
      var MSG_CHECK_TO_DELETE =  [[#{M0018}]];
      var MSG_CHECK_TO_SAVE =  [[#{M0020}]];
+     var MSG_CHECK_TO_DISCONNECT =  [[#{M0883}]];
+     var MSG_CHECK_TO_MODIFY =  [[#{M0048}]];
+     var MSG_CHECK_TO_START =  [[#{M0884}]];
+     var MSG_CHECK_TO_STOP =  [[#{M0885}]];
 
      //INGRESS PROPERTIES
      var MSG_NO_NAMESPACE = [[#{M0816}]];
@@ -209,6 +219,17 @@
      var MSG_SECS =  [[#{M0833}]];
      var MSG_AGO =  [[#{M0834}]];
 
+    // MODAL
+    /// MODAL APPS
+    //// MODAL APPS TITLE PROPERTIES
+    var MODAL_APPS_CONNECT_SERVICE_TITLE = [[#{M0878}]];
+    var MODAL_APPS_GET_CREDENTIAL_TITLE = [[#{M0877}]];
+    var MODAL_APPS_CREATE_ENVIRONMENT_TITLE = [[#{M0876}]];
+    var MODAL_APPS_CONNECT_ROUTE_TITLE = [[#{M0879}]];
+
+    //// MODAL APPS INPUT PROPERTIES
+    var MODAL_APPS_CONNECT_SERVICE_SERVICES = [[#{M0880}]];
+    var MODAL_APPS_CONNECT_ROUTE_ROUTES = [[#{M0881}]];
 
      const TIMES = {
          MIN : 60,

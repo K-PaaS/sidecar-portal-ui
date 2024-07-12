@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/appsLayout}">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.010/css/hack.min.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding&display=swap" rel="stylesheet">
+
+    <div id="content" class="sub-page users">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <div layout:fragment="content">
+                    <div class="title">
+                        <ul id="tabParent">
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_INSTANCES)" class="tabBtn">Instances</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_SERVICES)">Services</a>
+                            </li>
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_ENVIRONMENT)" class="tabBtn">Environment</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_ROUTES)">Routes</a>
+                            </li>
+                            <li class="on">
+                                <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
+                            </li>
+                        </ul>
+                        <div class="log_button">
+                            <i href="javascript:;" class="refresh fa-solid fa-xl fa-solid fa-arrows-rotate custom-access-button detail_icon"></i>
+                            <!--<a href="javascript:;" class="refresh" th:text="#{M0024}"></a>-->
+                        </div>
+                    </div>
+                    <div class="table_style01 on">
+                        <div class="custom-access-contents">
+                            <div id="cpEnvironmentsForLinux" class="cpEnvironments"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+<div layout:fragment="modal">
+    <div class="modal-wrap" style="display:none;">
+        <div class="modal">
+            <h5 th:text="#{M0034}"></h5>
+            <p th:text="#{M0018}"></p>
+            <button class="confirm" type="submit" th:text="#{M0026}"></button>
+            <a class="close" href="javascript:;" th:text="#{M0023}"></a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+            var logs;
+            var offset=0;
+            var limit=5;
+            var total_results=0;
+            const appsDetailsLog = {
+
+                init(){
+                    appsDetailsLog.getLog();
+                },
+                getLog(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/logs/${sessionStorage.getItem("appGuid")}/recentlogs`, 'application/json', appsDetailsLog.drawLog);
+                },
+                drawLog(data){
+                    logs= data.log.batch;
+                    func.removeHtml(document.querySelector(".cpEnvironments"));
+                    if (logs.length > 0) {
+                        for (var i = 0; i <= logs.length - 1; i++) {
+                            var myDate = new Date(logs[i].timestamp / 1000000);
+                            var date = myDate.getFullYear() + "-" + (myDate.getMonth()+1) + "-" + myDate.getDate() + " " + myDate.getHours() + ":" + myDate.getMinutes() + ":" + myDate.getSeconds();
+                            var html = `<pre><code class="bash">`+ date + " " + logs[i].log.type + "/" + logs[i].tags.source_type +  " : " + logs[i].log.payload +`</code></pre>`;
+                            func.appendHtml(
+                                document.querySelector(".cpEnvironments"),
+                                html,
+                                "div",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    appsDetailsLog.event();
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
+                },
+                list(data){
+                    func.removeHtml(document.querySelector('.eventList'));
+                    appsDetailsLog.event();
+                },
+
+                event(){
+                    document.querySelector('.refresh').addEventListener('click', (e) => {
+                            appsDetailsLog.getLog();
+                    }, false);
+                },
+
+                delete(){
+                },
+            }
+
+            appsDetailsLog.init();
+        }
+    </script>
+</th:block>
+</html>

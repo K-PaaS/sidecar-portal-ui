@@ -1,10 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-APPSDETAILS
-</body>
-</html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:fragmentfragment="top_content">
+<div class="title">
+    <h4>Details</h4>
+    <div class="button">
+        <a href="javascript:;" id="delete" class="delete" th:text="#{M0026}"></a>
+    </div>
+</div>
+
+<div class="table_style01 on">
+    <table>
+        <caption>Details</caption>
+        <colgroup >
+            <col width="20%" />
+            <col width="70%" />
+            <col width="10%" />
+        </colgroup>
+        <tbody class="listTable">
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">Name</div></th>
+            <td class="left"><input class="editName" onchange="updateInput(this.id, this.value)" disabled="true" id="editName"><i class="fa-xl fa-solid fa-pen-to-square custom-access-button detail_icon" id="editNameBtn"></i></td>
+            <td class="fs-14"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyName);"></i></button></td>
+        </tr>
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">Instance</div></th>
+            <td class="left" id="detailsInstance">
+                <dd class="g-select-wrap">
+                    <div class="g-select" >
+                        <select id="selectInstance" onchange="customCheck(this.id, this.value)">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <input class="editInstance" onchange="updateInput(this.id, this.value)" disabled="true" id="editInstance">
+                </dd>
+            </td>
+            <td class="fs-14" id="detailsInstanceBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyInstance);"></i></button></td>
+        </tr>
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">Memory (MB)</div></th>
+            <td class="left" id="detailsMemory">
+                <dd class="g-select-wrap">
+                    <div class="g-select">
+                        <select id="selectMemory" onchange="customCheck(this.id, this.value)">
+                            <option value="256">256</option>
+                            <option value="512">512</option>
+                            <option value="1024">1024</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <input class="editMemory" onchange="updateInput(this.id, this.value)" disabled="true" id="editMemory">
+                </dd>
+            </td>
+            <td class="fs-14" id="detailsMemoryBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyMemory);"></i></button></td>
+        </tr>
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">Disk (MB)</div></th>
+            <td class="box left" id="details_disk">
+                <dd class="g-select-wrap">
+                    <div class="g-select" >
+                        <select id="selectDisk" onchange="customCheck(this.id, this.value)">
+                            <option value="256">256</option>
+                            <option value="512">512</option>
+                            <option value="1024">1024</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <input class="editDisk" onchange="updateInput(this.id, this.value)" disabled="true" id="editDisk">
+                </dd>
+            </td>
+            <td class="fs-14" id="detailsDiskBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyDisk);"></i></button></td>
+        </tr>
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">State</div></th>
+            <td class="box left" ><div style="margin-left:5px;" id="detailsState"></div></td>
+            <td class="fs-14" ><i class="fa-xl fa-solid fa-stop custom-access-button detail_icon stop"></i><i class="fa-xl fa-solid fa-play custom-access-button detail_icon start" style="display:none;"></i></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<th:block layout:fragment="script2">
+    <script type="text/javascript">
+        var apps;
+        var processes;
+
+        function customCheck(id, value){
+            if(document.getElementById(id).value == "custom"){
+                if(id == "selectMemory"){
+                    document.getElementById("editMemory").removeAttribute('disabled');
+                } else if (id == "selectDisk"){
+                    document.getElementById("editDisk").removeAttribute('disabled');
+                } else if (id == "selectInstance"){
+                    document.getElementById("editInstance").removeAttribute('disabled');
+                } else {
+                    console.log("error check!!!!");
+                }
+            } else {
+                if(id == "selectMemory"){
+                    document.getElementById("editMemory").setAttribute('disabled', 'true');
+                } else if (id == "selectDisk"){
+                    document.getElementById("editDisk").setAttribute('disabled', 'true');
+                } else if (id == "selectInstance"){
+                    document.getElementById("editInstance").setAttribute('disabled', 'true');
+                } else {
+                    console.log("error check!!!!");
+                }
+            }
+        }
+        function modifyName(){
+            //기존 name과 동일한지 체크
+            var name =  document.getElementById('editName').value;
+            var sendData = JSON.stringify({
+                "name" : name
+            });
+            funcsc.postData('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}`, sendData, true, 'application/json', func.refresh);
+        }
+        function modifyInstance(){
+            //기존 name과 동일한지 체크
+            var instances;
+            if (document.getElementById('selectInstance').value == "custom" ){
+                instances = document.getElementById('editInstance').value;
+            } else {
+                instances = document.getElementById('selectInstance').value;
+            }
+            var sendData = JSON.stringify({
+                "instances" : instances
+            });
+            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+        }
+        function modifyMemory(){
+            //기존 name과 동일한지 체크
+            var memory;
+            if (document.getElementById('selectMemory').value == "custom" ){
+                memory = document.getElementById('editMemory').value;
+            } else {
+                memory = document.getElementById('selectMemory').value;
+            }
+            var sendData = JSON.stringify({
+                "memoryInMb" : memory
+            });
+            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+        }
+        function modifyDisk(){
+            //기존 name과 동일한지 체크
+            var disk;
+            if (document.getElementById('selectDisk').value == "custom" ){
+                memory = document.getElementById('editDisk').value;
+            } else {
+                memory = document.getElementById('selectDisk').value;
+            }
+            var sendData = JSON.stringify({
+                "diskInMb" : disk
+            });
+            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+        }
+        function getApps(){
+            funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/get`, 'application/json', (e) => {
+                apps = e;
+                getProcess();
+            });
+        }
+        function getProcess(){
+            funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/getProcess`, 'application/json', (e) => {
+                processes = e;
+                drawDetails();
+            });
+        }
+        function drawDetails(){
+            document.getElementById('editName').value=apps.name;
+            if ( processes.instances == 1 || processes.instances == 2 || processes.instances == 3 || processes.instances == 4 || processes.instances == 5){
+                document.getElementById('selectInstance').value=processes.instances;
+            } else {
+                document.getElementById('selectInstance').value="custom";
+                document.getElementById('editInstance').value=processes.instances;
+            }
+            if ( processes.memory_in_mb == 256 || processes.memory_in_mb == 512 || processes.memory_in_mb == 1024 ){
+                document.getElementById('selectMemory').value=processes.memory_in_mb;
+            } else {
+                document.getElementById('selectMemory').value="custom";
+                document.getElementById('editMemory').value=processes.memory_in_mb;
+            }
+            if ( processes.disk_in_mb == 256 || processes.disk_in_mb == 512 || processes.disk_in_mb == 1024 ){
+                document.getElementById('selectDisk').value=processes.disk_in_mb;
+            } else {
+                document.getElementById('selectDisk').value="custom";
+                document.getElementById('editDisk').value=processes.disk_in_mb;
+            }
+            document.getElementById('detailsState').innerText = apps.state;
+            if(apps.state == "STARTED"){
+                document.querySelector('.fa-play').style.display = "none";
+                document.querySelector('.fa-stop').style.display = "";
+            } else if (apps.state == "STOPPED"){
+                document.querySelector('.fa-play').style.display = "";
+                document.querySelector('.fa-stop').style.display = "none";
+            }
+            eventDetails();
+        }
+        function start(){
+            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/start`, '', true, 'application/json', func.refresh);
+        }
+        function stop(){
+            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/stop`, '', true, 'application/json', func.refresh);
+        }
+        function eventDetails(){
+            document.querySelector('.start').addEventListener('click', (e) => {
+                func.alertPopup('START', MSG_CHECK_TO_START, true, MSG_CONFIRM, start);
+            }, false);
+
+            document.querySelector('.stop').addEventListener('click', (e) => {
+                func.alertPopup('STOP', MSG_CHECK_TO_STOP, true, MSG_CONFIRM, stop);
+            }, false);
+
+            document.getElementById('delete').addEventListener('click', (e) => {
+                        func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, delete2);
+                    }, false);
+            document.addEventListener('click', (e) => {
+                if (e.target && e.target.id == `editNameBtn`) {
+                    var editName = document.getElementById(`editName`);
+                    var value = editName.value;
+                    editName.removeAttribute('disabled');
+                    editName.focus();
+                    editName.value = '';
+                    editName.value = value;
+                    }
+                if (e.target && e.target.id == `editInstanceBtn`) {
+                    var editInstance = document.getElementById(`editInstance`);
+                    var value = editInstance.value;
+                    editInstance.removeAttribute('disabled');
+                    editInstance.focus();
+                    editInstance.value = '';
+                    editInstance.value = value;
+                }
+                if (e.target && e.target.id == `editMemoryBtn`) {
+                    var editMemory = document.getElementById(`editMemory`);
+                    var value = editMemory.value;
+                    editMemory.removeAttribute('disabled');
+                    editMemory.focus();
+                    editMemory.value = '';
+                    editMemory.value = value;
+                }
+                if (e.target && e.target.id == `editDiskBtn`) {
+                    var editDisk = document.getElementById(`editDisk`);
+                    var value = editDisk.value;
+                    editDisk.removeAttribute('disabled');
+                    editDisk.focus();
+                    editDisk.value = '';
+                    editDisk.value = value;
+                }
+            });
+        }
+        function delete2(){
+            funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem('appGuid')}`, '', true, 'application/json', goToApps);
+        }
+        function initDetails(){
+            func.loading();
+            getApps();
+        }
+
+        initDetails();
+        window.onload = () => {
+            initDetails();
+        }
+
+        function goToApps(){
+		    document.location.href = URI_SC_WORKLOADS_APPS;
+	    }
+    </script>
+</th:block>
+
+</div>

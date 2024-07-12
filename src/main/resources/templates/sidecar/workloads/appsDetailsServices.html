@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/appsLayout}">
+
+    <div id="content" class="sub-page application">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <div layout:fragment="content">
+                    <div class="title">
+                        <ul id="tabParent">
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_INSTANCES)" class="tabBtn">Instances</a>
+                            </li>
+                            <li class="on">
+                                <a onclick="movePage(URI_SC_DETAILS_SERVICES)">Services</a>
+                            </li>
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_ENVIRONMENT)" class="tabBtn">Environment</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_ROUTES)">Routes</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
+                            </li>
+                        </ul>
+                        <div class="svc_button">
+                            <a href="javascript:;" class="connect" id="connect" th:text="#{M0882}"></a>
+                        </div>
+                    </div>
+                <div class="table_style01 on">
+                    <table>
+                        <caption>Services</caption>
+                        <colgroup >
+                            <col width="40%" />
+                            <col width="30%" />
+                            <col width="30%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Credentials</th>
+                            <th scope="col">Disconnect</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable services"></tbody>
+                    </table>
+                    <a class="more" href="javascript:">more</a>
+                </div>
+            </div>
+            </div>
+        </article>
+    </div>
+</div>
+<div layout:fragment="modal">
+    <div class="modal-wrap" style="display:none;">
+        <div class="modal">
+            <h5 th:text="#{M0034}"></h5>
+            <p th:text="#{M0018}"></p>
+            <button class="confirm" type="submit" th:text="#{M0026}"></button>
+            <a class="close" href="javascript:;" th:text="#{M0023}"></a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script th:inline="javascript" type="text/javascript">
+        window.onload = () => {
+            clicked_binding_guid="";
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+            var services;
+            var offset=0;
+            var limit=5;
+            var total_results=0;
+            var avsv;
+            const appsDetailsService = {
+                init(){
+                    funcsc.loadDataSidecar('GET',
+                     `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/get`, 'application/json', appsDetailsService.draw);
+                },
+
+                draw(data){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/getProcess`, 'application/json', appsDetailsService.process);
+                },
+                process(data){
+                    processes = data;
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/getEnvironment`, 'application/json', appsDetailsService.services);
+                },
+                services(data){
+                    if (typeof data.system_env_json.VCAP_SERVICES == "undefined" || data.system_env_json.VCAP_SERVICES == null || data.system_env_json.VCAP_SERVICES == ""){
+                        services = "";
+                    }
+                    else {
+                        services = data['system_env_json']['VCAP_SERVICES']['user-provided'];
+                    }
+                    appsDetailsService.realdraw();
+                },
+                realdraw(){
+
+                    if (offset == 0)
+                        total_results = services.length;
+                    if (services.length > 0) {
+                        for (var i = 0; i <= services.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < limit) {
+                                var html = `<tr>`
+                                + `<td class="left" id=${trId}>`
+                                + services[i].instance_name
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-eye serviceCredentialBtn custom-access-button" ></i></button>`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-link-slash custom-access-button serviceDisconnectBtn"></i>`
+                                + `</td>`
+                                + `</tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}>`
+                                + `<td class="left" id=${trId}>`
+                                + services[i].instance_name
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-eye serviceCredentialBtn custom-access-button" ></i></button>`
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-link-slash custom-access-button serviceDisconnectBtn"></i>`
+                                + `</td>`
+                                + `</tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable.services"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable.services"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    var serviceDisconnectBtn = document.getElementsByClassName('serviceDisconnectBtn');
+                    for (var i = 0 ; i < serviceDisconnectBtn.length; i++) {
+                        serviceDisconnectBtn[i].setAttribute('id', 'serviceDisconnectBtn_'+`${i}`);
+                    }
+
+                    var serviceCredentialBtn = document.getElementsByClassName('serviceCredentialBtn');
+                    for (var i = 0 ; i < serviceCredentialBtn.length; i++) {
+                        serviceCredentialBtn[i].setAttribute('id', 'serviceCredentialBtn_'+`${i}`);
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                    appsDetailsService.event();
+                },
+
+                list(data){
+                    func.removeHtml(document.querySelector('.eventList'));
+                    appsDetailsService.event();
+                },
+                more() {
+                    var startIndex = offset * limit;
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                credentials(title, url, name, data) {
+                    let json = JSON.stringify(data, null, 2);
+                    var html = `<div class="modal-wrap" id="modal">
+			            <div class="modal midium">
+				        <h5>${title}</h5>
+				        <dl>
+    				        <dt>Space 이름</dt>
+    					    <dd>
+    					        <textarea id="w3review" name="w3review" rows="4" cols="50" disabled>${json}</textarea>\
+    					    </dd>
+        				</dl>
+		    		    <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			            </div>
+		                </div>`;
+                    func.appendHtml(document.getElementById('wrap'), html, 'div');
+                    document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                        document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                    }, false);
+                },
+                disConnectService(){
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceBindings/${clickedBindingGuid}`, '', true, 'application/json', func.refresh);
+                },
+                event(){
+                    appsDetailsService.notconnecttedService();
+                    document.querySelector("#connect").addEventListener(
+                        "click",
+                        (e) => {
+                            appsModal.connectService(avsv);
+                        },
+                        false,
+                    );
+                // more 버튼 event
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (limit < total_results) {
+                                offset++;
+                                appsDetailsService.more();
+                            }
+                        },
+                        false,
+                    );
+                    document.addEventListener('click', (e) => {
+                        var serviceDisconnectBtn = document.getElementsByClassName('serviceDisconnectBtn');
+                        for (var i = 0; i <= serviceDisconnectBtn.length - 1; i++) {
+                            if (e.target && e.target.id == 'serviceDisconnectBtn_' + `${i}`) {
+                                var innerText = document.getElementById(`tr`+`${i}`).innerText;
+                                clickedBindingGuid = services[i].binding_guid;
+                                func.alertPopup('DISCONNECT', MSG_CHECK_TO_DISCONNECT, true, MSG_CONFIRM, appsDetailsService.disConnectService);
+
+                            }
+                        }
+
+                        var serviceCredentialBtn = document.getElementsByClassName('serviceCredentialBtn');
+                        for (var i = 0; i <= serviceCredentialBtn.length - 1; i++) {
+                            if (e.target && e.target.id == 'serviceCredentialBtn_' + `${i}`) {
+                                var innerText = document.getElementById(`tr`+`${i}`).innerText;
+                                appsModal.getCredentials(services[i].credentials, services[i].name);
+                            }
+                        }
+                    });
+                },
+                delete(){
+                },
+                notconnecttedService(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem("spaceGuid")}`, 'application/json', appsDetailsService.notconnecttedService1);
+                },
+                notconnecttedService1(data){
+                    let spaceServices = data.resources;
+                    let result = "";
+                    if(services.length == 0) {
+                        result = spaceServices;
+                    }
+                    else{
+                        result = spaceServices.filter(item => {
+	                        return !services.some(other => other.instance_guid === item.guid);
+                        });
+                    }
+                    avsv = result;
+                },
+                connected(title, url, name, data) {
+                    var options = ``;
+                    if(data.length == 0){
+                        options = `<option value="not_found">Not found available connect service</option>`
+                    }else {
+                        for (var i=0; i< data.length; i++){
+                        options = options + `<option value="${data[i].guid}">${data[i].name}</option>`
+                        }
+                    }
+
+                    var html = `<div class="modal-wrap" id="modal">
+			            <div class="modal midium">
+				            <h5>${title}</h5>
+				            <dl>
+				                <dt>Services</dt>
+					            <dd>
+						            <select name="cars" id="avservice">` +
+                                    options
+                                    +`</select>
+					            </dd>
+				            </dl>
+				            <a class="confirm" href="javascript:;">확인</a>
+				            <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			            </div>
+		            </div>`;
+                    func.appendHtml(document.getElementById('wrap'), html, 'div');
+                    document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                        document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                    }, false);
+
+                    document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                        let serviceGuid = document.querySelector('#avservice').options[document.querySelector('#avservice').selectedIndex].value;
+                        let appGuid = sessionStorage.getItem("appGuid");
+                        var sendData = JSON.stringify({
+                            "appGuid": appGuid,
+                            "serviceGuid": serviceGuid
+                        });
+                        funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/serviceBindings`, sendData, true, 'application/json', func.refresh);
+                    }, false);
+                },
+            }
+
+            appsDetailsService.init();
+        }
+    </script>
+</th:block>
+</html>

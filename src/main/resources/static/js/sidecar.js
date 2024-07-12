@@ -220,6 +220,103 @@ const funcsc = {
             request.send();
         }, 0);
     },
+    postDataWithPopup(method, url, data, bull, header, callFunc){
+        func.loading();
+        console.log("1");
+        if(sessionStorage.getItem('token') == null){
+            func.loginCheck();
+        };
+
+        var request = new XMLHttpRequest();
+        console.log("2");
+        setTimeout(function() {
+            request.open(method, url, false);
+            request.setRequestHeader('Content-type', header);
+            request.setRequestHeader('Authorization', sessionStorage.getItem('token'));
+            request.setRequestHeader('uLang', CURRENT_LOCALE_LANGUAGE);
+            request.onreadystatechange = () => {
+                console.log("4");
+                if (request.readyState === XMLHttpRequest.DONE){
+                    console.log("5");
+                    if(request.status === 200 && request.responseText != ''){
+                        console.log("6");
+                        //토큰 만료 검사
+                        if(JSON.parse(request.responseText).resultMessage == 'TOKEN_EXPIRED') {
+                            func.refreshToken();
+                            return func.saveData(method, url, data, bull, header, callFunc);
+                        }
+                        else if(JSON.parse(request.responseText).resultMessage == 'TOKEN_FAILED') {
+                            func.loginCheck();
+                            return func.loadData(method, url, header, callbackFunction, list);
+                        }
+                        else {
+                            console.log("7");
+                            document.getElementById('wrap').removeChild(document.getElementById('loading'));
+                            var response = JSON.parse(request.responseText);
+                            let url_tmp = URI_REQUEST_SC_API+"sidecar/";
+                            let urlPath = request.responseURL.split(url_tmp);
+                            let urlPath2 = urlPath[1].split('/');
+                            let urlPath3 = 0;
+                            let urlCategory = 0;
+                            urlCategory = urlPath2[0];
+                            if (urlPath2.length%2== 0){
+                                urlPath3 = urlPath2[urlPath2.length -2];
+
+                            }else{
+                                urlPath3 = urlPath2[urlPath2.length -1];
+                            }
+                            console.log(urlPath3);
+                                if(response.resultCode != RESULT_STATUS_FAIL) {
+                                    console.log("SUCCESS!");
+                                    if(method == 'POST') {
+                                        if((urlCategory == "processes" && urlPath3 == "scale") || (urlCategory == "apps" && urlPath3 == "start" ) || (urlCategory == "apps" && urlPath3 == "stop" )){
+                                            console.log("SUCCESS! SCALE");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }else if ((urlCategory == "serviceBindings" && urlPath3 == "serviceBindings" ) || (urlCategory == "routes" && urlPath3 == "insertDestinations" )){
+                                            console.log("SUCCESS! CONNECT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CONNECT, true, MSG_CONFIRM, callFunc);
+                                        }else if ((urlCategory == "apps" && urlPath3 == "start" ) || (urlCategory == "routes" && urlPath3 == "insertDestinations" )){
+                                            console.log("SUCCESS! START");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CONNECT, true, MSG_CONFIRM, callFunc);
+                                        }
+                                        else{
+                                            console.log("SUCCESS! POST");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
+                                        }
+                                    }else if (method == 'DELETE') {
+                                        if ((urlCategory == "serviceBindings" && urlPath3 == "serviceBindings" ) || (urlCategory == "routes" && urlPath3 == "removeDestinations" )){
+                                            console.log("SUCCESS! DISCONNECT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_DISCONNECT, true, MSG_CONFIRM, callFunc);
+                                        }else {
+                                            console.log("SUCCESS! DELETE");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
+                                        }
+                                    }else if (method == 'PATCH') {
+                                        if(urlCategory == "apps" && urlPath3 == "updateEnvironmentVariables"){
+                                            console.log("SUCCESS! UPDATE ENVIRONMENT");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }else{
+                                            console.log("SUCCESS! PATCH");
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_PATCH, true, MSG_CONFIRM, callFunc);
+                                        }
+                                    }
+                                }
+                                else {
+                                    console.log("ERROR!");
+                                    func.alertPopup('ERROR', ALERT_POPUP_ERROR, true, MSG_CONFIRM, 'closed');
+                                }
+                          /*  }
+                            else {
+                                console.log("ERROR2");
+                                func.alertPopup('ERROR', response.detailMessage, true, MSG_CONFIRM, 'closed');
+                            }*/
+                        }
+                    }
+                }
+            };
+            console.log("3");
+            request.send(data); }, 0);
+    },
     postData(method, url, data, bull, header, callFunc){
         func.loading();
         if(sessionStorage.getItem('token') == null){func.loginCheck(); }

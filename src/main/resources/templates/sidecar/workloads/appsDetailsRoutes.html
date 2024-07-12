@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/appsLayout}">
+
+
+    <div id="content" class="sub-page application">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <div layout:fragment="content">
+                    <div class="title">
+                        <ul id="tabParent">
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_INSTANCES)" class="tabBtn">Instances</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_SERVICES)">Services</a>
+                            </li>
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_ENVIRONMENT)" class="tabBtn">Environment</a>
+                            </li>
+                            <li class="on">
+                                <a onclick="movePage(URI_SC_DETAILS_ROUTES)">Routes</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
+                            </li>
+                        </ul>
+                        <div class="route_button">
+                            <a href="javascript:;" id ="connect" class="connect" th:text="#{M0882}"></a>
+                        </div>
+                    </div>
+                    <div class="table_style01 on">
+                        <table>
+                            <caption>Routes</caption>
+                            <colgroup >
+                                <col width="75%" />
+                                <col width="25%" />
+                            </colgroup>
+                            <thead>
+
+                            <tr>
+                                <th scope="col">Route</th>
+                                <th scope="col">Disconnect</th>
+                            </tr>
+
+                            </thead>
+                            <tbody class="listTable routes"></tbody>
+                        </table>
+                        <a class="more" href="javascript:">more</a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+<div layout:fragment="modal">
+    <div class="modal-wrap" style="display:none;">
+        <div class="modal">
+            <h5 th:text="#{M0034}"></h5>
+            <p th:text="#{M0018}"></p>
+            <button class="confirm" type="submit" th:text="#{M0026}"></button>
+            <a class="close" href="javascript:;" th:text="#{M0023}"></a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+            var routes;
+            var offset=0;
+            var limit=5;
+            var total_results=0;
+            var avsv;
+            const appsDetailsRoutes = {
+
+                init(){
+                    appsDetailsRoutes.getRoutes();
+                },
+                getRoutes(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/list?appGuids=${sessionStorage.getItem("appGuid")}`, 'application/json', appsDetailsRoutes.drawRoutes);
+                },
+                drawRoutes(data){
+                    routes= data.resources;
+                    appsDetailsRoutes.notconnecttedService();
+
+                    if (offset == 0)
+                        total_results = routes.length;
+                    if (routes.length > 0) {
+                        for (var i = 0; i <= routes.length - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < limit) {
+                                var html = `<tr>`
+                                + `<td class="left" id=${trId}>`
+                                + routes[i].url
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-link-slash custom-access-button routeDisconnectBtn"></i>`
+                                + `</td>`
+                                + `</tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}>`
+                                + `<td class="left" id=${trId}>`
+                                + routes[i].url
+                                + `</td>`
+                                + `<td class="fs-14">`
+                                + `<i class="fa-xl fa-solid fa-link-slash custom-access-button routeDisconnectBtn"></i>`
+                                + `</td>`
+                                + `</tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable.routes"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    var routeDisconnectBtn = document.getElementsByClassName('routeDisconnectBtn');
+                            for (var i = 0 ; i < routeDisconnectBtn.length; i++) {
+                                routeDisconnectBtn[i].setAttribute('id', 'routeDisconnectBtn_'+`${i}`);
+                            }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+
+
+
+
+
+                    appsDetailsRoutes.event();
+                },
+
+                list(data){
+                    func.removeHtml(document.querySelector('.eventList'));
+                    appsDetailsRoutes.event();
+                },
+                more() {
+                    var startIndex = offset * limit;
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event(){
+                // more 버튼 event
+
+                    document.querySelector("#connect").addEventListener(
+                        "click",
+                        (e) => {
+                            appsModal.connectRoute(avsv);
+                        },
+                        false,
+                    );
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (limit < total_results) {
+                                offset++;
+                                appsDetailsRoutes.more();
+                            }
+                        },
+                        false,
+                    );
+
+                    var routeDisconnectBtn = document.getElementsByClassName('routeDisconnectBtn');
+
+                    document.addEventListener('click', (e) => {
+                        var routeDisconnectBtn = document.getElementsByClassName('routeDisconnectBtn');
+                        for (var i = 0; i <= routeDisconnectBtn.length - 1; i++) {
+                            if (e.target && e.target.id == 'routeDisconnectBtn_' + `${i}`) {
+                                var innerText = document.getElementById(`tr`+`${i}`).innerText;
+                                routeGuid = routes[i].guid;
+                                func.alertPopup('DISCONNECT', MSG_CHECK_TO_DISCONNECT, true, MSG_CONFIRM, appsDetailsRoutes.disConnectRoute);
+                            }
+                        }
+                    });
+                },
+                disConnectRoute(){
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/removeDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);
+                },
+                notconnecttedService(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/list?spaceGuids=${sessionStorage.getItem("spaceGuid")}`, 'application/json', appsDetailsRoutes.notconnecttedService1);
+                },
+                notconnecttedService1(data){
+                    const filteredNumbers = data.resources.filter(item => {
+                        return item.destinations.length === 0;
+                    });
+                    avsv = filteredNumbers;
+
+                },
+                connected(title, url, name, data) {
+                    var options = ``;
+                    if(data.length == 0){
+                        options = `<option value="not_found">Not found available connect service</option>`
+                    }else {
+                        for (var i=0; i< data.length; i++){
+                        options = options + `<option value="${data[i].guid}">${data[i].url}</option>`
+                        }
+                    }
+
+                    var html = `<div class="modal-wrap" id="modal">
+			            <div class="modal midium">
+				            <h5>${title}</h5>
+				            <dl>
+				                <dt>Services</dt>
+					            <dd>
+						            <select name="cars" id="avservice">` +
+                                    options
+                                    +`</select>
+					            </dd>
+				            </dl>
+				            <a class="confirm" href="javascript:;">확인</a>
+				            <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			            </div>
+		            </div>`;
+                    func.appendHtml(document.getElementById('wrap'), html, 'div');
+                    document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                        document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                    }, false);
+
+                    document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                        let routeGuid = document.querySelector('#avservice').options[document.querySelector('#avservice').selectedIndex].value;
+                        var sendData = JSON.stringify({
+                            "appGuid": "5c51edf7-5c6b-4cc2-9623-cbcbad40c5de",
+                            "routeGuid": routeGuid
+                        });
+                        funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/insertDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);
+                    }, false);
+                },
+
+                delete(){
+                },
+
+            }
+
+            appsDetailsRoutes.init();
+        }
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/appsLayout}">
+
+    <div id="content" class="sub-page application">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Workloads</a></li>
+                <li><a onclick="movePage(URI_SC_WORKLOADS_APPS)">Applications</a></li>
+            </ul>
+        </article>
+        <article class="base">
+            <div class="notice">
+                <div layout:fragment="content">
+                    <div class="title">
+                        <ul id="tabParent">
+                            <li >
+                                <a onclick="movePage(URI_SC_DETAILS_INSTANCES)" class="tabBtn">Instances</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_SERVICES)">Services</a>
+                            </li>
+                            <li class="on">
+                                <a onclick="movePage(URI_SC_DETAILS_ENVIRONMENT)" class="tabBtn">Environment</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_ROUTES)">Routes</a>
+                            </li>
+                            <li>
+                                <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
+                            </li>
+                        </ul>
+                        <div class="env_button">
+                            <a href="javascript:;" class="add" th:text="#{M0223}"></a>
+                        </div>
+                    </div>
+                <div class="table_style01 on">
+                    <table>
+                        <caption>Environment</caption>
+                        <colgroup >
+                            <col width="40%" />
+                            <col width="40%" />
+                            <col width="10%" />
+                            <col width="10%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Save</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody class="listTable environment"></tbody>
+                    </table>
+                    <a class="more" href="javascript:">more</a>
+                    <br>
+                    <h4>System Environment</h4>
+                    <div class="custom-access-contents">
+                        <div id="environmentsForLinux" class="environments">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </article>
+    </div>
+<div layout:fragment="modal">
+    <div class="modal-wrap" style="display:none;">
+        <div class="modal">
+            <h5 th:text="#{M0034}"></h5>
+            <p th:text="#{M0018}"></p>
+            <button class="confirm" type="submit" th:text="#{M0026}"></button>
+            <a class="close" href="javascript:;" th:text="#{M0023}"></a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+
+        window.onload = () => {
+            var environment;
+            let offset=0;
+            let limit=5;
+            let totalResults=0;
+            let onchange='printName()';
+
+            //importPage('appsDetails');
+            func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
+
+            const appsDetailsEnvironment = {
+                init(){
+                    appsDetailsEnvironment.getEnvironment();
+                },
+                getEnvironment(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/getEnvironment`, 'application/json', appsDetailsEnvironment.drawEnvironment);
+                },
+                drawEnvironment(data){
+                    environment = data;
+                    let envLength = Object.keys(environment.environment_variables).length;
+
+                    if (offset == 0)
+                        totalResults = envLength;
+
+                    if (envLength > 0) {
+                        for (var i = 0; i <= envLength - 1; i++) {
+                            var trId = "tr" + i;
+                            if (i < limit) {
+                                var html = `<tr>`
+                                + `<td class="left" id=${trId}>`
+                                + Object.keys(environment.environment_variables)[i]
+                                + `</td>`
+                                + `<td class="left path"><input class="editPath" value="${environment.environment_variables[Object.keys(environment.environment_variables)[i]]}" disabled="true"/><i class="fa-xl fa-solid fa-pen-to-square editPathBtn custom-access-button" ></i></button></td>`
+                                + `<td class="fs-14"><i class="fa-xl fa-solid fa-floppy-disk editPathSaveBtn custom-access-button" ></i></button></td>`
+                                + `<td class="fs-14"><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button" ></i></button></td>`
+                                + `</tr>`;
+                            } else {
+                                var html = `<tr style="display: none;" id=${trId}>`
+                                + `<td class="left">`
+                                + Object.keys(environment.environment_variables)[i]
+                                + `</td>`
+                                + `<td class="left path"><input class="editPath" value="${environment.environment_variables[Object.keys(environment.environment_variables)[i]]}" disabled="true"/><i class="fa-xl fa-solid fa-pen-to-square editPathBtn custom-access-button" ></i></button></td>`
+                                + `<td class="fs-14"><i class="fa-xl fa-solid fa-floppy-disk editPathSaveBtn custom-access-button" ></i></button></td>`
+                                + `<td class="fs-14"><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button" ></i></button></td>`
+                                + `</tr>`;
+                            }
+                            func.appendHtml(
+                                document.querySelector(".listTable.environment"),
+                                html,
+                                "tbody",
+                            );
+                        }
+                        var editPath = document.getElementsByClassName('editPath');
+                        for (var i = 0 ; i < editPath.length; i++) {
+                            editPath[i].setAttribute('id', 'editPath_'+`${i}`);
+                        }
+                        var editPathBtn = document.getElementsByClassName('editPathBtn');
+                        for (var i = 0 ; i < editPathBtn.length; i++) {
+                            editPathBtn[i].setAttribute('id', 'editPathBtn_'+`${i}`);
+                        }
+                        var editPathSaveBtn = document.getElementsByClassName('editPathSaveBtn');
+                        for (var i = 0 ; i < editPathSaveBtn.length; i++) {
+                            editPathSaveBtn[i].setAttribute('id', 'editPathSaveBtn_'+`${i}`);
+                        }
+
+                        var deleteRowBtn = document.getElementsByClassName('deleteRowBtn');
+                        for (var i = 0 ; i < deleteRowBtn.length; i++) {
+                            deleteRowBtn[i].setAttribute('id', 'deleteRowBtn_'+`${i}`);
+                        }
+                    } else {
+                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        func.appendHtml(
+                            document.querySelector(".listTable.environment"),
+                            html,
+                            "tbody",
+                        );
+                    }
+                    // more 버튼 활성, 비활성
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        totalResults,
+                    );
+
+                    if (endIndex < totalResults) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                    var html = `<pre><code class="bash">`+JSON.stringify(environment, null, 2) +`</code></pre>`;
+                        func.appendHtml(
+                            document.querySelector(".environments"),
+                            html,
+                            "div",
+                        );
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
+                    appsDetailsEnvironment.event();
+                },
+
+                list(data){
+                    func.removeHtml(document.querySelector('.eventList'));
+                    appsDetailsEnvironment.event();
+                },
+
+                more() {
+                    var startIndex = offset * limit;
+                    var endIndex = Math.min(
+                        (offset + 1) * limit,
+                        total_results,
+                    );
+                    for (var i = startIndex; i < endIndex; i++) {
+                        var trId = "tr" + i;
+                        var rows = document.getElementById(trId);
+                        rows.style.display = "";
+                    }
+
+                    // more 버튼 활성, 비활성
+                    if (endIndex < total_results) {
+                        document.querySelector(".more").classList.toggle("on", true);
+                    } else {
+                        document.querySelector(".more").classList.toggle("on", false);
+                    }
+
+                    if (document.getElementById("loading")) {
+                        document
+                            .getElementById("wrap")
+                            .removeChild(document.getElementById("loading"));
+                    }
+                },
+                event(){
+                // more 버튼 event
+                    document.querySelector(".more").addEventListener(
+                        "click",
+                        (e) => {
+                            if (limit < totalResults) {
+                                offset++;
+                                appsDetailsEnvironment.more();
+                            }
+                        },
+                        false,
+                    );
+                    document.querySelector('.add').addEventListener('click', (e) => {
+                        appsModal.addEnvironment(environment);
+                    }, false);
+
+                    document.addEventListener('click', (e) => {
+                        let editPath = document.getElementsByClassName('editPath');
+                        for (var i = 0; i <= editPath.length - 1; i++) {
+                            if (e.target && e.target.id == 'editPathBtn_' + `${i}`) {
+                                let editPathId = document.getElementById('editPath_'+ `${i}`);
+                                editPathId.removeAttribute('disabled');
+                                editPathId.focus();
+                            }
+
+                            if (e.target && e.target.id == 'editPathSaveBtn_' + `${i}`) {
+                                let key = document.getElementById('tr'+ i).innerText;
+                                let value = document.getElementById('editPath_'+ `${i}`).value;
+                                sendData = JSON.stringify({
+                                    "environmentVariables" : {
+                                    [key]: value
+                                }
+                                });
+                                func.alertPopup('MODIFY', MSG_CHECK_TO_MODIFY, true, MSG_CONFIRM, appsDetailsEnvironment.updateEnvironmentVariables);
+                            }
+                        }
+
+                        var deleteRowBtn = document.getElementsByClassName('deleteRowBtn');
+                        for (var i = 0; i <= deleteRowBtn.length - 1; i++) {
+                            if (e.target && e.target.id == 'deleteRowBtn_' + `${i}`) {
+                                let key = Object.keys(environment.environment_variables)[i];
+                                let value = environment.environment_variables[Object.keys(environment.environment_variables)[i]];
+                                sendData = {
+                                    key: key
+                                }
+                                func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, appsDetailsEnvironment.deleteEnvironmentVariables);
+                            }
+                        }
+                    });
+                },
+                deleteEnvironmentVariables(){
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/deleteEnvironmentVariables`, JSON.stringify(sendData), true, 'application/json', func.refresh);
+                },
+                updateEnvironmentVariables(){
+                    funcsc.postData('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/updateEnvironmentVariables`, sendData, true, 'application/json', func.refresh);
+                },
+                delete(){
+                },
+            }
+
+            appsDetailsEnvironment.init();
+        }
+    </script>
+</th:block>
+</html>

@@ -14,5 +14,10 @@ public class ConstantsUrl extends org.container.platform.web.ui.common.Constants
 
     public static final String URI_SC_LIST = "/list";
     public static final String URI_SC_DETAILS = "/details";
+    public static final String URI_SC_DETAILS_INSTANCES = URI_SC_WORKLOADS_APPS + "/detailsInstances";
+    public static final String URI_SC_DETAILS_SERVICES = URI_SC_WORKLOADS_APPS + "/detailsServices";
+    public static final String URI_SC_DETAILS_ENVIRONMENT = URI_SC_WORKLOADS_APPS + "/detailsEnvironment";
+    public static final String URI_SC_DETAILS_ROUTES = URI_SC_WORKLOADS_APPS + "/detailsRoutes";
+    public static final String URI_SC_DETAILS_LOG = URI_SC_WORKLOADS_APPS + "/detailsLog";
     public static final String URI_SC_UPDATE = "/update";
 }

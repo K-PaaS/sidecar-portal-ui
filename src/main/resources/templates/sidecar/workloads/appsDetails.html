@@ -119,7 +119,7 @@
             var sendData = JSON.stringify({
                 "name" : name
             });
-            funcsc.postData('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}`, sendData, true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}`, sendData, true, 'application/json', func.refresh);
         }
         function modifyInstance(){
             //기존 name과 동일한지 체크
@@ -132,7 +132,7 @@
             var sendData = JSON.stringify({
                 "instances" : instances
             });
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
         }
         function modifyMemory(){
             //기존 name과 동일한지 체크
@@ -145,7 +145,7 @@
             var sendData = JSON.stringify({
                 "memoryInMb" : memory
             });
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
         }
         function modifyDisk(){
             //기존 name과 동일한지 체크
@@ -158,7 +158,7 @@
             var sendData = JSON.stringify({
                 "diskInMb" : disk
             });
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
         }
         function getApps(){
             funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/get`, 'application/json', (e) => {
@@ -203,10 +203,10 @@
             eventDetails();
         }
         function start(){
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/start`, '', true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/start`, '', true, 'application/json', func.refresh);
         }
         function stop(){
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/stop`, '', true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/stop`, '', true, 'application/json', func.refresh);
         }
         function eventDetails(){
             document.querySelector('.start').addEventListener('click', (e) => {
@@ -256,7 +256,7 @@
             });
         }
         function delete2(){
-            funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem('appGuid')}`, '', true, 'application/json', goToApps);
+            funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem('appGuid')}`, '', true, 'application/json', goToApps);
         }
         function initDetails(){
             func.loading();

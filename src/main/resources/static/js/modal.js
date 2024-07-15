@@ -36,7 +36,7 @@ const appsModal = {
     	    if (Object.keys(environment.environment_variables).some(other => other === key)){
     	        console.log("중복된 값");
     	    }else {
-    	        funcsc.postData('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/updateEnvironmentVariables`, sendData, true, 'application/json', func.refresh);
+    	        funcsc.postDataWithPopup('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/updateEnvironmentVariables`, sendData, true, 'application/json', func.refresh);
     	    }
     	}, false);
     },
@@ -99,7 +99,7 @@ const appsModal = {
                 "appGuid": appGuid,
                 "serviceGuid": serviceGuid
             });
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/serviceBindings`, sendData, true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/serviceBindings`, sendData, true, 'application/json', func.refresh);
         }, false);
     },
     //Route
@@ -140,7 +140,7 @@ const appsModal = {
                 "appGuid": appGuid,
                 "routeGuid": routeGuid
             });
-            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/insertDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);
+            funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/insertDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);
         }, false);
     },
 }

@@ -266,10 +266,10 @@
                     });
                 },
                 deleteEnvironmentVariables(){
-                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/deleteEnvironmentVariables`, JSON.stringify(sendData), true, 'application/json', func.refresh);
+                    funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/deleteEnvironmentVariables`, JSON.stringify(sendData), true, 'application/json', func.refresh);
                 },
                 updateEnvironmentVariables(){
-                    funcsc.postData('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/updateEnvironmentVariables`, sendData, true, 'application/json', func.refresh);
+                    funcsc.postDataWithPopup('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/updateEnvironmentVariables`, sendData, true, 'application/json', func.refresh);
                 },
                 delete(){
                 },

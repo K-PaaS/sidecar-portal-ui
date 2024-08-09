@@ -485,8 +485,9 @@ const funcsc = {
             for (var i = 0; i <= data.itemMetaData.allItemCount - 1; i++) {
                 for(var j = 0; j < data.items[i].items.length; j++) {
                     if (data.items[i].items[j].roleSetCode === SIDECAR_ROLE_USER) {
-                        var users = data.items[i].items[j].userId;
-                        var html = `<option value="${users}">${users}</option>`;
+                        var userId = data.items[i].items[j].userId;
+                        var userAuthId = data.items[i].items[j].userAuthId;
+                        var html = `<option value="${userAuthId}">${userId}</option>`;
                         func.appendHtml(document.getElementById('createName'), html, 'select');
                     }
                 }
@@ -519,7 +520,7 @@ const funcsc = {
                 }else {
                     var orgGuid = sessionStorage.getItem("org_guid");
                     var type = document.querySelector('input[type=radio][name=organization]:checked').value;
-                    var user = "system:serviceaccount:" + SIDECAR_ROLE_USER + ":" + document.getElementById('createName').value;
+                    var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
                     var sendData = JSON.stringify({
                         "orgGuid": orgGuid,
                         "type": type,

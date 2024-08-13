@@ -351,14 +351,17 @@ const funcsc = {
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
                                     }else if (data === 'org') {
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
-                                    }else if (data.includes("service")) {
-                                        data = data.replace("service","");
-                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/service.delete~${data}`, "application/json", callFunc);
-                                    }else if (data.includes("binding")) {
-                                        data = data.replace("binding","");
-                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/binding.delete~${data}`, "application/json", callFunc);
-                                    }else {
+                                    }else if (data.includes("domain")) {
+                                        data = data.replace("domain","");
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/domain.delete~${data}`, "application/json", callFunc);
+                                    }else if (data.includes("route")) {
+                                        data = data.replace("route","");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/route.delete~${data}`, "application/json", callFunc);
+                                    }else if (data.includes("role")) {
+                                        data = data.replace("role","");
+                                        funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/role.delete~${data}`, "application/json", callFunc);
+                                    }else {
+                                        func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
                                     }
                                 }
                             } else if (response.resultCode == RESULT_STATUS_FAIL && method === 'DELETE') {
@@ -366,17 +369,20 @@ const funcsc = {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/space.delete~${sessionStorage.getItem("space_guid")}`, "application/json", callFunc);
                                 }else if (data === 'org') {
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/org.delete~${sessionStorage.getItem("org_guid")}`, "application/json", callFunc);
-                                }else if (data.includes("service")) {
-                                    data = data.replace("service","");
-                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/service.delete~${data}`, "application/json", callFunc);
-                                }else if (data.includes("binding")) {
-                                    data = data.replace("binding","");
-                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/binding.delete~${data}`, "application/json", callFunc);
-                                }else {
+                                }else if (data.includes("domain")){
+                                    data = data.replace("domain","");
                                     funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/domain.delete~${data}`, "application/json", callFunc);
+                                }else if (data.includes("route")) {
+                                    data = data.replace("route","");
+                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/route.delete~${data}`, "application/json", callFunc);
+                                }else if (data.includes("role")) {
+                                    data = data.replace("role","");
+                                    funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/role.delete~${data}`, "application/json", callFunc);
+                                }else  {
+                                    func.alertPopup('ERROR', ALERT_POPUP_FAIL +"<br>"+ response.detailMessage, true, MSG_CONFIRM, 'closed');
                                 }
                             } else {
-                                func.alertPopup('ERROR', ALERT_POPUP_FAIL + response.detailMessage, true, MSG_CONFIRM, 'closed');
+                                func.alertPopup('ERROR', ALERT_POPUP_FAIL +"<br>"+ response.detailMessage, true, MSG_CONFIRM, 'closed');
                             }
                         }
                     }

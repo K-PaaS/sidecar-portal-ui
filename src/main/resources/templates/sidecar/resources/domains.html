@@ -148,7 +148,7 @@
                     test();
                 },
                 domainDelete() {
-                    const data = domain.delete_tg_guid;
+                    const data = "domain"+domain.delete_tg_guid;
                     funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/domains/${domain.delete_tg_guid}`, data, true, 'application/json', func.refresh);
                 }
             };

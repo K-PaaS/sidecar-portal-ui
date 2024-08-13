@@ -130,7 +130,10 @@
                 function cluster_user(cluster_data) {
                     if (sidecar_data.pagination.total_results > 0) {
                         var dataArray = [];
+                        var existUserIdx = -1 ;
+
                         for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
+                            existUserIdx = -1;
                             var userCheckbox = sidecar_data.resources[i].type === "organization_user" ? "checked" : "";
                             var managerCheckbox = sidecar_data.resources[i].type === "organization_manager" ? "checked" : "";
                             var auditorrCheckbox = sidecar_data.resources[i].type === "organization_auditor" ? "checked" : "";
@@ -141,11 +144,22 @@
                             var userLastPart = split[split.length - 1];
 
                             detail.users = sidecar_data.resources[i].relationships.user.data.guid;
+                            if (i > 0)
+                                for (let x = 0 ; x < dataArray.length ; x++)
+                                    if (dataArray[x].includes(detail.users)) existUserIdx = x;
 
                             if (!userId.startsWith("system:serviceaccount:")) {    // UA
                                 var account = "UA";
                                 var serviceAccountName = "-";
-                                dataArray[i] = [account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                                if (existUserIdx < 0)
+                                    dataArray.push([account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users]);
+                                else
+                                    if (userCheckbox)
+                                        dataArray[existUserIdx][3] = userCheckbox;
+                                    else if (managerCheckbox)
+                                        dataArray[existUserIdx][4] = managerCheckbox;
+                                    else if (auditorCheckbox)
+                                        dataArray[existUserIdx][5] = auditorCheckbox;
                             } else {  //SA
                                 var condition = false;
                                 var account = "SA";
@@ -153,15 +167,31 @@
                                 for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
                                     var serviceAccountName = cluster_data.items[j].serviceAccountName;
 
-                                    if (serviceAccountName === userLastPart) {       // SA(Portal)
+                                    if (serviceAccountName === userLastPart) {// SA(Portal)
                                         var userId = cluster_data.items[j].userId;
-                                        dataArray[i] = [account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                                        if (existUserIdx < 0)
+                                            dataArray.push([account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users]);
+                                        else
+                                        if (userCheckbox)
+                                            dataArray[existUserIdx][3] = userCheckbox;
+                                        else if (managerCheckbox)
+                                            dataArray[existUserIdx][4] = managerCheckbox;
+                                        else if (auditorCheckbox)
+                                            dataArray[existUserIdx][5] = auditorCheckbox;
                                         condition = true;
                                         break;
                                     }
-                                    if (!condition) {          // SA(CLI)
+                                    if (!condition) { // SA(CLI)
                                         var userId = "-";
-                                        dataArray[i] = [account,userId,userLastPart,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users];
+                                        if (existUserIdx < 0)
+                                            dataArray.push([account,userId,userLastPart,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users]);
+                                        else
+                                            if (userCheckbox)
+                                                dataArray[existUserIdx][3] = userCheckbox;
+                                            else if (managerCheckbox)
+                                                dataArray[existUserIdx][4] = managerCheckbox;
+                                            else if (auditorCheckbox)
+                                                dataArray[existUserIdx][5] = auditorCheckbox;
                                     }
                                 }
                             }
@@ -262,11 +292,11 @@
                     "type": type,
                     "user": user
                 }
-                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
+                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',func.refresh);
             } else {
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, 'role'+roleGuid , true, 'application/json',func.refresh);
             }
         }
         document.addEventListener("change", function(event) {

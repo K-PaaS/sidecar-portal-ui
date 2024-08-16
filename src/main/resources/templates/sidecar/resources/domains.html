@@ -39,6 +39,7 @@
 <th:block layout:fragment="script">
     <script type="text/javascript">
         window.onload = () => {
+            func.invisible = 2;
             func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.DOMAINS);
             funcsc.initOrgsSpaces();
             callbackFuncNameLoad();

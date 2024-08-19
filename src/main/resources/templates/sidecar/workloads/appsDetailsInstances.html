@@ -106,13 +106,18 @@
                             var trId = "tr" + i;
                             var initmem = instances[i].usage.mem/1024/1024;
                             var mem = Math.floor(initmem);
+                            var cpu = instances[i].usage.cpu;
+                            if (cpu == null){
+                                cpu = 0;
+                            }
                             if (i < limit) {
                                 var html = `<tr>`
                                 + `<td class="fs-14" id=${trId}>`
                                 + i
                                 + `</td>`
                                 + `<td class="fs-14">`
-                                + `${instances[i].usage.cpu} %`
+                                //+ `${instances[i].usage.cpu} %`
+                                + `${cpu} %`
                                 + `</td>`
                                 + `<td class="fs-14">`
                                 + mem+' MB'
@@ -127,7 +132,8 @@
                                 + i
                                 + `</td>`
                                 + `<td class="fs-14">`
-                                + `${instances[i].usage.cpu} %`
+                                //+ `${instances[i].usage.cpu} %`
+                                + `${cpu} %`
                                 + `</td>`
                                 + `<td class="fs-14">`
                                 + mem+' MB'

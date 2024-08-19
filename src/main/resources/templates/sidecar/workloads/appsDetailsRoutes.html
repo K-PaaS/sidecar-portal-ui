@@ -32,7 +32,7 @@
                                 <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
                             </li>
                         </ul>
-                        <div class="route_button">
+                        <div class="routeButton">
                             <a href="javascript:;" id ="connect" class="connect" th:text="#{M0882}"></a>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
             var offset=0;
             var limit=5;
             var total_results=0;
-            var avsv;
+            var connectAvailableRoutes;
             const appsDetailsRoutes = {
 
                 init(){
@@ -89,7 +89,7 @@
                 },
                 drawRoutes(data){
                     routes= data.resources;
-                    appsDetailsRoutes.notconnecttedService();
+                    appsDetailsRoutes.notConnecttedRoutes();
 
                     if (offset == 0)
                         total_results = routes.length;
@@ -122,9 +122,9 @@
                             );
                         }
                     } else {
-                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        var html = `<tr><td colspan="2">No Data.</td></tr>`;
                         func.appendHtml(
-                            document.querySelector(".listTable"),
+                            document.querySelector(".listTable.routes"),
                             html,
                             "tbody",
                         );
@@ -193,7 +193,7 @@
                     document.querySelector("#connect").addEventListener(
                         "click",
                         (e) => {
-                            appsModal.connectRoute(avsv);
+                            appsModal.connectRoute(connectAvailableRoutes);
                         },
                         false,
                     );
@@ -224,20 +224,20 @@
                 disConnectRoute(){
                     funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/removeDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);
                 },
-                notconnecttedService(){
-                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/list?spaceGuids=${sessionStorage.getItem("spaceGuid")}`, 'application/json', appsDetailsRoutes.notconnecttedService1);
+                notConnecttedRoutes(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, 'application/json', appsDetailsRoutes.notConnecttedRoutes1);
                 },
-                notconnecttedService1(data){
+                notConnecttedRoutes1(data){
                     const filteredNumbers = data.resources.filter(item => {
                         return item.destinations.length === 0;
                     });
-                    avsv = filteredNumbers;
+                    connectAvailableRoutes = filteredNumbers;
 
                 },
                 connected(title, url, name, data) {
                     var options = ``;
                     if(data.length == 0){
-                        options = `<option value="not_found">Not found available connect service</option>`
+                        options = `<option value="notFound">${NOT_FOUND_AVAILABLE_CONNECT_ROUTE}</option>`
                     }else {
                         for (var i=0; i< data.length; i++){
                         options = options + `<option value="${data[i].guid}">${data[i].url}</option>`
@@ -248,14 +248,14 @@
 			            <div class="modal midium">
 				            <h5>${title}</h5>
 				            <dl>
-				                <dt>Services</dt>
+				                <dt>Routes</dt>
 					            <dd>
-						            <select name="cars" id="avservice">` +
+						            <select name="selectRoute" id="selectRoutes">` +
                                     options
                                     +`</select>
 					            </dd>
 				            </dl>
-				            <a class="confirm" href="javascript:;">확인</a>
+				            <a class="confirm" href="javascript:;">${MSG_CONFIRM}</a>
 				            <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
 			            </div>
 		            </div>`;
@@ -265,9 +265,13 @@
                     }, false);
 
                     document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
-                        let routeGuid = document.querySelector('#avservice').options[document.querySelector('#avservice').selectedIndex].value;
+                        let routeGuid = document.querySelector('#selectRoute').options[document.querySelector('#selectRoute').selectedIndex].value;
+                        if (routeGuid == "notFound"){
+                            func.alertPopup('ERROR', NOT_FOUND_AVAILABLE_CONNECT_ROUTE, true, MSG_CONFIRM, 'closed');
+                            return false;
+                        }
                         var sendData = JSON.stringify({
-                            "appGuid": "5c51edf7-5c6b-4cc2-9623-cbcbad40c5de",
+                            "appGuid": sessionStorage.getItem("appGuid"),
                             "routeGuid": routeGuid
                         });
                         funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/routes/${routeGuid}/insertDestinations/${sessionStorage.getItem("appGuid")}`, '', true, 'application/json', func.refresh);

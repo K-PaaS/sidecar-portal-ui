@@ -31,7 +31,7 @@
                                 <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
                             </li>
                         </ul>
-                        <div class="env_button">
+                        <div class="envButton">
                             <a href="javascript:;" class="add" th:text="#{M0223}"></a>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
                             deleteRowBtn[i].setAttribute('id', 'deleteRowBtn_'+`${i}`);
                         }
                     } else {
-                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        var html = `<tr><td colspan="4">No Data.</td></tr>`;
                         func.appendHtml(
                             document.querySelector(".listTable.environment"),
                             html,
@@ -194,7 +194,7 @@
                     var startIndex = offset * limit;
                     var endIndex = Math.min(
                         (offset + 1) * limit,
-                        total_results,
+                        totalResults,
                     );
                     for (var i = startIndex; i < endIndex; i++) {
                         var trId = "tr" + i;
@@ -203,7 +203,7 @@
                     }
 
                     // more 버튼 활성, 비활성
-                    if (endIndex < total_results) {
+                    if (endIndex < totalResults) {
                         document.querySelector(".more").classList.toggle("on", true);
                     } else {
                         document.querySelector(".more").classList.toggle("on", false);
@@ -243,10 +243,20 @@
                             if (e.target && e.target.id == 'editPathSaveBtn_' + `${i}`) {
                                 let key = document.getElementById('tr'+ i).innerText;
                                 let value = document.getElementById('editPath_'+ `${i}`).value;
+                                if (value === null || value === undefined || value === ''){
+                                    func.alertPopup('ERROR', BLANK_CHECK, true, MSG_CONFIRM, 'closed');
+                                    return false;
+                                }
+                                //기존 VALUE와 동일한지 체크
+                                if (environment.environment_variables[Object.keys(environment.environment_variables)[i]] == value){
+                                    func.alertPopup('ERROR', SAME_VALUE_CHECK, true, MSG_CONFIRM, 'closed');
+                                    return false;
+                                }
+
                                 sendData = JSON.stringify({
                                     "environmentVariables" : {
-                                    [key]: value
-                                }
+                                        [key]: value
+                                    }
                                 });
                                 func.alertPopup('MODIFY', MSG_CHECK_TO_MODIFY, true, MSG_CONFIRM, appsDetailsEnvironment.updateEnvironmentVariables);
                             }

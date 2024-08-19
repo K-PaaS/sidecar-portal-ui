@@ -31,7 +31,7 @@
                                 <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
                             </li>
                         </ul>
-                        <div class="svc_button">
+                        <div class="svcButton">
                             <a href="javascript:;" class="connect" id="connect" th:text="#{M0882}"></a>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
             var offset=0;
             var limit=5;
             var total_results=0;
-            var avsv;
+            var connectAvailableServices;
             const appsDetailsService = {
                 init(){
                     funcsc.loadDataSidecar('GET',
@@ -211,9 +211,9 @@
 			            <div class="modal midium">
 				        <h5>${title}</h5>
 				        <dl>
-    				        <dt>Space 이름</dt>
+    				        <dt>${MODAL_APPS_GET_CREDENTIAL_TITLE}</dt>
     					    <dd>
-    					        <textarea id="w3review" name="w3review" rows="4" cols="50" disabled>${json}</textarea>\
+    					        <textarea rows="4" cols="50" disabled>${json}</textarea>\
     					    </dd>
         				</dl>
 		    		    <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
@@ -228,11 +228,11 @@
                     funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/serviceBindings/${clickedBindingGuid}`, '', true, 'application/json', func.refresh);
                 },
                 event(){
-                    appsDetailsService.notconnecttedService();
+                    appsDetailsService.notConnecttedService();
                     document.querySelector("#connect").addEventListener(
                         "click",
                         (e) => {
-                            appsModal.connectService(avsv);
+                            appsModal.connectService(connectAvailableServices);
                         },
                         false,
                     );
@@ -269,10 +269,10 @@
                 },
                 delete(){
                 },
-                notconnecttedService(){
-                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem("spaceGuid")}`, 'application/json', appsDetailsService.notconnecttedService1);
+                notConnecttedService(){
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, 'application/json', appsDetailsService.notConnecttedService1);
                 },
-                notconnecttedService1(data){
+                notConnecttedService1(data){
                     let spaceServices = data.resources;
                     let result = "";
                     if(services.length == 0) {
@@ -283,12 +283,12 @@
 	                        return !services.some(other => other.instance_guid === item.guid);
                         });
                     }
-                    avsv = result;
+                    connectAvailableServices = result;
                 },
                 connected(title, url, name, data) {
                     var options = ``;
                     if(data.length == 0){
-                        options = `<option value="not_found">Not found available connect service</option>`
+                        options = `<option value="notFound">${NOT_FOUND_AVAILABLE_CONNECT_SERVICE}</option>`
                     }else {
                         for (var i=0; i< data.length; i++){
                         options = options + `<option value="${data[i].guid}">${data[i].name}</option>`
@@ -301,12 +301,12 @@
 				            <dl>
 				                <dt>Services</dt>
 					            <dd>
-						            <select name="cars" id="avservice">` +
+						            <select name="selectServices" id="selectServices">` +
                                     options
                                     +`</select>
 					            </dd>
 				            </dl>
-				            <a class="confirm" href="javascript:;">확인</a>
+				            <a class="confirm" href="javascript:;">`+ MSG_CONFIRM + `</a>
 				            <a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
 			            </div>
 		            </div>`;
@@ -316,7 +316,11 @@
                     }, false);
 
                     document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
-                        let serviceGuid = document.querySelector('#avservice').options[document.querySelector('#avservice').selectedIndex].value;
+                        let serviceGuid = document.querySelector('#selectServices').options[document.querySelector('#selectServices').selectedIndex].value;
+                        if (serviceGuid == "notFound"){
+                            func.alertPopup('ERROR', NOT_FOUND_AVAILABLE_CONNECT_SERVICE, true, MSG_CONFIRM, 'closed');
+                            return false;
+                        }
                         let appGuid = sessionStorage.getItem("appGuid");
                         var sendData = JSON.stringify({
                             "appGuid": appGuid,

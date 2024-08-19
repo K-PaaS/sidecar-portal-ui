@@ -36,14 +36,13 @@
                                 <a onclick="movePage(URI_SC_DETAILS_LOG)">Log</a>
                             </li>
                         </ul>
-                        <div class="log_button">
+                        <div class="logButton">
                             <i href="javascript:;" class="refresh fa-solid fa-xl fa-solid fa-arrows-rotate custom-access-button detail_icon"></i>
-                            <!--<a href="javascript:;" class="refresh" th:text="#{M0024}"></a>-->
                         </div>
                     </div>
                     <div class="table_style01 on">
                         <div class="custom-access-contents">
-                            <div id="cpEnvironmentsForLinux" class="cpEnvironments"></div>
+                            <div id="logsForLinux" class="logs"></div>
                         </div>
                     </div>
                 </div>
@@ -80,14 +79,14 @@
                 },
                 drawLog(data){
                     logs= data.log.batch;
-                    func.removeHtml(document.querySelector(".cpEnvironments"));
+                    func.removeHtml(document.querySelector(".logs"));
                     if (logs.length > 0) {
                         for (var i = 0; i <= logs.length - 1; i++) {
                             var myDate = new Date(logs[i].timestamp / 1000000);
                             var date = myDate.getFullYear() + "-" + (myDate.getMonth()+1) + "-" + myDate.getDate() + " " + myDate.getHours() + ":" + myDate.getMinutes() + ":" + myDate.getSeconds();
                             var html = `<pre><code class="bash">`+ date + " " + logs[i].log.type + "/" + logs[i].tags.source_type +  " : " + logs[i].log.payload +`</code></pre>`;
                             func.appendHtml(
-                                document.querySelector(".cpEnvironments"),
+                                document.querySelector(".logs"),
                                 html,
                                 "div",
                             );

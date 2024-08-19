@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/sidecar}">
 <div layout:fragment="content">
     <div id="content" class="sub-page">
         <article class="location">
@@ -11,7 +11,7 @@
         <article class="base">
             <div class="notice">
                 <h3>List</h3>
-                <a href="javascript:" class="create-button addApp">추가</a>
+                <a href="javascript:" class="create-button addApp" th:text="#{M0223}"></a>
                 <div class="table_style01">
                     <table>
                         <caption>
@@ -48,38 +48,62 @@
     <script type="text/javascript">
         window.onload = () => {
             func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
-            callbackFuncNameLoad();
 
+            callbackFuncNameLoad();
             const apps = {
                 offset: 0,
                 limit: 10,
                 total_results: 0,
                 init() {
                     func.nameLoad = apps.reset;
-                    apps.load();
+                    funcsc.initOrgsSpaces();
                     apps.event();
                 },
                 reset() {
                     func.removeHtml(document.querySelector(".listTable"));
                     apps.offset = 0;
-                    apps.load();
-                },
-                load() {
                     func.loading();
+                    apps.preLoad();
+                },
+                preLoad(){
+                    apps.domains();
+                },
+                domains() {
                     funcsc.loadDataSidecar(
                         "GET",
-                        `${funcsc.sidecarUrl}sidecar/apps/customList?spaceGuid=cf-space-04b00c0f-0965-4317-ad7c-ed7b993ac434`,
+                        `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem('org_guid')}/listDomains`,
+                        "application/json",
+                        (e) => {domains=e; apps.routes();},
+                    );
+                },
+                routes() {
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/routes/list`,
+                        "application/json",
+                        (e) => {routes=e; apps.load();},
+                    );
+                },
+                load() {
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/apps/customList?spaceGuid=${sessionStorage.getItem('space_guid')}`,
                         "application/json",
                         apps.draw,
                     );
                 },
                 draw(data) {
+                    orgApps=data;
                     if (apps.offset == 0)
                         apps.total_results = data.length;
 
                     if (data.length > 0) {
                         for (var i = 0; i <= data.length - 1; i++) {
                             var trId = "tr" + i;
+                            var url = data[i].urls[0];
+                            if (typeof url == "undefined" || url == null || url == "") {
+                                url = '';
+                            }
                             if (i < apps.limit) {
                                 var html = `<tr>`
                                 + `<td class="left" id=${trId}>`
@@ -98,7 +122,7 @@
                                 + `${data[i].disk_in_mb}MB`
                                 + `</td>`
                                 + `<td class="left">`
-                                + `<a target='_blank' href="https://${data[i].urls[0]}" data-name="${data[i].urls[0]}" data-guid="${data[i].urls[0]}">${data[i].urls[0]}</a>`
+                                + `<a target='_blank' href="https://${url}" data-name="${url}" data-guid="${url}">${url}</a>`
                                 + `</td>`
                                 + `</tr>`;
                             } else {
@@ -119,7 +143,7 @@
                                 + `${data[i].disk_in_mb}MB`
                                 + `</td>`
                                 + `<td class="left">`
-                                + `<a target='_blank' href="https://${data[i].urls[0]}" data-name="${data[i].urls[0]}" data-guid="${data[i].urls[0]}">${data[i].urls[0]}</a>`
+                                + `<a target='_blank' href="https://${url}" data-name="${url}" data-guid="${url}">${url}</a>`
                                 + `</td>`
                                 + `</tr>`;
                             }
@@ -130,7 +154,7 @@
                             );
                         }
                     } else {
-                        var html = `<tr><td colspan="3">No Data.</td></tr>`;
+                        var html = `<tr><td colspan="6">No Data.</td></tr>`;
                         func.appendHtml(
                             document.querySelector(".listTable"),
                             html,
@@ -193,6 +217,9 @@
                         },
                         false,
                     );
+                    document.querySelector('.addApp').addEventListener('click', (e) => {
+                        appsModal.push(domains, routes, orgApps);
+                    }, false);
                 },
                 listEvent() {
                     var listAll = document.getElementsByTagName("tbody");
@@ -202,7 +229,6 @@
                         tds = trs[i].getElementsByTagName("td");
                         atag = tds[0].getElementsByTagName("a");
                         atag[0].addEventListener("click", (e) => {
-                            sessionStorage.setItem("spaceGuid", "cf-space-04b00c0f-0965-4317-ad7c-ed7b993ac434", );
                             sessionStorage.setItem("appGuid", e.target.getAttribute("data-guid"), );
                             document.location.href = URI_SC_DETAILS_INSTANCES;
                         }, true,);

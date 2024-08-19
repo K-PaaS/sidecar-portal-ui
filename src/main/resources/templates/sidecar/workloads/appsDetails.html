@@ -21,7 +21,7 @@
         <tr>
             <th scope="row" class="left"><div style="margin-left:5px;">Name</div></th>
             <td class="left"><input class="editName" onchange="updateInput(this.id, this.value)" disabled="true" id="editName"><i class="fa-xl fa-solid fa-pen-to-square custom-access-button detail_icon" id="editNameBtn"></i></td>
-            <td class="fs-14"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyName);"></i></button></td>
+            <td class="fs-14"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', MODIFY_CHECK, true, MSG_CONFIRM, modifyName);"></i></td>
         </tr>
         <tr>
             <th scope="row" class="left"><div style="margin-left:5px;">Instance</div></th>
@@ -40,7 +40,7 @@
                     <input class="editInstance" onchange="updateInput(this.id, this.value)" disabled="true" id="editInstance">
                 </dd>
             </td>
-            <td class="fs-14" id="detailsInstanceBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyInstance);"></i></button></td>
+            <td class="fs-14" id="detailsInstanceBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', MODIFY_CHECK, true, MSG_CONFIRM, modifyInstance);"></i></button></td>
         </tr>
         <tr>
             <th scope="row" class="left"><div style="margin-left:5px;">Memory (MB)</div></th>
@@ -57,7 +57,7 @@
                     <input class="editMemory" onchange="updateInput(this.id, this.value)" disabled="true" id="editMemory">
                 </dd>
             </td>
-            <td class="fs-14" id="detailsMemoryBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyMemory);"></i></button></td>
+            <td class="fs-14" id="detailsMemoryBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', MODIFY_CHECK, true, MSG_CONFIRM, modifyMemory);"></i></button></td>
         </tr>
         <tr>
             <th scope="row" class="left"><div style="margin-left:5px;">Disk (MB)</div></th>
@@ -74,7 +74,7 @@
                     <input class="editDisk" onchange="updateInput(this.id, this.value)" disabled="true" id="editDisk">
                 </dd>
             </td>
-            <td class="fs-14" id="detailsDiskBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', '수정하시겠습니까', true, MSG_CONFIRM, modifyDisk);"></i></button></td>
+            <td class="fs-14" id="detailsDiskBtn"><i class="fa-xl fa-solid fa-floppy-disk custom-access-button detail_icon" onclick="func.alertPopup('MODIFY', MODIFY_CHECK, true, MSG_CONFIRM, modifyDisk);"></i></button></td>
         </tr>
         <tr>
             <th scope="row" class="left"><div style="margin-left:5px;">State</div></th>
@@ -94,40 +94,72 @@
             if(document.getElementById(id).value == "custom"){
                 if(id == "selectMemory"){
                     document.getElementById("editMemory").removeAttribute('disabled');
+                    document.getElementById("editMemory").value = processes.memory_in_mb;
                 } else if (id == "selectDisk"){
                     document.getElementById("editDisk").removeAttribute('disabled');
+                    document.getElementById("editDisk").value = processes.disk_in_mb;
                 } else if (id == "selectInstance"){
                     document.getElementById("editInstance").removeAttribute('disabled');
-                } else {
-                    console.log("error check!!!!");
+                    document.getElementById("editInstance").value = processes.instances;
                 }
             } else {
                 if(id == "selectMemory"){
                     document.getElementById("editMemory").setAttribute('disabled', 'true');
+                    document.getElementById("editMemory").value = "";
                 } else if (id == "selectDisk"){
                     document.getElementById("editDisk").setAttribute('disabled', 'true');
+                    document.getElementById("editDisk").value = "";
                 } else if (id == "selectInstance"){
                     document.getElementById("editInstance").setAttribute('disabled', 'true');
-                } else {
-                    console.log("error check!!!!");
+                    document.getElementById("editInstance").value = "";
                 }
             }
         }
+        function popupReset(){
+            IS_VCHK = false;
+        }
         function modifyName(){
-            //기존 name과 동일한지 체크
             var name =  document.getElementById('editName').value;
+            //이름 공백 체크
+            if (name === null || name === undefined || name === ''){
+                IS_VCHK = true;
+                func.alertPopup('ERROR', BLANK_CHECK, true, MSG_CONFIRM, popupReset);
+                return false;
+            }
+            //기존 VALUE와 동일한지 체크
+            if (name === apps.name){
+                // 공백 체크
+                IS_VCHK = true;
+                func.alertPopup('ERROR', SAME_VALUE_CHECK, true, MSG_CONFIRM, popupReset);
+                return false;
+            }
             var sendData = JSON.stringify({
                 "name" : name
             });
             funcsc.postDataWithPopup('PATCH', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}`, sendData, true, 'application/json', func.refresh);
         }
         function modifyInstance(){
-            //기존 name과 동일한지 체크
             var instances;
             if (document.getElementById('selectInstance').value == "custom" ){
                 instances = document.getElementById('editInstance').value;
-            } else {
+                // 공백 체크
+                if (instances === null || instances === undefined || instances === ''){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', BLANK_CHECK, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }else if (instances < 1 || instances > 20){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', SCALE_INSTANCE_VALUE_RANGE, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }
+            }
+            else {
                 instances = document.getElementById('selectInstance').value;
+            }
+            if (instances == processes.instances){
+                IS_VCHK = true;
+                func.alertPopup('ERROR', SAME_VALUE_CHECK, true, MSG_CONFIRM, popupReset);
+                return false;
             }
             var sendData = JSON.stringify({
                 "instances" : instances
@@ -135,12 +167,28 @@
             funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
         }
         function modifyMemory(){
-            //기존 name과 동일한지 체크
             var memory;
             if (document.getElementById('selectMemory').value == "custom" ){
                 memory = document.getElementById('editMemory').value;
+                // 공백 체크
+                if (memory === null || memory === undefined || memory === ''){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', BLANK_CHECK, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }else if (memory < 1 || memory > 4096){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', SCALE_VALUE_RANGE, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }
+
             } else {
                 memory = document.getElementById('selectMemory').value;
+            }
+            //기존 VALUE와 동일한지 체크
+            if (memory == processes.memory_in_mb){
+                IS_VCHK = true;
+                func.alertPopup('ERROR', SAME_VALUE_CHECK, true, MSG_CONFIRM, popupReset);
+                return false;
             }
             var sendData = JSON.stringify({
                 "memoryInMb" : memory
@@ -148,12 +196,27 @@
             funcsc.postDataWithPopup('POST', `${funcsc.sidecarUrl}sidecar/processes/cf-proc-${sessionStorage.getItem("appGuid")}-web/scale`, sendData, true, 'application/json', func.refresh);
         }
         function modifyDisk(){
-            //기존 name과 동일한지 체크
             var disk;
             if (document.getElementById('selectDisk').value == "custom" ){
-                memory = document.getElementById('editDisk').value;
+                disk = document.getElementById('editDisk').value;
+                // 공백 체크
+                if (disk === null || disk === undefined || disk === ''){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', BLANK_CHECK, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }else if (disk < 1 || disk > 4096){
+                    IS_VCHK = true;
+                    func.alertPopup('ERROR', SCALE_VALUE_RANGE, true, MSG_CONFIRM, popupReset);
+                    return false;
+                }
             } else {
-                memory = document.getElementById('selectDisk').value;
+                disk = document.getElementById('selectDisk').value;
+            }
+            //기존 VALUE와 동일한지 체크
+            if (disk == processes.disk_in_mb){
+                IS_VCHK = true;
+                func.alertPopup('ERROR', SAME_VALUE_CHECK, true, MSG_CONFIRM, popupReset);
+                return false;
             }
             var sendData = JSON.stringify({
                 "diskInMb" : disk
@@ -179,18 +242,21 @@
             } else {
                 document.getElementById('selectInstance').value="custom";
                 document.getElementById('editInstance').value=processes.instances;
+                document.getElementById('editInstance').removeAttribute('disabled');
             }
             if ( processes.memory_in_mb == 256 || processes.memory_in_mb == 512 || processes.memory_in_mb == 1024 ){
                 document.getElementById('selectMemory').value=processes.memory_in_mb;
             } else {
                 document.getElementById('selectMemory').value="custom";
                 document.getElementById('editMemory').value=processes.memory_in_mb;
+                document.getElementById('editMemory').removeAttribute('disabled');
             }
             if ( processes.disk_in_mb == 256 || processes.disk_in_mb == 512 || processes.disk_in_mb == 1024 ){
                 document.getElementById('selectDisk').value=processes.disk_in_mb;
             } else {
                 document.getElementById('selectDisk').value="custom";
                 document.getElementById('editDisk').value=processes.disk_in_mb;
+                document.getElementById('editDisk').removeAttribute('disabled');
             }
             document.getElementById('detailsState').innerText = apps.state;
             if(apps.state == "STARTED"){
@@ -260,6 +326,10 @@
         }
         function initDetails(){
             func.loading();
+            document.querySelector('.orgTop').innerText = sessionStorage.getItem('org_name');
+            document.getElementById("orgTitleDiv").removeChild(document.getElementById("orgListUl"));
+            document.querySelector('.spaceTop').innerText = sessionStorage.getItem('space_name');
+            document.getElementById("spaceTitleDiv").removeChild(document.getElementById("spaceListUl"));
             getApps();
         }
 

@@ -203,7 +203,7 @@
 
                 serviceInstanceDelete() {
                     guid = serviceDetail.delete_si_guid;
-                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, "binding"+guid, true, 'application/json', movePage(URI_SC_RESOURCES_SERVICES));
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, "service"+guid, true, 'application/json', movePage(URI_SC_RESOURCES_SERVICES));
                 },
 
                 serviceBindingDelete() {

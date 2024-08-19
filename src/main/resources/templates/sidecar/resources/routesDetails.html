@@ -1,10 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-routesDetails
-</body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/sidecar}">
+
+<div layout:fragment="content">
+    <div id="content" class="sub-page">
+        <article class="location">
+            <ul>
+                <li><a onclick="movePage(URI_SC_RESOURCES_ROUTES)">Resources</a></li>
+                <li><a onclick="movePage(URI_SC_RESOURCES_ROUTES)">Routes</a></li>
+            </ul>
+        </article>
+        <article class="base detail">
+            <div class="notice">
+                <h4>Details</h4>
+                <div class="table_style01">
+                    <table>
+                        <caption>Details</caption>
+                        <colgroup >
+                            <col width="20%" />
+                            <col width="80%" />
+                        </colgroup>
+                        <tbody class="listTable">
+                        <tr>
+                            <th scope="row" class="left">Organization</th>
+                            <td class="left customBorderTop" id="organization"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Space</th>
+                            <td class="left" id="space"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Host</th>
+                            <td class="left" id="host"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Domain</th>
+                            <td class="left" id="domain"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Path</th>
+                            <td class="left" id="path"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">URL</th>
+                            <td class="left" id="url"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="left">Started</th>
+                            <td class="left" id="created"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table_style01">
+                    <table>
+                        <caption>Details</caption>
+                        <colgroup >
+                            <col width="25%" />
+                            <col width="25%" />
+                            <col width="25%" />
+                            <col width="25%" />
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th scope="col">App name</th>
+                            <th scope="col">State</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody class="detailList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- btn -->
+            <div class="btn02">
+                <div>
+                    <a href="javascript:;" id="delete" th:text="#{M0026}"></a>
+                    <a class="beforeBtn" onclick="movePage(URI_SC_RESOURCES_ROUTES)" th:text="#{M0028}"></a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        window.onload = () => {
+            func.init(ASIDE_DP1.RESOURCES, ASIDE_DP2.ROUTES);
+            funcsc.initOrgsSpaces();
+            callbackFuncNameLoad();
+
+            const routeDetail = {
+                delete_route_guid : 0,
+                delete_dest_guid : 0,
+
+                init(){
+
+                    func.loading();
+
+                    routeDetail.delete_route_guid = sessionStorage.getItem('commonGuid');
+                    //Detail
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/${sessionStorage.getItem('commonGuid')}/get`, 'application/json', routeDetail.draw);
+                    func.nameLoad = this.movePageToRoutes;
+                },
+
+                draw(data){
+
+                    // Details data
+                    document.getElementById('organization').innerText = sessionStorage.getItem('org_name');
+                    document.getElementById('space').innerText = sessionStorage.getItem('space_name');
+                    document.getElementById('host').innerText = data.host;
+                    document.getElementById('domain').innerText = "";
+                    document.getElementById('path').innerText = data.path;
+                    document.getElementById('url').innerText = data.url;
+                    document.getElementById('created').innerText = data.created_at;
+
+                    //Detail/Credentials
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/domains/${data.metadata.labels["korifi.cloudfoundry.org/domain-guid"]}/get`, 'application/json', routeDetail.drawDomain);
+
+                    //document.getElementById('wrap').removeChild(document.getElementById('loading'));
+
+                    //routeDetail.event();
+                    document.getElementById('delete').addEventListener('click', (e) => {
+                        const data = "route"+routeDetail.delete_route_guid;
+                        funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, routeDetail.routeDelete);
+                    }, false);
+                },
+
+                drawDomain(data) {
+                    // Details/Credential
+                    document.getElementById('domain').innerText = data.name;
+
+                    //destination Apps
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/${sessionStorage.getItem('commonGuid')}/listDestinations`, 'application/json', routeDetail.drawApps);
+                },
+
+                drawApps(data){
+
+                    if(data.destinations.length > 0){
+                        for(var i = 0 ; i < data.destinations.length ; i++){
+                            var appName = "appName" + i;
+                            var appStatus = "appStatus" + i;
+                            var appCreated = "appCreated" + i;
+                            var html = `<tr>
+								<td class="left" id=${"appName"+i}></td>
+								<td class="left" id=${"appState"+i}></td>
+                                <td class="left" id=${"appCreated"+i}></td>
+                                <td class="left" align="center">
+                                  <input type="text" id=${"appGuid"+i} hidden value="${data.destinations[i].app.guid}">
+                                  <svg class="trashcan" id="${data.destinations[i].guid}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                  <path fill="#bdbfc4" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/>
+                                  </svg></td>`;  // trashcan
+                            func.appendHtml(document.querySelector('.detailList'), html, 'tbody');
+                            funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${data.destinations[i].app.guid}/get`, 'application/json', routeDetail.drawApp);
+                        };
+                    } else {
+                        var html = '<tr><td class="table-no-data">No Data.</td></tr>';
+
+                        func.appendHtml(document.querySelector('.detailList'), html, 'tbody');
+                    };
+
+                    document.getElementById('wrap').removeChild(document.getElementById('loading'));
+
+                    routeDetail.event();
+
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                routeDetail.delete_dest_guid = e.currentTarget.id;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, routeDetail.destinationDelete);
+                            }, false);
+                        }
+                    }
+                    test();
+                },
+
+                drawApp(data){
+
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    for(var i = 0 ; i < trashcan.length ; i++){
+                        if ( data.guid == document.getElementById('appGuid'+i).value){
+                            document.getElementById('appName'+i).innerText = data.name;
+                            document.getElementById('appState'+i).innerText = data.state;
+                            document.getElementById('appCreated'+i).innerText = data.created_at;
+                        }
+                    }
+                },
+
+                event(){
+                    document.getElementById('delete').addEventListener('click', (e) => {
+                        const data = "route"+routeDetail.delete_route_guid;
+
+                        funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, routeDetail.routeDelete);
+                    }, false);
+                },
+
+                bindingsEvent(data) {
+                    let trashcan = document.querySelectorAll(".trashcan");
+                    function test() {
+                        for(let i = 0; i < trashcan.length; i++) {
+                            trashcan[i].addEventListener("click", (e) => {
+                                routeDetail.delete_dest_guid = e.currentTarget.id;
+                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, routeDetail.destinationDelete);
+                            }, false);
+                        }
+                    }
+                    test();
+                },
+
+                routeDelete() {
+                    guid = routeDetail.delete_route_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/routes/${routeDetail.delete_route_guid}`, "route"+guid, true, 'application/json', routeDetail.movePageToRoutes);
+                },
+
+                destinationDelete() {
+                    guid = routeDetail.delete_dest_guid;
+                    funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/routes/${routeDetail.delete_route_guid}/removeDestinations/${guid}`, "destination"+guid, true, 'application/json', func.refresh);
+                },
+                movePageToRoutes() {
+                    location.href = URI_SC_RESOURCES_ROUTES;
+                }
+            }
+
+            routeDetail.init();
+        }
+    </script>
+</th:block>
 </html>

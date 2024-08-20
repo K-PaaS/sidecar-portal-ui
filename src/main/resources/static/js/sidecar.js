@@ -90,7 +90,7 @@ const funcsc = {
                     return;
                 }
             }else {
-                if(IS_INDEX || IS_SIDECAR) {
+                if(IS_INDEX || IS_SIDECAR &&  typeof IS_APPS !== "undefined") {
                     funcsc.loadDataSidecar('GET', null, 'application/json', func.nameLoad);
                     return;
                 }

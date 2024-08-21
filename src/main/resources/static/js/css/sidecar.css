@@ -27,19 +27,19 @@
     border-radius: 2px;
 }
 .space_table {
-    display: block;
+    //display: block;
     max-height: 180px;
     overflow-y: auto;
     width: 1070px;
 }
 .detailList {
-    display: block;
+    //display: block;
     max-height: 300px;
     overflow-y: auto;
-    width: 1070px;
+    //width: 1070px;
 }
 .left {
-    width: 1070px;
+    //width: 1070px;
 }
 .table-no-data{
     width: 1070px;
@@ -79,6 +79,63 @@
 .popup_add_user_dd{
     display: flex;
     gap: 100px;
-    justify-content: center;
+    /*justify-content: center;*/
     align-items: center;
+}
+
+/* domains */
+input#domainName{
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+/* routes */
+.addRouteModal dl {
+    margin-bottom: 10px;
+}
+
+.modal.addRouteModal dl dt {
+    line-height: 50px;
+}
+
+.addRouteModal input#hostName {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+.addRouteModal input#path {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+/* services */
+.modal input#serviceInstanceName {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+.modal.addServiceInstanceModal dl dt {
+    line-height: 50px;
+}
+
+.modal input#credentials {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+/* organizations */
+.modal input#orgName {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+.modal input#spaceName {
+    border: 1px solid #ebebeb;
+    padding-left: 10px;
+}
+
+.orgDetails tr {border-top: 1px solid #ebebeb;}
+
+
+.detailList .user-info-td4{
+    border-right: 0;
 }

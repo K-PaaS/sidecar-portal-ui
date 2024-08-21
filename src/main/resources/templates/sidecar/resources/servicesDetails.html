@@ -162,7 +162,7 @@
                             funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${data.resources[i].relationships.app.data.guid}/get`, 'application/json', serviceDetail.drawApp);
                         };
                     } else {
-                        var html = '<tr><td colspan="4" class="table-no-data">No Data.</td></tr>';
+                        var html = '<tr><td colspan=4 class="table-no-data">No Data.</td></tr>';
 
                         func.appendHtml(document.querySelector('.detailList'), html, 'tbody');
                     };

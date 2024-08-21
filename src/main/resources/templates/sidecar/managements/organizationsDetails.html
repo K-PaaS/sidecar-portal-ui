@@ -96,6 +96,8 @@
             allItemCount: 0, //게시물 총 개수
             type: "user",
             users: "",
+            orgUserArray : [],
+
             init() {func.nameLoad = detail.reset; detail.load(); detail.eventSpace(); detail.eventUser();},
             reset() {func.removeHtml(document.querySelector(".listTable")); detail.offset = 0; detail.load(); },
             load() {
@@ -125,7 +127,7 @@
                 })
                 function cluster_user(cluster_data) {
                     if (sidecar_data.pagination.total_results > 0) {
-                        var dataArray = [];
+                        //var orgUserArray = [];
                         var existUserIdx = -1 ;
 
                         for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
@@ -141,8 +143,8 @@
 
                             detail.users = sidecar_data.resources[i].relationships.user.data.guid;
                             if (i > 0)
-                                for (let x = 0 ; x < dataArray.length ; x++)
-                                    if (dataArray[x].includes(detail.users)) existUserIdx = x;
+                                for (let x = 0 ; x < detail.orgUserArray.length ; x++)
+                                    if (detail.orgUserArray[x].includes(detail.users)) existUserIdx = x;
 
                             if (!userId.startsWith("system:serviceaccount:")) {    // UA
                                 var account = "UA";
@@ -165,22 +167,22 @@
                             }
 
                             if (existUserIdx < 0)
-                                dataArray.push([account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users, userRoleGuid, mgrRoleGuid,auditorRoleGuid]);
+                                detail.orgUserArray.push([account,userId,serviceAccountName,userCheckbox,managerCheckbox,auditorrCheckbox,roleGuid,detail.users, userRoleGuid, mgrRoleGuid,auditorRoleGuid]);
                             else{
                                 if (userCheckbox) {
-                                    dataArray[existUserIdx][3] = userCheckbox;
-                                    dataArray[existUserIdx][8] = roleGuid;
+                                    detail.orgUserArray[existUserIdx][3] = userCheckbox;
+                                    detail.orgUserArray[existUserIdx][8] = roleGuid;
                                 } else if (managerCheckbox) {
-                                    dataArray[existUserIdx][4] = managerCheckbox;
-                                    dataArray[existUserIdx][9] = roleGuid;
+                                    detail.orgUserArray[existUserIdx][4] = managerCheckbox;
+                                    detail.orgUserArray[existUserIdx][9] = roleGuid;
                                 } else if (auditorCheckbox) {
-                                    dataArray[existUserIdx][5] = auditorCheckbox;
+                                    detail.orgUserArray[existUserIdx][5] = auditorCheckbox;
                                 }
                             }
                         }
 
-                        for (var i = 0; i < dataArray.length; i++) {
-                            row = dataArray[i];
+                        for (var i = 0; i < detail.orgUserArray.length; i++) {
+                            row = detail.orgUserArray[i];
                             account = row[0];
                             userId = row[1];
                             serviceAccount = row[2];
@@ -248,7 +250,7 @@
             },
             eventUser() {
                 document.querySelector('.addUser').addEventListener('click', (e) => {
-                    funcsc.addUser('User List', 'orgs', MSG_SAVE);
+                    this.addUser('User List', 'orgs', MSG_SAVE);
                 }, false);
             },
             eventDelete() {
@@ -262,6 +264,107 @@
             },
             movePage() {
                 location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS;
+            },
+            addUser(title, url, name) {
+                var html = `<div class="modal-wrap" id="modal">
+			<div class="modal midium">
+				<h5>${title}</h5>
+				<dl>
+				    <dt>User</dt>
+					<dd>
+						<fieldset>
+							<select id="createName">
+							</select>
+						</fieldset>
+					</dd>
+				</dl>
+				<dl class="popup_add_user_dl">
+					<dt id="popup_add_user_dt">Type</dt>
+					<dd class="popup_add_user_dd" >
+					        <input type="radio" id="organization_user" name="organization" value="organization_user">
+                            <label for="organization_user">User</label>
+                            <input type="radio" id="organization_manager" name="organization" value="organization_manager">
+                            <label for="organization_manager">Manager</label>
+                    </dd>
+				</dl>
+				<a class="confirm" href="javascript:;">` + BUTTON_ADD + `</a>
+				<a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			</div>
+		</div>`;
+
+                func.appendHtml(document.getElementById('wrap'), html, 'div');
+                func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`, "application/json", (data) => {
+                    cluster_user(data);
+                })
+                function cluster_user(data) {
+                    for (var i = 0; i <= data.itemMetaData.allItemCount - 1; i++) {
+                        for(var j = 0; j < data.items[i].items.length; j++) {
+                            alreadyAssing = false;
+                            if (data.items[i].items[j].roleSetCode === SIDECAR_ROLE_USER) {
+                                for (y = 0; y < detail.orgUserArray.length; y++){
+                                    if (detail.orgUserArray[y].includes(data.items[i].items[j].userAuthId)) {
+                                        alreadyAssing = true;
+                                        break;
+                                    }
+                                }
+
+                                if (alreadyAssing)
+                                    continue;
+
+                                var userId = data.items[i].items[j].userId;
+                                var userAuthId = data.items[i].items[j].userAuthId;
+                                var html = `<option value="${userAuthId}">${userId}</option>`;
+                                func.appendHtml(document.getElementById('createName'), html, 'select');
+                            }
+                        }
+                    }
+
+                    if (document.getElementById('createName').children.length == 0){
+                        html = `<option value="notFound" selected>[[#{M0693}]]</option>`
+                        func.appendHtml(document.getElementById('createName'), html, 'select');
+                        //document.getElementById('createName').selectedIndex = 0;
+                    }
+
+                    /*if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
+                        document.getElementById('createName').selectedIndex = 0;
+                    } else {
+                        document.getElementById('createName').value = sessionStorage.getItem('users');
+                    }*/
+
+                    document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                        document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                    }, false);
+                    document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                        var check = false;
+                        var organization = document.getElementsByName('organization');
+                        for(var i = 0; i < organization.length; i++){
+                            if(organization[i].checked == true) {
+                                check = true;
+                            }
+                        }
+
+                        if(!document.getElementById('createName').value || document.getElementById('createName').value == "notFound"){
+                            //alert(ALERT_USER_SELECT);
+                            func.alertPopup('', ALERT_USER_SELECT, true, MSG_CONFIRM, 'closed');
+                            return;
+                        }else if(check == false){
+                            //alert(ALERT_TYPE_SELECT);
+                            func.alertPopup('', ALERT_TYPE_SELECT, true, MSG_CONFIRM, 'closed');
+                            return;
+                        }else {
+                            var orgGuid = sessionStorage.getItem("org_guid");
+                            var type = document.querySelector('input[type=radio][name=organization]:checked').value;
+                            var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
+                            var sendData = JSON.stringify({
+                                "orgGuid": orgGuid,
+                                "type": type,
+                                "user": user
+                            });
+
+                            funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
+                        }
+                    }, false);
+                }
             }
         };
 

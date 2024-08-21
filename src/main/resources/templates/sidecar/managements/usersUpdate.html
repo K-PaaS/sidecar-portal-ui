@@ -35,7 +35,7 @@
                             </dd>
                         </dl>
                         <dl>
-                            <dt><label for="sidecarRoleFieldset">Sidecar Role #2</label></dt>
+                            <dt><label for="sidecarRoleFieldset">Sidecar Role</label></dt>
                             <dd>
                                 <fieldset id="sidecarRoleFieldset">
                                 </fieldset>
@@ -92,7 +92,6 @@
                         if (data.items[i].cpNamespace == SIDECAR_ROOT_NAMESPACE || userAuthority == AUTH_CLUSTER_ADMIN ){
                             if(data.items[i].roleSetCode == SIDECAR_ROLE_ADMIN ) {
                                 userSidecarRole = data.items[i].roleSetCode;
-                                console.log("userSidecarRole=" + userSidecarRole);
                                 break;
                             }
                             else if(data.items[i].roleSetCode == SIDECAR_ROLE_USER) {
@@ -109,14 +108,11 @@
 
                 document.getElementById('sidecarRoleFieldset').innerHTML = sidecarRoleSelectHTML;
                 document.getElementById('sidecarRole').value = userSidecarRole;
-                console.log("#1 userSidecarRole=" + userSidecarRole);
                 userUpdate.event();
-                console.log("#2");
             },
 
             event(){
                 document.getElementById('modify').addEventListener('click', (e) => {
-                    console.log("#3");
                     var createName = {
                         "userType": document.getElementById('authority').value,
                         "userId": document.getElementById('userId').value,
@@ -126,8 +122,6 @@
                         "clusterId": sessionStorage.getItem('cluster'),
                     };
 
-                    console.log("#4 getElement=" + document.getElementById('sidecarRole'));
-                    console.log("#4 createName.roleSetCode=" + createName.roleSetCode);
                     /*if (createName.roleSetCode == ""){
                         alert("Select Sidecar Role");
                         return;

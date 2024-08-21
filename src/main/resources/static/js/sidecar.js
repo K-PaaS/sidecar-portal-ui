@@ -477,7 +477,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
             }
         }, false);
     },
-    addUser(title, url, name) {
+    addUser(title, url, name) { // Org 이동완료
         var html = `<div class="modal-wrap" id="modal">
 			<div class="modal midium">
 				<h5>${title}</h5>

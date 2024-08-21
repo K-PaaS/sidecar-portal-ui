@@ -51,6 +51,7 @@
                         </thead>
                         <tbody class="detailList"></tbody>
                     </table>
+                    <a href="javascript:" class="create-button addUser" th:text="#{M0223}"></a>
                 </div>
             </div>
             <div class="btn02">
@@ -75,8 +76,16 @@
             allItemCount: 0, //게시물 총 개수
             type: "user",
             users: "",
-            init() {func.nameLoad = detail.reset; detail.load();},
-            reset() {func.removeHtml(document.querySelector(".listTable")); detail.offset = 0; detail.load(); },
+            init() {
+                func.nameLoad = detail.reset;
+                detail.load();
+                detail.eventUser();
+            },
+            reset() {
+                func.removeHtml(document.querySelector(".listTable"));
+                detail.offset = 0;
+                detail.load();
+            },
             load() {
                 func.loading();
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
@@ -89,6 +98,7 @@
                 funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (cluster_data) => {
                     space_user(cluster_data);
                 })
+
                 function space_user(cluster_data) {
                     if (space_data.pagination.total_results > 0) {
                         var dataArray = [];
@@ -146,14 +156,15 @@
                                 var row = oldUserId.parentElement;
                                 var checkboxes = row.querySelectorAll('input[type="checkbox"]');
                             }
-                            var html = `<tr>
+                            if (!document.getElementById(users + "_developer")) {
+                                var html = `<tr>
                                   <td class="user-info-td1">${account}</td>
                                   <td class="user-info-td2" id=${userId}>${userId}</td>
                                   <td class="user-info-td3">${serviceAccount}</td>
                                   <td class="user-info-td4">
-                                    <input type="checkbox" id="${users}_developer" ${developerCheckbox} name="space_developer">
+                                    <input type="checkbox" id="${users}_developer" ${developerCheckbox} value="${roleGuid}" name="space_developer">
                                     <label for="${users}_developer" class="checkbox-label">Developer</label>
-                                    <input type="checkbox" id="${users}_manager" ${managerCheckbox} name="space_manager">
+                                    <input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${roleGuid}" name="space_manager">
                                     <label for="${users}_manager" class="checkbox-label"">Manager</label>
                                     <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} name="space_auditor" disabled >
                                     <label for="${users}_auditor">Auditor</label>
@@ -162,17 +173,32 @@
                                     <label id="${roleGuid}"></label>
                                   </td>
                                 </tr>`;
-                            func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
+                                func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
+                            } else {
+                                if (managerCheckbox !== "") {
+                                    document.getElementById(users + "_manager").checked = true;
+                                    document.getElementById(users + "_manager").value = roleGuid;
+                                } else if (developerCheckbox !== "") {
+                                    document.getElementById(users + "_developer").checked = true;
+                                    document.getElementById(users + "_developer").value = roleGuid;
+                                }
+                            }
                         }
                     } else {
                         var html = "<tr><td colspan=4 class='table-no-data'>No Data.</td></tr>";
                         func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                     }
                 }
+
                 if (document.getElementById("loading")) {
                     document.getElementById("wrap").removeChild(document.getElementById("loading"));
                 }
                 detail.eventDelete();
+            },
+            eventUser() {
+                document.querySelector('.addUser').addEventListener('click', (e) => {
+                    addSpaceUser('User List', 'spaces', MSG_SAVE);
+                }, false);
             },
             eventDelete() {
                 document.getElementById('deleteSpace').addEventListener('click', (e) => {
@@ -181,9 +207,92 @@
             },
             spaceDelete() {
                 const data = 'space';
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, data, true, 'application/json', funcsc.movePageToOrg );
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, data, true, 'application/json', funcsc.movePageToOrg);
             },
-        };
+        }
+        function addSpaceUser(title, url, name) {
+            var html = `<div class="modal-wrap" id="modal">
+			<div class="modal midium">
+				<h5>${title}</h5>
+				<dl>
+				    <dt>User</dt>
+					<dd>
+						<fieldset>
+							<select id="createName">
+							</select>
+						</fieldset>
+					</dd>
+				</dl>
+				<dl class="popup_add_user_dl">
+					<dt id="popup_add_user_dt">Type</dt>
+					<dd class="popup_add_user_dd" >
+					        <input type="radio" id="organization_user" name="organization" value="space_developer">
+                            <label for="organization_user">Developer</label>
+                            <input type="radio" id="organization_manager" name="organization" value="space_manager">
+                            <label for="organization_manager">Manager</label>
+                    </dd>
+				</dl>
+				<a class="confirm" href="javascript:;">` + BUTTON_ADD + `</a>
+				<a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
+			</div>
+		</div>`;
+            func.appendHtml(document.getElementById('wrap'), html, 'div');
+            console.log(`${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`);
+            func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`, "application/json", (data) => {
+                cluster_user(data);
+            })
+            function cluster_user(cluster_data) {
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", org_user);
+                function org_user(sidecar_data){
+                    for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
+                        var userAuthId = sidecar_data.resources[i].relationships.user.data.guid;
+                        var split = userAuthId.split(":");
+                        var userLastPart = split[split.length - 1];
+                        for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
+                            var serviceAccountName = cluster_data.items[j].serviceAccountName;
+                            if (serviceAccountName === userLastPart) {
+                                var userId = cluster_data.items[j].userId;
+                                var html = `<option value=${serviceAccountName}>${userId}</option>`;
+                                func.appendHtml(document.getElementById('createName'), html, 'select');
+                            }
+                        }
+                    }
+                }
+                if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
+                    document.getElementById('createName').selectedIndex = 0;
+                }
+                else {
+                    document.getElementById('createName').value = sessionStorage.getItem('users');
+                }
+                document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                    document.getElementById('wrap').removeChild(document.getElementById('modal'));
+                }, false);
+                document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                    var check = false;
+                    var organization = document.getElementsByName('organization');
+                    for (var i = 0; i < organization.length; i++) {
+                        if (organization[i].checked == true) {
+                            check = true;}
+                    }if (!document.getElementById('createName').value) {
+                        alert(ALERT_USER_SELECT);
+                        return;
+                    }else if (check == false) {
+                        alert(ALERT_TYPE_SELECT);
+                        return;
+                    }else {
+                        var spaceGuid = sessionStorage.getItem("space_guid");
+                        var type = document.querySelector('input[type=radio][name=organization]:checked').value;
+                        var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
+                        var sendData = JSON.stringify({
+                            "spaceGuid": spaceGuid,
+                            "type": type,
+                            "user": user,
+                        });
+                        funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
+                    }
+                }, false);
+            }
+        }
         detail.init();
         function checkboxChange(event) {
             const checkbox = event.target;
@@ -202,7 +311,7 @@
                 const roleGuid = roleLabel.getAttribute("id");
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
             }
-        };
+        }
         document.addEventListener("change", function(event) {
             const target = event.target;
             if (target.matches("input[type='checkbox']")) {

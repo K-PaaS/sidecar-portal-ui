@@ -7,6 +7,8 @@ public class ConstantsUrl extends org.container.platform.web.ui.common.Constants
     public static final String URI_SC_RESOURCES_SERVICES = "/sidecar/services";
     public static final String URI_SC_MANAGEMENTS_USERS_ADMIN = "/sidecar/admin";
     public static final String URI_SC_MANAGEMENTS_USERS = "/sidecar/users";
+
+    public static final String URI_SC_MANAGEMENTS_USERS_DETAILS = "/sidecar/users/details";
     public static final String URI_SC_MANAGEMENTS_INACTIVE_USERS = "/sidecar/inactiveUsers";
     public static final String URI_SC_MANAGEMENTS_ORGANIZATIONS = "/sidecar/organizations";
 

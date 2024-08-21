@@ -4,9 +4,6 @@
 <div th:fragmentfragment="top_content">
 <div class="title">
     <h4>Details</h4>
-    <div class="button">
-        <a href="javascript:;" id="delete" class="delete" th:text="#{M0026}"></a>
-    </div>
 </div>
 
 <div class="table_style01 on">
@@ -284,7 +281,7 @@
             }, false);
 
             document.getElementById('delete').addEventListener('click', (e) => {
-                        func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, delete2);
+                        func.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, deleteApp);
                     }, false);
             document.addEventListener('click', (e) => {
                 if (e.target && e.target.id == `editNameBtn`) {
@@ -321,7 +318,7 @@
                 }
             });
         }
-        function delete2(){
+        function deleteApp(){
             funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem('appGuid')}`, '', true, 'application/json', goToApps);
         }
         function initDetails(){

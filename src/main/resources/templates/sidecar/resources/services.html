@@ -194,12 +194,14 @@
                         const spaceGuid = sessionStorage.getItem("space_guid");
 
                         if(!serviceInstanceName) {
-                            alert(ALERT_SERVICE_ENTER);
+                            func.alertPopup('', ALERT_SERVICE_ENTER, true, MSG_CONFIRM, 'closed');
                             return;
-                        }else if(!credentials) {
-                            alert(ALERT_CREDENTIALS_ENTER);
+                        }
+                        /*else if(!credentials) {
+                            func.alertPopup('', ALERT_CREDENTIALS_ENTER, true, MSG_CONFIRM, 'closed');
                             return;
-                        }else {
+                        }*/
+                        else {
                             var sendData = JSON.stringify({
                                 "name": serviceInstanceName,
                                 "spaceGuid": spaceGuid,

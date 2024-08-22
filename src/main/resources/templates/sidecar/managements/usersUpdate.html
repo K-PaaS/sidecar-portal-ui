@@ -122,11 +122,6 @@
                         "clusterId": sessionStorage.getItem('cluster'),
                     };
 
-                    /*if (createName.roleSetCode == ""){
-                        alert("Select Sidecar Role");
-                        return;
-                    }*/
-
                     if (userSidecarRole == "" && createName.roleSetCode != "") {
                         func.saveData('POST', `${funcsc.sidecarUrl}sidecar/rolebindings`, JSON.stringify(createName), true, 'application/json', func.historyBack);
                     } else if (userSidecarRole != "" && createName.roleSetCode != "") {

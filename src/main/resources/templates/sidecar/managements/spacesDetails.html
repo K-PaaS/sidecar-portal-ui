@@ -11,7 +11,7 @@
         <article class="base detail">
             <div class="notice">
                 <h4>Space Details</h4>
-                <div class="table_style01">
+                <div class="table_style01 spaceDetails">
                     <table>
                         <caption>Space Details</caption>
                         <colgroup>
@@ -55,9 +55,9 @@
                 </div>
             </div>
             <div class="btn02">
-                <button onclick="historyBack()" th:text="#{M0028}"></button>
                 <div>
-                    <button type="delete" id="deleteSpace" th:text="#{M0026}"></button>
+                    <a href="javascript:;" id="deleteSpace" th:text="#{M0026}"></a>
+                    <a class="beforeBtn" onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS_DETAILS)" th:text="#{M0028}"></a>
                 </div>
             </div>
         </article>

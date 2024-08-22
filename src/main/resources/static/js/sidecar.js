@@ -317,7 +317,11 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                                         //unbind
                                         if ((urlCategory == "serviceBindings" && urlPath3 == "serviceBindings" ) || (urlCategory == "routes" && urlPath3 == "removeDestinations" )){
                                             func.alertPopup('SUCCESS', ALERT_POPUP_DISCONNECT, true, MSG_CONFIRM, callFunc);
-                                        }else {
+                                        }
+                                        else if ((urlCategory == "apps")){
+                                            func.alertPopup('SUCCESS', ALERT_POPUP_DELETE + ALERT_WAIT, true, MSG_CONFIRM, callFunc);
+                                        }
+                                        else {
                                             func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
                                         }
                                     }else if (method == 'PATCH') {

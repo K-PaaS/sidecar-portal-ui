@@ -45,9 +45,9 @@
                 </div>
                 <!-- btn -->
                 <div class="btn02">
-                    <button onclick="historyBack()" th:text="#{M0028}"></button>
                     <div>
-                        <button type="submit" id="modify" th:text="#{M0025}"></button>
+                        <a href="javascript:;" id="modify" th:text="#{M0025}"></a>
+                        <a class="beforeBtn" onclick="moveUserPrePage()" th:text="#{M0028}"></a>
                     </div>
                 </div>
             </article>
@@ -150,6 +150,9 @@
         else if(obj.value == AUTH_USER){
             document.getElementById('nsRoleContent').style.display="";
         }
+    }
+    function moveUserPrePage(){
+        movePage(URI_SC_MANAGEMENTS_USERS_DETAILS);
     }
 </script>
 </th:block>

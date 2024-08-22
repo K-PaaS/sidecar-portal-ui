@@ -143,6 +143,7 @@
 
                 drawCredential(data) {
                     // Details/Credential
+                    document.getElementById('credentials').placeholder = PLACEHOLDER_CREATE_CREDENCIALS;
                     credentialsStr = JSON.stringify(data).includes("null") ? "" : JSON.stringify(data);
                     credentialsStr = JSON.stringify(data).includes('\\"\\":\\"\\"') ? "" : JSON.stringify(data);
                     document.getElementById('credentials').value = credentialsStr;

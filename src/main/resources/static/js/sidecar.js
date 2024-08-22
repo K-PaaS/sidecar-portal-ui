@@ -386,7 +386,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                                         data = data.replace("role","");
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/role.delete~${data}`, "application/json", callFunc);
                                     }else {
-                                        func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
+                                        func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
                                     }
                                 }
                             } else if (response.resultCode == RESULT_STATUS_FAIL && method === 'DELETE') {

@@ -91,7 +91,6 @@
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
                 document.getElementById("space_name").innerText = sessionStorage.getItem("space_name");
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}/get`, "application/json", '', '', 'space');
 
             },
             user(space_data) {
@@ -297,19 +296,19 @@
         function checkboxChange(event) {
             const checkbox = event.target;
             if (checkbox.checked) {
-                var orgGuid = sessionStorage.getItem("orgGuid");
+                var spaceGuid = sessionStorage.getItem("space_guid");
                 var type = checkbox.getAttribute("name");
                 var user = checkbox.id.replace("_developer", "").replace("_manager", "").replace("_auditor", "");
                 var data = {
-                    "orgGuid": orgGuid,
+                    "spaceGuid": spaceGuid,
                     "type": type,
                     "user": user
                 }
-                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',);
+                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',func.refresh);
             } else {
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',);
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',func.refresh);
             }
         }
         document.addEventListener("change", function(event) {

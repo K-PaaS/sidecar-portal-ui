@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <div layout:fragment="content">
     <div id="content" class="sub-page">
         <article class="location">
@@ -15,8 +16,8 @@
                     <table>
                         <caption>Space Details</caption>
                         <colgroup>
-                            <col width="20%" />
-                            <col width="80%" />
+                            <col width="20%"/>
+                            <col width="80%"/>
                         </colgroup>
                         <tbody class="listTable">
                         <tr>
@@ -34,11 +35,11 @@
                     <table id="table">
                         <caption>Details</caption>
                         <colgroup>
-                            <col width="7%" />
-                            <col width="20%" />
-                            <col width="35%" />
-                            <col width="38%" />
-                            <col width="0%" />
+                            <col width="7%"/>
+                            <col width="20%"/>
+                            <col width="35%"/>
+                            <col width="38%"/>
+                            <col width="0%"/>
                         </colgroup>
                         <thead>
                         <tr>
@@ -57,15 +58,19 @@
             <div class="btn02">
                 <div>
                     <a href="javascript:;" id="deleteSpace" th:text="#{M0026}"></a>
-                    <a class="beforeBtn" onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS_DETAILS)" th:text="#{M0028}"></a>
+                    <a class="beforeBtn" onclick="movePage(URI_SC_MANAGEMENTS_ORGANIZATIONS_DETAILS)"
+                       th:text="#{M0028}"></a>
                 </div>
             </div>
         </article>
     </div>
 </div>
-<th:block layout:fragment="script"> </th:block>
+<th:block layout:fragment="script"></th:block>
 </html>
 <script type="text/javascript">
+    var cluster_data;
+    var sidecar_data;
+
     window.onload = () => {
         func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.ORGANIZATIONS);
         callbackFuncNameLoad();
@@ -90,15 +95,21 @@
                 func.loading();
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
                 document.getElementById("space_name").innerText = sessionStorage.getItem("space_name");
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", org_user);
 
+                function org_user(sidecarData) {
+                    sidecar_data = sidecarData;
+                }
+
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", detail.user);
             },
             user(space_data) {
-                funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (cluster_data) => {
-                    space_user(cluster_data);
+                funcsc.loadDataSidecar("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=${detail.type}&searchName`, "application/json", (clusterData) => {
+                    cluster_data = clusterData;
+                    space_user(clusterData);
                 })
 
-                function space_user(cluster_data) {
+                function space_user(clusterData) {
                     if (space_data.pagination.total_results > 0) {
                         var dataArray = [];
                         for (var i = 0; i < space_data.pagination.total_results; i++) {
@@ -122,11 +133,11 @@
                                 var condition = false;
                                 var account = "SA";
 
-                                for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
-                                    var serviceAccountName = cluster_data.items[j].serviceAccountName;
+                                for (var j = 0; j < clusterData.itemMetaData.allItemCount; j++) {
+                                    var serviceAccountName = clusterData.items[j].serviceAccountName;
 
                                     if (serviceAccountName === userLastPart) {       // SA(Portal)
-                                        var userId = cluster_data.items[j].userId;
+                                        var userId = clusterData.items[j].userId;
                                         dataArray[i] = [account, userId, serviceAccountName, developerCheckbox, managerCheckbox, auditorrCheckbox, roleGuid, detail.users];
                                         condition = true;
                                         break;
@@ -209,7 +220,12 @@
                 funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/spaces/${sessionStorage.getItem("space_guid")}`, data, true, 'application/json', funcsc.movePageToOrg);
             },
         }
+
         function addSpaceUser(title, url, name) {
+            const spaceUser = document.querySelectorAll(".user-info-td2");
+            var flag = false;
+            var emptyUser = "조회된 사용자가 없습니다.";
+
             var html = `<div class="modal-wrap" id="modal">
 			<div class="modal midium">
 				<h5>${title}</h5>
@@ -217,8 +233,36 @@
 				    <dt>User</dt>
 					<dd>
 						<fieldset>
-							<select id="createName">
-							</select>
+							<select id="createName">`;
+            for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
+                var userAuthId = sidecar_data.resources[i].relationships.user.data.guid;
+                var split = userAuthId.split(":");
+                var userLastPart = split[split.length - 1];
+
+                for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
+                    var serviceAccountName = cluster_data.items[j].serviceAccountName;
+
+                    if (serviceAccountName === userLastPart) {
+                        var existUserIdx = 0;
+                        var userId = cluster_data.items[j].userId;
+                        spaceUser.forEach(function (userIdx, index) {
+
+                            if (userIdx.innerText === userId) {
+                                existUserIdx++;
+                            }
+                        })
+                        if (existUserIdx == 0) {
+                            html += `<option value=${serviceAccountName}>${userId}</option>`;
+                            flag = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!flag) {
+                html += `<option value="notFound">` + emptyUser + `</option>`;
+            }
+            html += ` </select>
 						</fieldset>
 					</dd>
 				</dl>
@@ -237,62 +281,50 @@
 		</div>`;
             func.appendHtml(document.getElementById('wrap'), html, 'div');
             console.log(`${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`);
-            func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`, "application/json", (data) => {
-                cluster_user(data);
-            })
-            function cluster_user(cluster_data) {
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", org_user);
-                function org_user(sidecar_data){
-                    for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
-                        var userAuthId = sidecar_data.resources[i].relationships.user.data.guid;
-                        var split = userAuthId.split(":");
-                        var userLastPart = split[split.length - 1];
-                        for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
-                            var serviceAccountName = cluster_data.items[j].serviceAccountName;
-                            if (serviceAccountName === userLastPart) {
-                                var userId = cluster_data.items[j].userId;
-                                var html = `<option value=${serviceAccountName}>${userId}</option>`;
-                                func.appendHtml(document.getElementById('createName'), html, 'select');
-                            }
-                        }
-                    }
-                }
-                if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
-                    document.getElementById('createName').selectedIndex = 0;
-                }
-                else {
-                    document.getElementById('createName').value = sessionStorage.getItem('users');
-                }
-                document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
-                    document.getElementById('wrap').removeChild(document.getElementById('modal'));
-                }, false);
-                document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
-                    var check = false;
-                    var organization = document.getElementsByName('organization');
-                    for (var i = 0; i < organization.length; i++) {
-                        if (organization[i].checked == true) {
-                            check = true;}
-                    }if (!document.getElementById('createName').value) {
-                        alert(ALERT_USER_SELECT);
-                        return;
-                    }else if (check == false) {
-                        alert(ALERT_TYPE_SELECT);
-                        return;
-                    }else {
-                        var spaceGuid = sessionStorage.getItem("space_guid");
-                        var type = document.querySelector('input[type=radio][name=organization]:checked').value;
-                        var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
-                        var sendData = JSON.stringify({
-                            "spaceGuid": spaceGuid,
-                            "type": type,
-                            "user": user,
-                        });
-                        funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
-                    }
-                }, false);
+
+            if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
+                document.getElementById('createName').selectedIndex = 0;
             }
+            // else {
+            //     document.getElementById('createName').value = sessionStorage.getItem('users');
+            // }
+            document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
+                document.getElementById('wrap').removeChild(document.querySelector('.modal-wrap'));
+            }, false);
+            document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
+                var check = false;
+                var organization = document.getElementsByName('organization');
+
+                for (var i = 0; i < organization.length; i++) {
+                    if (organization[i].checked) {
+                        check = true;
+                        break;
+                    }
+                }
+                if (!document.getElementById('createName').value || document.getElementById('createName').value == "notFound") {
+                    //alert(ALERT_USER_SELECT);
+                    func.alertPopup('', ALERT_USER_SELECT, true, MSG_CONFIRM, 'closed');
+                    return;
+                } else if (!check) {
+                    func.alertPopup('', ALERT_USER_SELECT, true, MSG_CONFIRM, 'closed');
+                    //alert(ALERT_TYPE_SELECT);
+                    return;
+                } else {
+                    var spaceGuid = sessionStorage.getItem("space_guid");
+                    var type = document.querySelector('input[type=radio][name=organization]:checked').value;
+                    var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
+                    var sendData = JSON.stringify({
+                        "spaceGuid": spaceGuid,
+                        "type": type,
+                        "user": user,
+                    });
+                    funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
+                }
+            }, false);
         }
+
         detail.init();
+
         function checkboxChange(event) {
             const checkbox = event.target;
             if (checkbox.checked) {
@@ -304,14 +336,15 @@
                     "type": type,
                     "user": user
                 }
-                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json',func.refresh);
+                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json', func.refresh);
             } else {
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
                 const roleGuid = roleLabel.getAttribute("id");
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json',func.refresh);
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json', func.refresh);
             }
         }
-        document.addEventListener("change", function(event) {
+
+        document.addEventListener("change", function (event) {
             const target = event.target;
             if (target.matches("input[type='checkbox']")) {
                 checkboxChange(event);

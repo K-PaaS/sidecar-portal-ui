@@ -95,7 +95,7 @@
                 func.loading();
                 document.getElementById("org_name").innerText = sessionStorage.getItem("org_name");
                 document.getElementById("space_name").innerText = sessionStorage.getItem("space_name");
-                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", org_user);
+                funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", org_user);
 
                 function org_user(sidecarData) {
                     sidecar_data = sidecarData;

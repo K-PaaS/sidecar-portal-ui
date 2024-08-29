@@ -1,3 +1,20 @@
+/* Button */
+/*
+.application .notice .title .button {margin-left:auto; margin-bottom:5px;}
+.application .notice .title .button a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
+*/
+.application .notice .title .envButton,
+.application .notice .title .svcButton,
+.application .notice .title .routeButton,
+.application .notice .title .logButton
+{margin-left:auto; margin-bottom:5px;line-height:40px;}
+
+.application .notice .title .envButton a,
+.application .notice .title .svcButton a,
+.application .notice .title .routeButton a,
+.application .notice .title .logButton a
+{position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
+
 /* Application의 Instance, Service, Environment, Route, Log */
 .application .notice ul {overflow:hidden;font-family:'Apple SD Gothic Neo B', sans-serif;}
 .application .notice ul li {float:left;padding-left:15px;margin-left:15px;position:relative;}
@@ -9,24 +26,7 @@
 
 /* Application의 Start & Stop & Delete */
 .application .notice .title {display: flex;}
-.application .notice .title .button {margin-left:auto; margin-bottom:5px;}
-.application .notice .title .button a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
-
 .application .notice .listTable input {margin-left:5px;}
-
-/* Application Env의 Create */
-.application .notice .title .envButton {margin-left:auto; margin-bottom:5px;line-height:40px;}
-.application .notice .title .envButton a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
-
-.application .notice .title .svcButton {margin-left:auto; margin-bottom:5px;line-height:40px;}
-.application .notice .title .svcButton a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
-
-.application .notice .title .routeButton {margin-left:auto; margin-bottom:5px;line-height:40px;}
-.application .notice .title .routeButton a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
-
-.application .notice .title .logButton {margin-left:auto; margin-bottom:5px;line-height:40px;}
-.application .notice .title .logButton a {position: initial;top:50px;right:40px;color:#ffffff;padding:11px 13px 7px 13px;background-color:#0556c0;border-radius:2px;}
-
 
 /* Application Detail icon*/
 .detail_icon {margin-right:10px;}

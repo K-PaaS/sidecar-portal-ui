@@ -178,8 +178,8 @@
                             var appCreated = "appCreated" + i;
                             var html = `<tr>
 								<td class="left" id=${"appName"+i}></td>
-								<td class="left" id=${"appState"+i}></td>
-                                <td class="left" id=${"appCreated"+i}></td>
+								<td class="fs-14" id=${"appState"+i}></td>
+                                <td class="fs-14" id=${"appCreated"+i}></td>
                                 <td class="fs-14" align="center">
                                   <input type="text" id=${"appGuid"+i} hidden value="${data.resources[i].relationships.app.data.guid}">
                                   <i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button trashcan" id="${data.resources[i].guid}"></i></td>`;  // trashcan
@@ -215,6 +215,7 @@
                         if ( data.guid == document.getElementById('appGuid'+i).value){
                             document.getElementById('appName'+i).innerText = data.name;
                             document.getElementById('appState'+i).innerText = data.state;
+                            document.getElementById('appState'+i).className += " " + data.state.toLowerCase();
                             document.getElementById('appCreated'+i).innerText = data.created_at;
                         }
                     }

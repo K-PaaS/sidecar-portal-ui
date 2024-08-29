@@ -339,8 +339,8 @@
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, JSON.stringify(data), true, 'application/json', func.refresh);
             } else {
                 const roleLabel = checkbox.parentElement.nextElementSibling.querySelector("label");
-                const roleGuid = roleLabel.getAttribute("id");
-                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, '', true, 'application/json', func.refresh);
+                const roleGuid = checkbox.getAttribute("value");
+                funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/roles/${roleGuid}`, 'role'+roleGuid, true, 'application/json', func.refresh);
             }
         }
 

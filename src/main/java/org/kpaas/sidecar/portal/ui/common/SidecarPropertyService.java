@@ -27,4 +27,7 @@ public class SidecarPropertyService {
     @Value("${sidecar.roleUser}")
     private String sidecarRoleUser;
 
+    @Value("${sidecar.targetCluster}")
+    private String targetCluster;
+
 }

@@ -101,7 +101,8 @@ const func = {
 		if ( func.invisible > 1 ) return; // cluster, namespace 블필요 in sidecar
 		var html ='';
 		for(var i=0; i<=data.items.length-1; i++){
-			html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
+			if (SIDECAR_TARGET_CLUSTER === "${data.items[i].clusterId}" )  // only targetCluster in sidecar
+				html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
 		};
 
 		document.getElementById("clusterListUl").innerHTML = html;

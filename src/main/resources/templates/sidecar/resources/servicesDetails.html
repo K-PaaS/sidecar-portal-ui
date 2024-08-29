@@ -36,7 +36,11 @@
                         </tr>
                         <tr>
                             <th scope="row" class="left">Credentials</th>
-                            <td class="left" id="credentials"></td>
+                            <td class="left" id="credentialstd">
+                                <input class="left" id="credentials" type="text" readonly>
+                                <button type="button" class="right" id="credentialsSaveButton">&nbsp;&nbsp;Save&nbsp;&nbsp;</button>
+                                <button type="button" class="right" id="credentialsEditButton" onclick="activeEdit('credentials', this.id)">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row" class="left">Type</th>
@@ -139,7 +143,28 @@
 
                 drawCredential(data) {
                     // Details/Credential
-                    document.getElementById('credentials').innerText = JSON.stringify(data);
+                    document.getElementById('credentials').placeholder = PLACEHOLDER_CREATE_CREDENCIALS;
+                    credentialsStr = JSON.stringify(data).includes("null") ? "" : JSON.stringify(data);
+                    credentialsStr = JSON.stringify(data).includes('\\"\\":\\"\\"') ? "" : JSON.stringify(data);
+                    document.getElementById('credentials').value = credentialsStr;
+
+                    document.getElementById('credentialsSaveButton').addEventListener('click', (e) => {
+                        credentials = document.getElementById('credentials').value;
+                        spaceGuid = sessionStorage.getItem("space_guid");
+                        guid = serviceDetail.delete_si_guid;
+
+                        /*if(!credentials) {
+                            func.alertPopup('', ALERT_CREDENTIALS_ENTER, true, MSG_CONFIRM, 'closed');
+                            return;
+                        } else {*/
+                            var sendData = JSON.stringify({
+                                "guid": guid,
+                                "spaceGuid": spaceGuid,
+                                "credentials": credentials
+                            });
+                            funcsc.postDataWithPopup('PATCH', `${funcsc.sidecarUrl}sidecar/serviceInstances/${guid}`, sendData, true, 'application/json', func.refresh);
+                        //}
+                    }, false);
 
                     //binding Apps
                     funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceBindings/list?spaceGuids=${sessionStorage.getItem('space_guid')}&serviceInstanceGuids=${sessionStorage.getItem('commonGuid')}`, 'application/json', serviceDetail.drawApps);
@@ -169,7 +194,7 @@
 
                     document.getElementById('wrap').removeChild(document.getElementById('loading'));
 
-                    serviceDetail.event();
+                    //serviceDetail.event();
                     //serviceDetail.bindingsEvent(data);
 
                     let trashcan = document.querySelectorAll(".trashcan");
@@ -193,27 +218,14 @@
                             document.getElementById('appCreated'+i).innerText = data.created_at;
                         }
                     }
-                },
+                },/*
                 event(){
                     document.getElementById('delete').addEventListener('click', (e) => {
                         const data = "service"+serviceDetail.delete_si_guid;
                         //funcsc.postData('DELETE', `${funcsc.sidecarUrl}sidecar/serviceInstances/${serviceDetail.delete_si_guid}`, data, true, 'application/json', func.refresh);
                         funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceInstanceDelete);
                     }, false);
-                },
-
-                bindingsEvent(data) {
-                    let trashcan = document.querySelectorAll(".trashcan");
-                    function test() {
-                        for(let i = 0; i < trashcan.length; i++) {
-                            trashcan[i].addEventListener("click", (e) => {
-                                serviceDetail.delete_sb_guid = e.currentTarget.id;
-                                funcsc.alertPopup('DELETE', MSG_CHECK_TO_DELETE, true, MSG_CONFIRM, serviceDetail.serviceBindingDelete);
-                            }, false);
-                        }
-                    }
-                    test();
-                },
+                },*/
 
                 serviceInstanceDelete() {
                     guid = serviceDetail.delete_si_guid;

@@ -151,17 +151,21 @@
                                 var serviceAccountName = "-";
                             } else {  //SA
                                 var account = "SA";
+                                if (cluster_data.itemMetaData.allItemCount == 0){
+                                    serviceAccountName = userId.split(":")[userId.split(":").length - 1];
+                                    userId = "-";
+                                }else {
+                                    for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
+                                        serviceAccountName = userId.split(":")[userId.split(":").length - 1];
 
-                                for (var j = 0; j < cluster_data.itemMetaData.allItemCount; j++) {
-                                    serviceAccountName = userId.split(":")[userId.split(":").length-1];
-
-                                    if (userId.includes(cluster_data.items[j].serviceAccountName)) {// SA(Portal)
-                                        userId = cluster_data.items[j].userId;
-                                        serviceAccountName = cluster_data.items[j].serviceAccountName;
-                                        break;
-                                    } else { // SA(CLI)
-                                        if ( j == cluster_data.itemMetaData.allItemCount-1 )
-                                            userId = "-";
+                                        if (userId.includes(cluster_data.items[j].serviceAccountName)) {// SA(Portal)
+                                            userId = cluster_data.items[j].userId;
+                                            serviceAccountName = cluster_data.items[j].serviceAccountName;
+                                            break;
+                                        } else { // SA(CLI)
+                                            if (j == cluster_data.itemMetaData.allItemCount - 1)
+                                                userId = "-";
+                                        }
                                     }
                                 }
                             }
@@ -222,9 +226,10 @@
                         var html = "<tr><td colspan=4 class='table-no-data'>No Data.</td></tr>";
                         func.appendHtml(document.querySelector(".detailList"), html, "tbody", );
                     }
-                }
-                if (document.getElementById("loading")) {
-                    document.getElementById("wrap").removeChild(document.getElementById("loading"));
+
+                    if (document.getElementById("loading")) {
+                        document.getElementById("wrap").removeChild(document.getElementById("loading"));
+                    }
                 }
 
                 detail.eventDelete();

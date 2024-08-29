@@ -212,13 +212,13 @@
                         const spaceGuid = sessionStorage.getItem("space_guid");
 
                         if(!host) {
-                            alert(ALERT_HOST_ENTER);
+                            func.alertPopup('', ALERT_HOST_ENTER, true, MSG_CONFIRM, 'closed');
                             return;
                         }else if(!domainGuid) {
-                            alert(ALERT_DOMAIN_ENTER);
+                            func.alertPopup('', ALERT_DOMAIN_ENTER, true, MSG_CONFIRM, 'closed');
                             return;
                         }else if(path != "" && path.indexOf("\/") < 0) {
-                            alert("Type \/");
+                            func.alertPopup('',"Type \/", true, MSG_CONFIRM, 'closed');
                             return;
                         }else {
                             var sendData = JSON.stringify({

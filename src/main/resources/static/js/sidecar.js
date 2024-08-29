@@ -386,7 +386,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                                         data = data.replace("role","");
                                         funcsc.loadDataSidecarJob('GET', `${funcsc.sidecarUrl}sidecar/jobs/role.delete~${data}`, "application/json", callFunc);
                                     }else {
-                                        func.alertPopup('SUCCESS', ALERT_POPUP_CREATE, true, MSG_CONFIRM, callFunc);
+                                        func.alertPopup('SUCCESS', ALERT_POPUP_DELETE, true, MSG_CONFIRM, callFunc);
                                     }
                                 }
                             } else if (response.resultCode == RESULT_STATUS_FAIL && method === 'DELETE') {
@@ -436,7 +436,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
         document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
             const orgName = document.getElementById('orgName').value;
             if(!orgName) {
-                alert(ALERT_ORG_ENTER);
+                func.alertPopup('', ALERT_ORG_ENTER, true, MSG_CONFIRM, 'closed');
                 return;
             }else {
                 var sendData = JSON.stringify({
@@ -470,7 +470,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
             const orgGuid = sessionStorage.getItem("org_guid");
 
             if(!spaceName) {
-                alert(ALERT_SPACE_ENTER);
+                func.alertPopup('', ALERT_SPACE_ENTER, true, MSG_CONFIRM, 'closed');
                 return;
             }else {
                 var sendData = JSON.stringify({
@@ -480,88 +480,6 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                 funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/spaces`, sendData, true, 'application/json', func.refresh);
             }
         }, false);
-    },
-    addUser(title, url, name) { // Org 이동완료
-        var html = `<div class="modal-wrap" id="modal">
-			<div class="modal midium">
-				<h5>${title}</h5>
-				<dl>
-				    <dt>User</dt>
-					<dd>
-						<fieldset>
-							<select id="createName">
-							</select>
-						</fieldset>
-					</dd>
-				</dl>
-				<dl class="popup_add_user_dl">
-					<dt id="popup_add_user_dt">Type</dt>
-					<dd class="popup_add_user_dd" >
-					        <input type="radio" id="organization_user" name="organization" value="organization_user">
-                            <label for="organization_user">User</label>
-                            <input type="radio" id="organization_manager" name="organization" value="organization_manager">
-                            <label for="organization_manager">Manager</label>        
-                    </dd>
-				</dl>
-				<a class="confirm" href="javascript:;">` + BUTTON_ADD + `</a>
-				<a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
-			</div>
-		</div>`;
-
-        func.appendHtml(document.getElementById('wrap'), html, 'div');
-        func.loadData("GET", `${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`, "application/json", (data) => {
-            cluster_user(data);
-        })
-        function cluster_user(data) {
-            for (var i = 0; i <= data.itemMetaData.allItemCount - 1; i++) {
-                for(var j = 0; j < data.items[i].items.length; j++) {
-                    if (data.items[i].items[j].roleSetCode === SIDECAR_ROLE_USER) {
-                        var userId = data.items[i].items[j].userId;
-                        var userAuthId = data.items[i].items[j].userAuthId;
-                        var html = `<option value="${userAuthId}">${userId}</option>`;
-                        func.appendHtml(document.getElementById('createName'), html, 'select');
-                    }
-                }
-            }
-
-            if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
-                document.getElementById('createName').selectedIndex = 0;
-            } else {
-                document.getElementById('createName').value = sessionStorage.getItem('users');
-            }
-
-            document.getElementById('modal').querySelector('.close').addEventListener('click', (e) => {
-                document.getElementById('wrap').removeChild(document.getElementById('modal'));
-            }, false);
-            document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
-                var check = false;
-                var organization = document.getElementsByName('organization');
-                for(var i = 0; i < organization.length; i++){
-                    if(organization[i].checked == true) {
-                        check = true;
-                    }
-                }
-
-                if(!document.getElementById('createName').value){
-                    alert(ALERT_USER_SELECT);
-                    return;
-                }else if(check == false){
-                    alert(ALERT_TYPE_SELECT);
-                    return;
-                }else {
-                    var orgGuid = sessionStorage.getItem("org_guid");
-                    var type = document.querySelector('input[type=radio][name=organization]:checked').value;
-                    var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
-                    var sendData = JSON.stringify({
-                        "orgGuid": orgGuid,
-                        "type": type,
-                        "user": user
-                    });
-
-                    funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
-                }
-            }, false);
-        }
     },
     addDomain(title, url, name) {
         var html = `<div class="modal-wrap" id="modal">
@@ -587,7 +505,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
             const orgGuid = sessionStorage.getItem("org_guid");
 
             if(!domainName) {
-                alert(ALERT_DOMAIN_ENTER);
+                func.alertPopup('', ALERT_DOMAIN_ENTER, true, MSG_CONFIRM, 'closed');
                 return;
             }else {
                 var sendData = JSON.stringify({

@@ -27,29 +27,27 @@
     border-radius: 2px;
 }
 .space_table {
-    //display: block;
     max-height: 180px;
     overflow-y: auto;
     width: 1070px;
 }
+/*
 .detailList {
-    //display: block;
     max-height: 300px;
     overflow-y: auto;
-    //width: 1070px;
-}
-.left {
-    //width: 1070px;
 }
 .table-no-data{
     width: 1070px;
 }
+*/
 .checkbox-label {
     margin-right: 25px;
 }
+/*
 .user-info-td1 {
     width: 74.89px;
 }
+
 .user-info-td2 {
     width: 214px;
 }
@@ -63,79 +61,52 @@
     width: 0px;
     display: none;
 }
+*/
+/*
 .user-info-col5 {
     display: none;
-}
+}*/
 .popup_add_input{
     width: 100%;
     height: 100%;
 }
+/*
 .popup_add_user_dl{
     margin-bottom: 10px;
 }
 #popup_add_user_dt{
     line-height: 50px;
-}
+}*/
 .popup_add_user_dd{
     display: flex;
     gap: 100px;
-    /*justify-content: center;*/
     align-items: center;
 }
 
-/* domains */
-input#domainName{
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-/* routes */
-.addRouteModal dl {
-    margin-bottom: 10px;
-}
-
-.modal.addRouteModal dl dt {
-    line-height: 50px;
-}
-
-.addRouteModal input#hostName {
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-
-.addRouteModal input#path {
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-
-/* services */
-.modal input#serviceInstanceName {
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-
-.modal.addServiceInstanceModal dl dt {
-    line-height: 50px;
-}
-
-.modal input#credentials {
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-
-/* organizations */
-.modal input#orgName {
-    border: 1px solid #ebebeb;
-    padding-left: 10px;
-}
-
+/* modal */
+.modal input#domainName,
+.modal input#hostNazme,
+.modal input#path,
+.modal input#serviceInstanceName,
+.modal input#credentials,
+.modal input#orgName,
 .modal input#spaceName {
     border: 1px solid #ebebeb;
     padding-left: 10px;
 }
 
-.orgDetails tr {border-top: 1px solid #ebebeb;}
-.spaceDetails tr {border-top: 1px solid #ebebeb;}
+.modal dl {
+    margin-bottom: 10px;
+}
 
+.modal dl dt{
+    line-height: 50px;
+}
+
+.orgDetails tr,
+.spaceDetails tr {
+    border-top: 1px solid #ebebeb;
+}
 
 .detailList .user-info-td4{
     border-right: 0;

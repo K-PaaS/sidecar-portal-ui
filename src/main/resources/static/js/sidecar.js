@@ -65,6 +65,7 @@ const funcsc = {
                     sessionStorage.setItem('space_name', data.resources[0].name);
                 }else {
                     document.querySelector('.spaceTop').innerText = "No spaces found";
+                    document.getElementById("spaceTitleDiv").removeChild(document.getElementById("spaceListUl"));
                 }
             };
 

@@ -50,6 +50,20 @@ const funcsc = {
     spaces(data){
         var html = '';
         if(document.querySelector('.spaceUl')){
+            if (data.resources.length < 1){
+                const elms = document.querySelectorAll('h3 ul#spaceListUl');
+                console.log(elms);
+                elms.forEach((elm) => {
+                  elm.style.setProperty('--display-style', 'none');
+                });
+            }else {
+                const elms = document.querySelectorAll('h3 ul#spaceListUl');
+                console.log(elms);
+                elms.forEach((elm) => {
+                    elm.style.setProperty('--display-style', 'block');
+                });
+
+            }
             for(var i=0; i <= data.resources.length-1 ; i++){
                 html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
             };
@@ -65,21 +79,21 @@ const funcsc = {
                     sessionStorage.setItem('space_name', data.resources[0].name);
                 }else {
                     document.querySelector('.spaceTop').innerText = "No spaces found";
-                    document.getElementById("spaceTitleDiv").removeChild(document.getElementById("spaceListUl"));
                 }
             };
+            if (data.resources.length > 0){
+                var name = document.querySelector('.spaceUl').querySelectorAll('a');
 
-            var name = document.querySelector('.spaceUl').querySelectorAll('a');
-
-            for(var i=0 ; i < name.length ; i++){
-                name[i].addEventListener('click', (e) => {
-                    sessionStorage.setItem('space_guid' , e.target.getAttribute('data-name'));
-                    sessionStorage.setItem('space_name', e.target.innerText);
-                    document.querySelector('.spaceTop').innerText = e.target.innerText;
-                    IS_RELOAD = true;
-                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
-                }, false);
-            };
+                for(var i=0 ; i < name.length ; i++){
+                    name[i].addEventListener('click', (e) => {
+                        sessionStorage.setItem('space_guid' , e.target.getAttribute('data-name'));
+                        sessionStorage.setItem('space_name', e.target.innerText);
+                        document.querySelector('.spaceTop').innerText = e.target.innerText;
+                        IS_RELOAD = true;
+                        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+                    }, false);
+                };
+            }
 
             if(IS_RELOAD) {
                 if(IS_NAMELOAD) {

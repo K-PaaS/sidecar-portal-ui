@@ -224,14 +224,15 @@
                 listEvent() {
                     var listAll = document.getElementsByTagName("tbody");
                     var trs = listAll[0].getElementsByTagName("tr");
-
-                    for (var i = apps.offset * 10; i < trs.length; i++) {
-                        tds = trs[i].getElementsByTagName("td");
-                        atag = tds[0].getElementsByTagName("a");
-                        atag[0].addEventListener("click", (e) => {
-                            sessionStorage.setItem("appGuid", e.target.getAttribute("data-guid"), );
-                            document.location.href = URI_SC_DETAILS_INSTANCES;
-                        }, true,);
+                    if(orgApps.length > 0 ){
+                        for (var i = apps.offset * 10; i < trs.length; i++) {
+                            tds = trs[i].getElementsByTagName("td");
+                            atag = tds[0].getElementsByTagName("a");
+                            atag[0].addEventListener("click", (e) => {
+                                sessionStorage.setItem("appGuid", e.target.getAttribute("data-guid"), );
+                                document.location.href = URI_SC_DETAILS_INSTANCES;
+                            }, true,);
+                        }
                     }
                 },
             };

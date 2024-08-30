@@ -111,3 +111,7 @@
 .detailList .user-info-td4{
     border-right: 0;
 }
+
+h3:hover ul#spaceListUl{
+	display: var(--display-style);
+}

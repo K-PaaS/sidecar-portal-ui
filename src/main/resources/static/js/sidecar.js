@@ -172,7 +172,11 @@ const funcsc = {
                             callbackFunction(JSON.parse(request.responseText), list);
                         }
 
-                    } else if (JSON.parse(request.responseText).httpStatusCode === 500) {
+                    }
+                    else if (request.status === 503 ){
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, func.refresh);
+                    }
+                    else if (JSON.parse(request.responseText).httpStatusCode === 500) {
                         sessionStorage.clear();
                         func.loginCheck();
                     }
@@ -229,7 +233,11 @@ const funcsc = {
                             callbackFunction(JSON.parse(request.responseText), list);
                         }
 
-                    } else if (JSON.parse(request.responseText).httpStatusCode === 500) {
+                    }
+                    else if (request.status === 503 ){
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, func.refresh);
+                    }
+                    else if (JSON.parse(request.responseText).httpStatusCode === 500) {
                         sessionStorage.clear();
                         func.loginCheck();
                     }

@@ -342,7 +342,11 @@ const func = {
 			};
 		};
 
-		request.send();
+		try {
+			request.send();
+		} catch (err) {
+			func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+		}
 	},
 
 	// Refresh 토큰 조회 ////////////////////////////////////////////////////////////////
@@ -363,7 +367,11 @@ const func = {
 			};
 		};
 
-		request.send();
+		try {
+			request.send();
+		} catch (err) {
+			func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+		}
 	},
 
 	// Locale Language 조회 ////////////////////////////////////////////////////////////////
@@ -383,7 +391,11 @@ const func = {
 				};
 			};
 		};
-		request.send();
+		try {
+			request.send();
+		} catch (err) {
+			func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+		}
 	},
 
 	// Locale Language 설정 ////////////////////////////////////////////////////////////////
@@ -399,7 +411,11 @@ const func = {
 				}
 			};
 		};
-		request.send();
+		try {
+			request.send();
+		} catch (err) {
+			func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+		}
 	},
 
 	setUserAuthority(cluster, usersList){
@@ -421,7 +437,12 @@ const func = {
 				}
 			};
 		};
-		request.send(authority);
+		try {
+			request.send(authority);
+		} catch (err) {
+			func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+		}
+
 	},
 	/////////////////////////////////////////////////////////////////////////////////////
 	// 데이터 로드 - loadData(method, url, callbackFunction)
@@ -476,7 +497,12 @@ const func = {
 				};
 			};
 
-			request.send(); },0);
+			try {
+				request.send();
+			} catch (err) {
+				func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+			}
+			},0);
 	},
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -539,8 +565,12 @@ const func = {
 					};
 				};
 			};
-
-			request.send(data); }, 0);
+			try {
+				request.send(data);
+			} catch (err) {
+				func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+			}
+			}, 0);
 	},
 
 	/////////////////////////////////////////////////////////////////////////////////////

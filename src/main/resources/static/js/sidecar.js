@@ -178,7 +178,11 @@ const funcsc = {
                     }
                 }
             };
-            request.send();
+            try {
+                request.send();
+            } catch (err) {
+                func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+            }
         }, 0);
     },
     loadDataSidecarJob(method, url, header, callbackFunction, list) {
@@ -235,7 +239,11 @@ const funcsc = {
                     }
                 }
             };
-            request.send();
+            try {
+                request.send();
+            } catch (err) {
+                func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+            }
         }, 0);
     },
 postDataWithFile(method, url, data, bull, header, callFunc){
@@ -275,7 +283,11 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                     }
                 }
             };
-            request.send(data);
+            try {
+                request.send();
+            } catch (err) {
+                func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+            }
     },
     postDataWithPopup(method, url, data, bull, header, callFunc){
         func.loading();
@@ -355,7 +367,12 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                     }
                 }
             };
-            request.send(data); }, 0);
+            try {
+                request.send();
+            } catch (err) {
+                func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+            }
+            }, 0);
     },
     postData(method, url, data, bull, header, callFunc){
         func.loading();
@@ -428,7 +445,12 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                     }
                 }
             };
-            request.send(data); }, 0);
+            try {
+                request.send();
+            } catch (err) {
+                func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
+            }
+            }, 0);
     },
     addOrg(title, url, name) {
         var html = `<div class="modal-wrap" id="modal">

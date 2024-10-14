@@ -284,7 +284,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                 }
             };
             try {
-                request.send();
+                request.send(data);
             } catch (err) {
                 func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
             }
@@ -368,7 +368,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                 }
             };
             try {
-                request.send();
+                request.send(data);
             } catch (err) {
                 func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
             }
@@ -446,7 +446,7 @@ postDataWithFile(method, url, data, bull, header, callFunc){
                 }
             };
             try {
-                request.send();
+                request.send(data);
             } catch (err) {
                 func.alertPopup('ERROR',  ALERT_POPUP_CONNECTION_FAIL, true, MSG_CONFIRM, func.refresh);
             }

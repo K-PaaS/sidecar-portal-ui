@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: portal-ui
+  - name: sidecar-portal-ui
     memory: 1G
     disk: 1G
     instances: 1

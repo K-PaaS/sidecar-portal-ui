@@ -78,6 +78,10 @@
             <td class="box left" ><div style="margin-left:5px;" id="detailsState"></div></td>
             <td class="fs-14" ><i class="fa-xl fa-solid fa-stop custom-access-button detail_icon stop"></i><i class="fa-xl fa-solid fa-play custom-access-button detail_icon start" style="display:none;"></i></td>
         </tr>
+        <tr>
+            <th scope="row" class="left"><div style="margin-left:5px;">URL</div></th>
+            <td class="box left" colspan="2" ><div style="margin-left:5px;" id="detailsUrl"></div></td>
+        </tr>
         </tbody>
     </table>
 </div>
@@ -86,6 +90,7 @@
     <script type="text/javascript">
         var apps;
         var processes;
+        var routes;
         IS_APPS = true;
         function customCheck(id, value){
             if(document.getElementById(id).value == "custom"){
@@ -223,6 +228,12 @@
         function getApps(){
             funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem("appGuid")}/get`, 'application/json', (e) => {
                 apps = e;
+                getRoutes();
+            });
+        }
+        function getRoutes(){
+            funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/routes/list?appGuids=${sessionStorage.getItem("appGuid")}`, 'application/json', (e) => {
+                routes = e;
                 getProcess();
             });
         }
@@ -262,6 +273,12 @@
             } else if (apps.state == "STOPPED"){
                 document.querySelector('.fa-play').style.display = "";
                 document.querySelector('.fa-stop').style.display = "none";
+            }
+            if(routes.resources.length>0){
+                var html = '<a target=\"_blank\" href=\"https://' + routes.resources[0].url + '\">' + routes.resources[0].url + '</a>';
+                func.appendHtml(document.getElementById('detailsUrl'), html, 'a');
+            } else {
+                document.getElementById('detailsUrl').innerText = "No Data."
             }
             eventDetails();
         }

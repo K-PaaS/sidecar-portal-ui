@@ -93,7 +93,7 @@
                     func.loading();
 
                     // nameSpace 정보 조회
-                    func.loadData('GET', `${func.url}clusters/' + SIDECAR_TARGET_CLUSTER + '/namespaces/${sessionStorage.getItem('space_guid')}/overview`, 'application/json', overview.draw);
+                    func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/namespaces/${sessionStorage.getItem('space_guid')}/overview`, 'application/json', overview.draw);
                 },
 
                 draw(data) {

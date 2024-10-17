@@ -132,7 +132,7 @@ const func = {
     			    sessionStorage.removeItem('nameSpace');
     			    func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
     			    IS_RELOAD = true;
-    			    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
+    			    func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}}/users/namespacesList`, 'application/json', func.namespaces);
     		    }, false);
 	    	};
 		}

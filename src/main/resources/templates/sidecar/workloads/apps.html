@@ -11,7 +11,10 @@
         <article class="base">
             <div class="notice">
                 <h3>List</h3>
-                <a href="javascript:" class="create-button addApp" th:text="#{M0223}"></a>
+                <th:block th:if="${sessionStorage.getItem('space_guid') != null}">
+                    <a href="javascript:" class="create-button addApp" th:text="#{M0223}"></a>
+                </th:block>
+                <!--<a href="javascript:" class="create-button addApp" th:text="#{M0223}"></a>-->
                 <div class="table_style01">
                     <table>
                         <caption>
@@ -93,6 +96,11 @@
                     );
                 },
                 draw(data) {
+                    if( sessionStorage.getItem('space_guid') == null ){
+                        document.querySelector('.addApp').style.display = 'none';
+                    }else {
+                        document.querySelector('.addApp').style.display = 'block';
+                    }
                     orgApps=data;
                     if (apps.offset == 0)
                         apps.total_results = data.length;

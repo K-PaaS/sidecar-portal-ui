@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/sidecar}">
 
 <div layout:fragment="content">
     <!-- Content -->
@@ -86,13 +86,14 @@
             const overview = {
                 init() {
                     func.nameLoad = overview.load;
+                    funcsc.initOrgsSpaces();
                 },
 
                 load() {
                     func.loading();
 
                     // nameSpace 정보 조회
-                    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/namespaces/${sessionStorage.getItem('nameSpace')}/overview`, 'application/json', overview.draw);
+                    func.loadData('GET', `${func.url}clusters/' + SIDECAR_TARGET_CLUSTER + '/namespaces/${sessionStorage.getItem('space_guid')}/overview`, 'application/json', overview.draw);
                 },
 
                 draw(data) {

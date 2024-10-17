@@ -31,11 +31,26 @@
             <h4>Workloads</h4>
             <ul>
                 <li>
+                    <h5>Deployments</h5>
+                    <!-- doughnutChart -->
+                    <div>
+                        <canvas id="deploymentChart" style="height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                    <!--a onclick="movePage(URI_CP_WORKLOADS_DEPLOYMENTS)">more</a-->
+                </li>
+                <li>
                     <h5>Pods</h5>
                     <div>
                         <canvas id="podChart" style="height: 250px; max-width: 100%;"></canvas>
                     </div>
                     <!--a onclick="movePage(URI_CP_WORKLOADS_PODS)">more</a-->
+                </li>
+                <li>
+                    <h5>ReplicaSets</h5>
+                    <div>
+                        <canvas id="replicaSetChart" style="height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                    <!--a onclick="movePage(URI_CP_WORKLOADS_REPLICASETS)">more</a-->
                 </li>
             </ul>
         </article>
@@ -116,8 +131,8 @@
                         'rgba(255, 205, 86, 0.4)',
                         'rgba(161, 136, 127, 0.4)'];
 
-                    var dataId = ['deploymentChart', 'replicaSetChart', 'podChart'];
-                    var dataArr = [data.deploymentsUsage, data.replicaSetsUsage, data.podsUsage];
+                    var dataId = ['podChart'];
+                    var dataArr = [data.podsUsage];
 
 
                     for (var i = 0; i < dataId.length; i++) {

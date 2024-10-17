@@ -89,7 +89,7 @@
                             if (i < limit) {
                                 var html = `<tr>`
                                 + `<td class="left" id=${trId}>`
-                                + routes[i].url
+                                + '<a target=\"_blank\" href=\"https://' + routes[i].url + '\">' + routes[i].url + '</a>'
                                 + `</td>`
                                 + `<td class="fs-14">`
                                 + `<i class="fa-xl fa-solid fa-link-slash custom-access-button routeDisconnectBtn"></i>`
@@ -98,7 +98,7 @@
                             } else {
                                 var html = `<tr style="display: none;" id=${trId}>`
                                 + `<td class="left" id=${trId}>`
-                                + routes[i].url
+                                + '<a target=\"_blank\" href=\"https://' + routes[i].url + '\">' + routes[i].url + '</a>'
                                 + `</td>`
                                 + `<td class="fs-14">`
                                 + `<i class="fa-xl fa-solid fa-link-slash custom-access-button routeDisconnectBtn"></i>`

@@ -100,37 +100,42 @@ const func = {
 	clusters(data){
 		if ( func.invisible > 1 ) return; // cluster, namespace 블필요 in sidecar
 		var html ='';
-		for(var i=0; i<=data.items.length-1; i++){
-			if (SIDECAR_TARGET_CLUSTER === "${data.items[i].clusterId}" )  // only targetCluster in sidecar
-				html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
-		};
+		if (SIDECAR_TARGET_CLUSTER === "${data.items[i].clusterId}" ){  // only targetCluster in sidecar
+		    for(var i=0; i<=data.items.length-1; i++){
+			    html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
+			};
+			document.getElementById("clusterListUl").innerHTML = html;
+		}
 
-		document.getElementById("clusterListUl").innerHTML = html;
+
 
 		/////////////////////
-		if(sessionStorage.getItem('cluster') != null){
-			document.querySelector('.clusterTop').innerText = sessionStorage.getItem('clusterName');
-		} else {
-			document.querySelector('.clusterTop').innerText = data.items[0].clusterName;
-			sessionStorage.setItem('cluster', data.items[0].clusterId);
-			sessionStorage.setItem('clusterName', data.items[0].clusterName);
-		};
+		if(document.getElementById("clusterTitleDiv")){
+    		if(sessionStorage.getItem('cluster') != null){
+    			document.querySelector('.clusterTop').innerText = sessionStorage.getItem('clusterName');
+		    } else {
+		    	document.querySelector('.clusterTop').innerText = data.items[0].clusterName;
+	    		sessionStorage.setItem('cluster', data.items[0].clusterId);
+    			sessionStorage.setItem('clusterName', data.items[0].clusterName);
+		    };
 
-		var name = document.querySelector('.clusterUl').querySelectorAll('a');
-		func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
 
-		//cluster click event
-		for(var i=0 ; i<name.length; i++){
-			name[i].addEventListener('click', (e) => {
-				sessionStorage.setItem('cluster' , e.target.getAttribute('data-name'));
-			sessionStorage.setItem('clusterName', e.target.innerText);
-			document.querySelector('.clusterTop').innerText = e.target.innerText;
-			sessionStorage.removeItem('nameSpace');
-			func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
-			IS_RELOAD = true;
-			func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
-		}, false);
-		};
+		    var name = document.querySelector('.clusterUl').querySelectorAll('a');
+		    func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
+
+		    //cluster click event
+		    for(var i=0 ; i<name.length; i++){
+    			name[i].addEventListener('click', (e) => {
+    				sessionStorage.setItem('cluster' , e.target.getAttribute('data-name'));
+    			    sessionStorage.setItem('clusterName', e.target.innerText);
+    			    document.querySelector('.clusterTop').innerText = e.target.innerText;
+    			    sessionStorage.removeItem('nameSpace');
+    			    func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
+    			    IS_RELOAD = true;
+    			    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
+    		    }, false);
+	    	};
+		}
 
 		func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
 

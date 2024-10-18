@@ -106,7 +106,8 @@
                         {type: 'Failed', background: 'rgba(231, 76, 60, 0.4)'},
                         {type: 'Succeeded', background: 'rgba(142, 68, 173, 0.4)'},
                         {type: 'Pending', background: 'rgba(241, 196, 15, 0.4)'},
-                        {type: 'Unknown', background: 'rgba(189, 195, 199, 0.4)'}
+                        {type: 'Unknown', background: 'rgba(189, 195, 199, 0.4)'},
+                        {type: 'No data', background: 'rgba(237, 237, 237, 0.4)'}
                     ];
 
                     var otherBackgroundColor = [
@@ -114,9 +115,18 @@
                         'rgba(127, 140, 141 , 0.4)',
                         'rgba(52, 73, 94 , 0.4)',
                         'rgba(255, 205, 86, 0.4)',
+                        'rgba(161, 136, 127, 0.4)',
                         'rgba(161, 136, 127, 0.4)'];
 
                     var dataId = ['podChart'];
+                    if(data.podsUsage.length == 0){
+                    	var emptyData = {
+                    		type: "No data",
+                    		count: 1,
+                    		percent: 100
+                    	}
+                    	data.podsUsage[0]= emptyData;
+                    }
                     var dataArr = [data.podsUsage];
 
 
@@ -160,9 +170,13 @@
                                             label: function(tooltipItems, data) {
                                                 var item = tooltipItems.raw;
                                                 var label = item.type;
-                                                var label2 = "Percent : " + item.percent +  '%';
-                                                var label3 = "Count : "  + item.count;
-                                                return [label, label2, label3];
+                                                if (item.type == "No data"){
+                                                    return [label];
+                                                } else {
+                                                    var label2 = "Percent : " + item.percent +  '%';
+                                                    var label3 = "Count : "  + item.count;
+                                                    return [label, label2, label3];
+                                                }
                                             }
 
                                         }

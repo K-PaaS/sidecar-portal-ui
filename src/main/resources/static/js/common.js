@@ -100,12 +100,13 @@ const func = {
 	clusters(data){
 		if ( func.invisible > 1 ) return; // cluster, namespace 블필요 in sidecar
 		var html ='';
-		if (SIDECAR_TARGET_CLUSTER === "${data.items[i].clusterId}" ){  // only targetCluster in sidecar
-		    for(var i=0; i<=data.items.length-1; i++){
-			    html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
+		for(var i=0; i<=data.items.length-1; i++){
+		    if (SIDECAR_TARGET_CLUSTER == data.items[i].clusterId ){  // only targetCluster in sidecar
+		        html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
 			};
-			document.getElementById("clusterListUl").innerHTML = html;
-		}
+	    }
+	    if (document.getElementById("clusterListUl"))
+		    document.getElementById("clusterListUl").innerHTML = html;
 
 
 
@@ -142,7 +143,13 @@ const func = {
 	},
 
 	namespaces(data){
-		if ( func.invisible > 0 ) return; // namespace 블필요 in sidecar
+		if ( func.invisible > 0 ) {
+		    const elms = document.querySelectorAll('h3 ul#namespaceListUl');
+            elms.forEach((elm) => {
+                elm.style.setProperty('display', 'none');
+            });
+		    return; // namespace 블필요 in sidecar
+		}
 		func.nameData = data;
 
 		var html = '';
@@ -700,3 +707,4 @@ const func = {
 		});
 	},
 }
+

@@ -14,8 +14,8 @@
                     <dd id="nameStatus">0</dd>
                 </dl>
                 <dl>
-                    <dt>Deployments</dt>
-                    <dd id="deployStatus">0</dd>
+                    <dt>Apps</dt>
+                    <dd id="appStatus">0</dd>
                 </dl>
                 <dl>
                     <dt>Pods</dt>
@@ -30,6 +30,13 @@
         <article class="chart base-type2">
             <h4>Workloads</h4>
             <ul>
+                <li>
+                    <h5>Apps</h5>
+                    <div>
+                        <canvas id="appChart" style="height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                    <!--a onclick="movePage(URI_CP_WORKLOADS_PODS)">more</a-->
+                </li>
                 <li>
                     <h5>Pods</h5>
                     <div>
@@ -65,6 +72,7 @@
 
     <script type="text/javascript">
         window.onload = () => {
+            func.invisible = 2;
             IS_INDEX = true;
             func.init(ASIDE_DP1.CLUSTERS, ASIDE_DP2.C_OVERVIEW);
 
@@ -76,22 +84,56 @@
 
                 load() {
                     func.loading();
+                    overview.overviews();
+                },
+                overviews() {
 
                     // nameSpace 정보 조회
-                    func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/namespaces/${sessionStorage.getItem('space_guid')}/overview`, 'application/json', overview.draw);
+                    func.loadData(
+                        "GET",
+                        `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/namespaces/${sessionStorage.getItem('space_guid')}/overview`,
+                        "application/json",
+                        (e) => {overviewData=e; overview.apps();},
+                    );
+                },
+                apps() {
+                    // Apps 정보 조회
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/apps/customList?spaceGuid=${sessionStorage.getItem('space_guid')}`,
+                        "application/json",
+                        (e) => {apps=e; overview.users();},
+                    );
+                },
+                users() {
+                    // Users 정보 조회
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`,
+                        "application/json",
+                        (e) => {users=e.resources; overview.draw();},
+                    );
                 },
 
-                draw(data) {
-
-                    if (data.httpStatusCode == 200) {
+                draw() {
+                    if (overviewData.httpStatusCode == 200) {
                         // dstatus setting
-                        func.countUp(document.getElementById('nameStatus'), data.namespacesCount);
-                        func.countUp(document.getElementById('deployStatus'), data.deploymentsCount);
-                        func.countUp(document.getElementById('podStatus'), data.podsCount);
-                        func.countUp(document.getElementById('userStatus'), data.usersCount);
+                        func.countUp(document.getElementById('nameStatus'), overviewData.namespacesCount);
+                        func.countUp(document.getElementById('appStatus'), apps.length);
+                        func.countUp(document.getElementById('podStatus'), overviewData.podsCount);
 
-                        overview.workloadChart(data);
-                        overview.topChart(data);
+                        let usersAccount = [];
+                        for(let i=0; i<users.length; i++){
+                            if(!usersAccount.includes(users[i].relationships.user.data.guid)){
+                                usersAccount.push(users[i].relationships.user.data.guid);
+                            }
+                        }
+
+                        func.countUp(document.getElementById('userStatus'), usersAccount.length);
+
+                        overview.workloadChart(overviewData);
+                        overview.appChart();
+                        overview.topChart(overviewData);
 
                     }
                     document.getElementById('wrap').removeChild(document.getElementById('loading'));
@@ -190,6 +232,68 @@
                             config
                         );
                     };
+                },
+                appChart() {
+                    /* ChartJS
+            * -------
+            * Here we will create a few charts using ChartJS
+            */
+                    var backgroundColor = [
+                        {state: 'STARTED', background: 'rgba(54, 162, 235, 0.4)'},
+                        {state: 'STOPPED', background: 'rgba(255, 99, 132, 0.4)'},
+                    ];
+
+                    var dataId = 'appChart';
+                    var startedCnt = 0;
+                    var stoppedCnt = 0;
+
+                    for(var i = 0; i < apps.length; i++) {
+                        if (apps[i].state == "STARTED"){
+                            startedCnt++;
+                        } else if (apps[i].state == "STOPPED"){
+                            stoppedCnt++;
+                        }
+                    }
+                    var labels = [];
+                    var dataSet = [];
+                    var backgroundColor = [];
+                    if (startedCnt > 0) {
+                        labels.push("Started");
+                        dataSet.push(startedCnt);
+                        backgroundColor.push("rgba(54, 162, 235, 0.4)");
+                    }
+                    if (stoppedCnt > 0) {
+                        labels.push("Stopped");
+                        dataSet.push(stoppedCnt);
+                        backgroundColor.push("rgba(255, 99, 132, 0.4)");
+                    }
+                    const config = {
+                        type: 'doughnut',
+                        data: data,
+                        options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                        }
+                    };
+                    if (stoppedCnt < 1 && startedCnt < 1){
+                        labels.push("No data");
+                        dataSet.push("No data");
+                        backgroundColor.push("rgba(237, 237, 237, 0.4)");
+                    }
+                    const data = {
+                        labels: labels,
+                        datasets: [{
+                            data: dataSet,
+                            backgroundColor: backgroundColor,
+                        hoverOffset: 0
+                        }]
+                    };
+
+                    new Chart(
+                        document.getElementById(dataId),
+                        config
+                    );
+
                 },
                 topChart(data) {
                     /* ChartJS

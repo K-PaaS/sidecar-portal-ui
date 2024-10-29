@@ -52,13 +52,11 @@ const funcsc = {
         if(document.querySelector('.spaceUl')){
             if (data.resources.length < 1){
                 const elms = document.querySelectorAll('h3 ul#spaceListUl');
-                console.log(elms);
                 elms.forEach((elm) => {
                   elm.style.setProperty('--display-style', 'none');
                 });
             }else {
                 const elms = document.querySelectorAll('h3 ul#spaceListUl');
-                console.log(elms);
                 elms.forEach((elm) => {
                     elm.style.setProperty('--display-style', 'block');
                 });

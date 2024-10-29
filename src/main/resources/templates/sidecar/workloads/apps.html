@@ -48,6 +48,7 @@
 <th:block layout:fragment="script">
     <script type="text/javascript">
         window.onload = () => {
+            func.invisible = 2;
             func.init(ASIDE_DP1.WORKLOADS, ASIDE_DP2.APPS);
             IS_APPS = true;
             callbackFuncNameLoad();

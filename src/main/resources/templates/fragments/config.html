@@ -33,6 +33,8 @@
      var SIDECAR_ROLE_USER = [[${@environment.getProperty('sidecar.roleUser')}]];
      var SIDECAR_ROOT_NAMESPACE = [[${@environment.getProperty('sidecar.rootNamespace')}]];
      var SIDECAR_TARGET_CLUSTER = [[${@environment.getProperty('sidecar.targetCluster')}]];
+     sessionStorage.setItem('cluster', SIDECAR_TARGET_CLUSTER);
+     sessionStorage.setItem('clusterName', SIDECAR_TARGET_CLUSTER);
 
 
      var URI_SC_LIST = [[${T(org.kpaas.sidecar.portal.ui.common.ConstantsUrl).URI_SC_LIST}]];
@@ -302,6 +304,7 @@
          PRIVATE_REPOSITORY: 'private_repository',
          ORGANIZATIONS: 'organizations'
      }
+
 </script>
 
 

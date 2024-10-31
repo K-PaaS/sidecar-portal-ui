@@ -267,6 +267,14 @@
                         dataSet.push(stoppedCnt);
                         backgroundColor.push("rgba(255, 99, 132, 0.4)");
                     }
+                    const data = {
+                        labels: labels,
+                        datasets: [{
+                            data: dataSet,
+                            backgroundColor: backgroundColor,
+                        hoverOffset: 0
+                        }]
+                    };
                     const config = {
                         type: 'doughnut',
                         data: data,
@@ -280,14 +288,7 @@
                         dataSet.push("No data");
                         backgroundColor.push("rgba(237, 237, 237, 0.4)");
                     }
-                    const data = {
-                        labels: labels,
-                        datasets: [{
-                            data: dataSet,
-                            backgroundColor: backgroundColor,
-                        hoverOffset: 0
-                        }]
-                    };
+
 
                     new Chart(
                         document.getElementById(dataId),

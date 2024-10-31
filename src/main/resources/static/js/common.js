@@ -179,7 +179,7 @@ const func = {
 					func.loadData('GET', null, 'application/json', func.nameLoad);
 				}
 				else {
-					movePage(URI_CP_INDEX_URL);
+					movePage(URI_SIDECAR_INDEX_URL);
 				}
 			}, false);
 
@@ -190,7 +190,7 @@ const func = {
 					func.loadData('GET', null, 'application/json', func.nameLoad);
 				}
 				else {
-					movePage(URI_CP_INDEX_URL);
+					movePage(URI_SIDECAR_INDEX_URL);
 				}
 			}
 			if(IS_INDEX) {

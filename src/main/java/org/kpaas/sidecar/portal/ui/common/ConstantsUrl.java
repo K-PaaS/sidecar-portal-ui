@@ -1,6 +1,8 @@
 package org.kpaas.sidecar.portal.ui.common;
 
 public class ConstantsUrl extends org.container.platform.web.ui.common.ConstantsUrl {
+    public static final String URI_SIDECAR_INDEX_URL = "/sidecar/overview";
+
     public static final String URI_SC_WORKLOADS_APPS = "/sidecar/apps";
     public static final String URI_SC_RESOURCES_DOMAINS = "/sidecar/domains";
     public static final String URI_SC_RESOURCES_ROUTES = "/sidecar/routes";
@@ -24,4 +26,5 @@ public class ConstantsUrl extends org.container.platform.web.ui.common.Constants
     public static final String URI_SC_DETAILS_ROUTES = URI_SC_WORKLOADS_APPS + "/detailsRoutes";
     public static final String URI_SC_DETAILS_LOG = URI_SC_WORKLOADS_APPS + "/detailsLog";
     public static final String URI_SC_UPDATE = "/update";
+
 }

@@ -99,7 +99,7 @@ const funcsc = {
                     return;
                 }
                 else {
-                    movePage(URI_CP_INDEX_URL);
+                    movePage(URI_SIDECAR_INDEX_URL);
                     return;
                 }
             }else {

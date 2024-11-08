@@ -502,6 +502,9 @@ const func = {
 						else {
 							callbackFunction(JSON.parse(request.responseText), list);
 						}
+					} else if(JSON.parse(request.responseText).httpStatusCode === 401){
+						sessionStorage.clear();
+						movePage(URI_CP_INACTIVE);
 					} else if(JSON.parse(request.responseText).httpStatusCode === 500){
 						sessionStorage.clear();
 						func.loginCheck();

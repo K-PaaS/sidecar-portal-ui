@@ -8,43 +8,64 @@ const funcsc = {
 
     organizations(data){
         var html ='';
-        for(var i=0 ; i <= data.resources.length-1 ; i++){
-            html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
-        };
+        if(document.querySelector('.orgUl')){
+            if (data.resources.length < 1){
+                let elms = document.querySelectorAll('h3 ul#orgListUl');
+                elms.forEach((elm) => {
+                  elm.style.setProperty('--display-style', 'none');
+                });
+                elms = document.querySelectorAll('h3 ul#spaceListUl');
+                elms.forEach((elm) => {
+                  elm.style.setProperty('--display-style', 'none');
+                });
+            }else {
+                let elms = document.querySelectorAll('h3 ul#orgListUl');
+                elms.forEach((elm) => {
+                    elm.style.setProperty('--display-style', 'block');
+                });
+                elms = document.querySelectorAll('h3 ul#spaceListUl');
+                elms.forEach((elm) => {
+                    elm.style.setProperty('--display-style', 'block');
+                });
+            }
+            for(var i=0 ; i <= data.resources.length-1 ; i++){
+                html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
+            };
 
-        document.getElementById("orgListUl").innerHTML = html;
+            document.getElementById("orgListUl").innerHTML = html;
 
         /////////////////////
-        if(sessionStorage.getItem('org_guid') != null){
-            document.querySelector('.orgTop').innerText = sessionStorage.getItem('org_name');
-        } else {
-            if (data.resources.length > 0) {
-                document.querySelector('.orgTop').innerText = data.resources[0].name;
-                sessionStorage.setItem('org_guid', data.resources[0].guid);
-                sessionStorage.setItem('org_name', data.resources[0].name);
-            }else {
-                document.querySelector('.orgTop').innerText = MSG_NO_ORGS;
-                document.querySelector('.spaceTop').innerText = MSG_NO_SPACES;
-                return;
-            }
-        };
+            if(sessionStorage.getItem('org_guid') != null){
+                document.querySelector('.orgTop').innerText = sessionStorage.getItem('org_name');
+            } else {
+                if (data.resources.length > 0) {
+                    document.querySelector('.orgTop').innerText = data.resources[0].name;
+                    sessionStorage.setItem('org_guid', data.resources[0].guid);
+                    sessionStorage.setItem('org_name', data.resources[0].name);
+                }else {
+                    document.querySelector('.orgTop').innerText = MSG_NO_ORGS;
+                    document.querySelector('.spaceTop').innerText = MSG_NO_SPACES;
+                    return;
+                }
+            };
 
-        var name = document.querySelector('.orgUl').querySelectorAll('a');
+            var name = document.querySelector('.orgUl').querySelectorAll('a');
 
-        //org click event
-        for(var i=0 ; i<name.length; i++){
-            name[i].addEventListener('click', (e) => {
-                sessionStorage.setItem('org_guid' , e.target.getAttribute('data-name'));
-                sessionStorage.setItem('org_name', e.target.innerText);
-                document.querySelector('.orgTop').innerText = e.target.innerText;
-                sessionStorage.removeItem('space_guid');
-                sessionStorage.removeItem('space_name');
-                IS_RELOAD = true;
-                funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
-            }, false);
-        };
+            //org click event
+            for(var i=0 ; i<name.length; i++){
+                name[i].addEventListener('click', (e) => {
+                    sessionStorage.setItem('org_guid' , e.target.getAttribute('data-name'));
+                    sessionStorage.setItem('org_name', e.target.innerText);
+                    document.querySelector('.orgTop').innerText = e.target.innerText;
+                    sessionStorage.removeItem('space_guid');
+                    sessionStorage.removeItem('space_name');
+                    IS_RELOAD = true;
+                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+                }, false);
+            };
 
-        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+            funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, 'application/json', funcsc.spaces);
+        }
     },
 
     spaces(data){
@@ -60,7 +81,6 @@ const funcsc = {
                 elms.forEach((elm) => {
                     elm.style.setProperty('--display-style', 'block');
                 });
-
             }
             for(var i=0; i <= data.resources.length-1 ; i++){
                 html += `<li><a href="javascript:;" data-name="${data.resources[i].guid}">${data.resources[i].name}</a></li>`;
@@ -584,3 +604,4 @@ postDataWithFile(method, url, data, bull, header, callFunc){
         location.href = URI_SC_MANAGEMENTS_ORGANIZATIONS;
     },
 }
+

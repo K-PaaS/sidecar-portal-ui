@@ -257,37 +257,74 @@
                     var labels = [];
                     var dataSet = [];
                     var backgroundColor = [];
-                    if (startedCnt > 0) {
-                        labels.push("Started");
-                        dataSet.push(startedCnt);
-                        backgroundColor.push("rgba(54, 162, 235, 0.4)");
+                    var dataCount;
+                    var dataArr = [];
+                    if (stoppedCnt > 1 || startedCnt > 1){
+                        if (startedCnt > 0) {
+                            labels.push("Started");
+                            dataCount = {
+                        		type: "Started",
+                        		count: startedCnt
+                        	}
+                        	dataArr.push(dataCount);
+                            backgroundColor.push("rgba(54, 162, 235, 0.4)");
+                        }
+                        if (stoppedCnt > 0) {
+                            labels.push("Stopped");
+                            dataCount = {
+                        		type: "Stopped",
+                        		count: stoppedCnt
+                        	}
+                        	dataArr.push(dataCount);
+                            backgroundColor.push("rgba(255, 99, 132, 0.4)");
+                        }
                     }
-                    if (stoppedCnt > 0) {
-                        labels.push("Stopped");
-                        dataSet.push(stoppedCnt);
-                        backgroundColor.push("rgba(255, 99, 132, 0.4)");
+                    else {
+                        labels.push("No data");
+                        dataCount = {
+                    		type: "No data",
+                    		count: 1
+                    	}
+                    	dataArr.push(dataCount);
+                        backgroundColor.push("rgba(237, 237, 237, 0.4)");
                     }
                     const data = {
                         labels: labels,
                         datasets: [{
-                            data: dataSet,
+                            data: dataArr,
                             backgroundColor: backgroundColor,
                         hoverOffset: 0
                         }]
                     };
-                    const config = {
-                        type: 'doughnut',
-                        data: data,
-                        options: {
+                    var config = {
+                            type: 'doughnut',
+                            data: data,
+                            options: {
                                 responsive: true,
-                                maintainAspectRatio: false
-                        }
-                    };
-                    if (stoppedCnt < 1 && startedCnt < 1){
-                        labels.push("No data");
-                        dataSet.push("No data");
-                        backgroundColor.push("rgba(237, 237, 237, 0.4)");
-                    }
+                                maintainAspectRatio: false,
+                                parsing: {
+                                    key: 'count'
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(tooltipItems, data) {
+                                                var item = tooltipItems.raw;
+                                                var label = item.type;
+                                                if (item.type == "No data"){
+                                                    return [label];
+                                                } else {
+                                                    var label2 = "Count : "  + item.count;
+                                                    return [label, label2];
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
 
 
                     new Chart(
@@ -393,3 +430,4 @@
 </th:block>
 
 </html>
+

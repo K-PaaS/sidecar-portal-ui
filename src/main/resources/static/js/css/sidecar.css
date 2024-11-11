@@ -115,3 +115,6 @@
 h3:hover ul#spaceListUl{
 	display: var(--display-style);
 }
+h3:hover ul#orgListUl{
+	display: var(--display-style);
+}

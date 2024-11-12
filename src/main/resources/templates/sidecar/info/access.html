@@ -39,9 +39,11 @@
                 <h3>How to Access</h3>
                 <div class="table_style01">
                     <div class="custom-access-title">
-                        <p>1.
-                            <a style="text-decoration: underline" th:text="#{M0060}" onclick="window.open('https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl')"></a>
-                        </p>
+                        <p>1. CLI DOWNLOAD</p>
+                    </div>
+                    <div class="custom-access-contents-wrap">
+                        <p>※ <a style="text-decoration: underline" th:text="#{M0060}" onclick="window.open('https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl')"></a></p>
+                        <p>※ <a style="text-decoration: underline" th:text="#{M0904}" onclick="window.open('https://github.com/cloudfoundry/cli/wiki/V8-CLI-Installation-Guide')"></a></p>
                     </div>
                     <div class="custom-access-title">
                         <p>2. <span th:text="#{M0061}"></span></p>
@@ -58,6 +60,7 @@
                                 <pre><code class="bash">export SIDECAR_SERVICE_CONTEXT_NAME=""</code></pre>
                                 <pre><code class="bash xNamespace">export SIDECAR_SERVICE_NAMESPACE_NAME=""</code></pre>
                                 <pre><code class="bash" style="white-space: normal">export SIDECAR_SERVICE_CREDENTIALS_TOKEN=""</code></pre>
+                                <pre><code class="bash">export SIDECAR_SERVICE_API_URL=""</code></pre>
                             </div>
                             <div class="fa-pull-right">
                                 <i class="fas fa-copy custom-access-button" about="cpEnvironmentsForLinux" onclick="btnCopy(this.id)"></i>
@@ -74,6 +77,7 @@
                                 <pre><code class="bash">set SIDECAR_SERVICE_CONTEXT_NAME=""</code></pre>
                                 <pre><code class="bash xNamespace">set SIDECAR_SERVICE_NAMESPACE_NAME=""</code></pre>
                                 <pre><code class="bash" style="white-space: normal">set SIDECAR_SERVICE_CREDENTIALS_TOKEN=""</code></pre>
+                                <pre><code class="bash">set SIDECAR_SERVICE_API_URL=""</code></pre>
                             </div>
                             <div class="fa-pull-right">
                                 <i class="fas fa-copy custom-access-button" about="cpEnvironmentsForWindows" onclick="btnCopy(this.id)"></i>
@@ -221,15 +225,29 @@
                     </div>
                     <div class="custom-access-wrap custom-paB40">
                         <div class="custom-access-title">
-                            <p>8. <span th:text="#{M0066}"></span></p>
+                            <p>8. <span th:text="#{M0905}"></span></p>
                         </div>
                         <div class="custom-access-contents-wrap">
+                            <div>
+                                <p>※ For Linux</p>
+                            </div>
                             <div class="custom-access-contents">
-                                <div class="fa-pull-left" id="cpResourceCheck">
-                                    <pre><code class="bash">kubectl get all</code></pre>
+                                <div class="fa-pull-left" id="sidecarLoginForLinux">
+                                    <pre><code class="bash">cf login --skip-ssl-validation -a ${SIDECAR_SERVICE_API_URL}</code></pre>
                                 </div>
                                 <div class="fa-pull-right">
-                                    <i class="fas fa-copy custom-access-button" about="cpResourceCheck" onclick="btnCopy(this.id)"></i>
+                                    <i class="fas fa-copy custom-access-button" about="sidecarLoginForLinux" onclick="btnCopy(this.id)"></i>
+                                </div>
+                            </div>
+                            <div class="maT10">
+                                <p>※ For Windows</p>
+                            </div>
+                            <div class="custom-access-contents">
+                                <div class="fa-pull-left" id="sidecarLoginForWindows">
+                                    <pre><code class="bash">cf login --skip-ssl-validation -a %SIDECAR_SERVICE_API_URL%</code></pre>
+                                </div>
+                                <div class="fa-pull-right">
+                                    <i class="fas fa-copy custom-access-button" about="sidecarLoginForWindows" onclick="btnCopy(this.id)"></i>
                                 </div>
                             </div>
                         </div>
@@ -260,19 +278,21 @@
                 }
 
                 var hljsString=document.getElementsByClassName('hljs-string');
-                for (let i = 0 ; i <= 11; i++) {
-                    if (i == 0 || i == 6) {
+                for (let i = 0 ; i <= 13; i++) {
+                    if (i == 0 || i == 7) {
                         hljsString[i].setAttribute('class','hljs-string cpClusterName');
-                    } else if (i == 1 || i == 7) {
+                    } else if (i == 1 || i == 8) {
                         hljsString[i].setAttribute('class','hljs-string cpClusterServer');
-                    } else if (i == 2 || i == 8) {
+                    } else if (i == 2 || i == 9) {
                         hljsString[i].setAttribute('class','hljs-string cpUserName');
-                    } else if (i == 3 || i == 9) {
+                    } else if (i == 3 || i == 10) {
                         hljsString[i].setAttribute('class','hljs-string cpContextName');
-                    } else if (i == 4 || i == 10) {
+                    } else if (i == 4 || i == 11) {
                         hljsString[i].setAttribute('class','hljs-string cpNamespace xNamespace');
-                    } else if (i == 5 || i == 11) {
+                    } else if (i == 5 || i == 12) {
                         hljsString[i].setAttribute('class','hljs-string cpCredentialsToken');
+                    } else if (i == 6 || i == 13) {
+                        hljsString[i].setAttribute('class','hljs-string sidecarApiUrl');
                     }
                 }
 
@@ -291,6 +311,7 @@
                     document.getElementsByClassName('cpClusterServer')[i].innerText = data.clusterApiUrl;
                     document.getElementsByClassName('cpClusterName')[i].innerText = data.clusterName;
                     document.getElementsByClassName('cpCredentialsToken')[i].innerText = data.clusterToken;
+                    document.getElementsByClassName('sidecarApiUrl')[i].innerText = SIDECAR_API_URL;
 
                     if (data.userType === 'USER') {
                         if (data.cpNamespace === sessionStorage.getItem('nameSpace')) {
@@ -337,3 +358,4 @@
 <style>
     pre code.hljs {padding: 0; background: #eeeeee;}
 </style>
+

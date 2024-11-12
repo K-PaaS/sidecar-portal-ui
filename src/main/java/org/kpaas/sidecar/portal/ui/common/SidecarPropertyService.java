@@ -30,4 +30,7 @@ public class SidecarPropertyService {
     @Value("${sidecar.targetCluster}")
     private String targetCluster;
 
+    @Value("${sidecar.sidecarApiUrl}")
+    private String sidecarApiUrl;
+
 }

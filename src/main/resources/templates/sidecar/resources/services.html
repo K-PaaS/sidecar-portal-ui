@@ -64,6 +64,11 @@
                     setTimeout(() => funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", serviceInstance.draw), 500);
                 },
                 draw(data) {
+                    if( sessionStorage.getItem('space_guid') == null ){
+                        document.querySelector('.addServiceInstance').style.display = 'none';
+                    }else {
+                        document.querySelector('.addServiceInstance').style.display = 'block';
+                    }
                     if (serviceInstance.offset == 0)
                         serviceInstance.total_results = data.pagination.total_results;
 
@@ -217,3 +222,4 @@
     </script>
 </th:block>
 </html>
+

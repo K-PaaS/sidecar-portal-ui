@@ -64,6 +64,11 @@
                     setTimeout(() => funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/routes/list?spaceGuids=${sessionStorage.getItem("space_guid")}`, "application/json", route.draw), 500);
                 },
                 draw(data) {
+                    if( sessionStorage.getItem('space_guid') == null ){
+                        document.querySelector('.addRoute').style.display = 'none';
+                    }else {
+                        document.querySelector('.addRoute').style.display = 'block';
+                    }
                     if (route.offset == 0)
                         route.total_results = data.pagination.total_results;
 
@@ -237,3 +242,4 @@
     </script>
 </th:block>
 </html>
+

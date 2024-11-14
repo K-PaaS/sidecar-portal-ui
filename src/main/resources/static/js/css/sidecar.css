@@ -85,7 +85,7 @@
 
 /* modal */
 .modal input#domainName,
-.modal input#hostNazme,
+.modal input#hostName,
 .modal input#path,
 .modal input#serviceInstanceName,
 .modal input#credentials,

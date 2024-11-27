@@ -116,6 +116,8 @@
                         func.appendHtml(document.querySelector(".space_table"), html, "tbody", );
                     }
                 } else {
+                    sessionStorage.removeItem('space_guid');
+                    sessionStorage.removeItem('space_name');
                     var html = "<tr><td class='table-no-data'>No Data.</td></tr>";
                     func.appendHtml(document.querySelector(".space_table"), html, "tbody", );
                 }

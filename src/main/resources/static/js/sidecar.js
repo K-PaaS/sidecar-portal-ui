@@ -1,6 +1,12 @@
 const funcsc = {
     sidecarUrl: URI_REQUEST_SC_API,
-
+    initNamespaces(){
+        if(sessionStorage.getItem('nameSpace') == null){
+            func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/users/namespacesList`, 'application/json', (e) => {
+                sessionStorage.setItem('nameSpace', e.items[0].cpNamespace);
+            });
+        }
+    },
     initOrgsSpaces(){
         IS_SIDECAR=true;
         funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/organizations/list`, 'application/json', funcsc.organizations);

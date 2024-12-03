@@ -235,6 +235,7 @@
 					<dd>
 						<fieldset>
 							<select id="createName">`;
+			var tempUsers = [];
             for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
                 var userAuthId = sidecar_data.resources[i].relationships.user.data.guid;
                 var split = userAuthId.split(":");
@@ -253,9 +254,12 @@
                             }
                         })
                         if (existUserIdx == 0) {
-                            html += `<option value=${serviceAccountName}>${userId}</option>`;
-                            flag = true;
-                            break;
+                            if(!tempUsers.includes(serviceAccountName)){
+                                html += `<option value=${serviceAccountName}>${userId}</option>`;
+                                tempUsers.push(serviceAccountName);
+                                flag = true;
+                                break;
+                            }
                         }
                     }
                 }

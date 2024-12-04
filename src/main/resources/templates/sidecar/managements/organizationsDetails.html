@@ -368,6 +368,14 @@
                                 "user": user
                             });
 
+                            if(type=="organization_manager"){
+                                var sendTempData = JSON.stringify({
+                                    "orgGuid": orgGuid,
+                                    "type": "organization_user",
+                                    "user": user
+                                });
+                                funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendTempData, true, 'application/json', func.refresh);
+                            }
                             funcsc.postData('POST', `${funcsc.sidecarUrl}sidecar/roles`, sendData, true, 'application/json', func.refresh);
                         }
                     }, false);
@@ -402,3 +410,4 @@
         });
     };
 </script>
+

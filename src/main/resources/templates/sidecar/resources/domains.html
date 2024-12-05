@@ -22,8 +22,8 @@
                         </colgroup>
                         <thead>
                         <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Delete</th>
+                            <th id="name" scope="col">Name</th>
+                            <th id="delete" scope="col">Delete</th>
                         </tr>
                         </thead>
                         <tbody class="listTable"></tbody>
@@ -49,12 +49,14 @@
                 limit: 10,
                 total_results: 0,
                 delete_tg_guid : 0,
-                init() {
+                init(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), domain.initNext);},
+                initNext() {
                     func.nameLoad = domain.reset;
                     domain.load();
                     domain.event();
                 },
-                reset() {
+                reset(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), domain.resetNext);},
+                resetNext() {
                     func.removeHtml(document.querySelector(".listTable"));
                     domain.offset = 0;
                     domain.load();
@@ -71,9 +73,17 @@
                         for (var i = 0; i <= data.resources.length - 1; i++) {
                             var trId = "tr" + i;
                             if (i < domain.limit) {
-                                var html = `<tr><td class="left" id=${trId} >${data.resources[i].name}</td><td><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button trashcan" id="${data.resources[i].guid}"></i></td></tr>`;
+                                if(!myRoles.includes(SIDECAR_ROLE_ADMIN)){
+                                    var html = `<tr><td colspan="2" class="left" id=${trId} >${data.resources[i].name}</td></tr>`;
+                                }else{
+                                    var html = `<tr><td class="left" id=${trId} >${data.resources[i].name}</td><td><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button trashcan" id="${data.resources[i].guid}"></i></td></tr>`;
+                                }
                             } else {
-                                var html = `<tr style="display: none;" id=${trId}><td class="left">${data.resources[i].name}</td><td><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button trashcan" id="${data.resources[i].guid}"></i></td></tr>`;
+                                if(!myRoles.includes(SIDECAR_ROLE_ADMIN)){
+                                    var html = `<tr colspan="2" style="display: none;" id=${trId}><td class="left">${data.resources[i].name}</td></tr>`;
+                                }else{
+                                    var html = `<tr style="display: none;" id=${trId}><td class="left">${data.resources[i].name}</td><td><i class="fa-xl fa-solid fa-trash-can deleteRowBtn custom-access-button trashcan" id="${data.resources[i].guid}"></i></td></tr>`;
+                                }
                             }
                             func.appendHtml(document.querySelector(".listTable"), html, "tbody",);
                         }
@@ -92,7 +102,11 @@
                     } else {
                         document.querySelector(".more").classList.toggle("on", false);
                     }
-
+                    if(!myRoles.includes(SIDECAR_ROLE_ADMIN) ){
+                        document.querySelector('.addDomain').style.display = 'none';
+                        document.querySelector('#name').setAttribute('colspan', 2);
+                        document.querySelector('#delete').style.display = 'none';
+                    }
                     if (document.getElementById("loading")) {
                         document.getElementById("wrap").removeChild(document.getElementById("loading"));
                     }

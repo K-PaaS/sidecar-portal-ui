@@ -243,6 +243,9 @@
                     if(!myRoles.includes(SIDECAR_ROLE_ADMIN) && !myRoles.includes(SIDECAR_ROLE_ORG_MANAGER)){
                         document.querySelector('.addSpace').style.display = 'none';
                     }
+                    if(!myRoles.includes(SIDECAR_ROLE_ADMIN) ){
+                        document.querySelector('.addUser').style.display = 'none';
+                    }
 
                     if (document.getElementById("loading")) {
                         document.getElementById("wrap").removeChild(document.getElementById("loading"));

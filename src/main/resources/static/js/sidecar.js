@@ -1,5 +1,12 @@
 const funcsc = {
     sidecarUrl: URI_REQUEST_SC_API,
+    getMyRole(namespaceGuid, callbackFunction){
+        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/rolebindings/myroles?namespaceGuid=`+namespaceGuid, 'application/json', (e) => {
+            myRoles = e;
+            callbackFunction();
+        });
+
+    },
     initNamespaces(){
         if(sessionStorage.getItem('nameSpace') == null){
             func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/users/namespacesList`, 'application/json', (e) => {

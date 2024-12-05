@@ -86,6 +86,7 @@
 </html>
 <script type="text/javascript">
     window.onload = () => {
+
         func.invisible = 1;
         func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.ORGANIZATIONS);
         callbackFuncNameLoad();
@@ -97,12 +98,14 @@
             type: "user",
             users: "",
             orgUserArray : [],
-
-            init() {func.nameLoad = detail.reset; detail.load(); detail.eventSpace(); detail.eventUser();},
-            reset() {func.removeHtml(document.querySelector(".listTable")); detail.offset = 0; detail.load(); },
+            init(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.initNext);},
+            initNext() {func.nameLoad = detail.reset; detail.load(); detail.eventSpace(); detail.eventUser();},
+            reset() {funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.resetNext);},
+            resetNext() {func.removeHtml(document.querySelector(".listTable")); detail.offset = 0; detail.load(); },
             load() {
                 func.loading();
                 document.getElementById("name").innerText = sessionStorage.getItem("org_name");
+
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/organizations/${sessionStorage.getItem("org_guid")}/getDefaultDomain`, "application/json", detail.domain);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/spaces/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.space);
                 funcsc.loadDataSidecar("GET", `${funcsc.sidecarUrl}sidecar/roles/list?orgGuids=${sessionStorage.getItem("org_guid")}`, "application/json", detail.user);
@@ -181,8 +184,8 @@
                                 } else if (managerCheckbox) {
                                     detail.orgUserArray[existUserIdx][4] = managerCheckbox;
                                     detail.orgUserArray[existUserIdx][9] = roleGuid;
-                                } else if (auditorCheckbox) {
-                                    detail.orgUserArray[existUserIdx][5] = auditorCheckbox;
+                                } else if (auditorrCheckbox) {
+                                    detail.orgUserArray[existUserIdx][5] = auditorrCheckbox;
                                 }
                             }
                         }
@@ -210,14 +213,23 @@
                               <td class="user-info-td1">${account}</td>
                               <td class="user-info-td2" id=${userId}>${userId}</td>
                               <td class="user-info-td3">${serviceAccount}</td>
-                              <td class="user-info-td4">
-                                <input type="checkbox" id="${users}_user" ${userCheckbox} value="${userRoleGuid}" name="organization_user">
-                                <label for="${users}_user" class="checkbox-label">User</label>
-                                <input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${mgrRoleGuid}" name="organization_manager">
-                                <label for="${users}_manager" class="checkbox-label">Manager</label>
-                                <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} value="${auditorRoleGuid}" name="organization_auditor" disabled >
-                                <label for="${users}_auditor">Auditor</label>
-                              </td>
+                              <td class="user-info-td4">`;
+                            if (myRoles.includes(SIDECAR_ROLE_ADMIN) || (myRoles.includes(SIDECAR_ROLE_ORG_MANAGER) && userCheckbox == "checked")){
+                                html = html + `<input type="checkbox" id="${users}_user" ${userCheckbox} value="${userRoleGuid}" name="organization_user"}>`;
+                            }else {
+                                html = html + `<input type="checkbox" id="${users}_user" ${userCheckbox} value="${userRoleGuid}" name="organization_user" disabled }>`;
+                            }
+                            html = html + `<label for="${users}_user" class="checkbox-label">User</label>`;
+                            if (myRoles.includes(SIDECAR_ROLE_ADMIN) || (myRoles.includes(SIDECAR_ROLE_ORG_MANAGER) && managerCheckbox == "checked")){
+                                html = html + `<input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${mgrRoleGuid}" name="organization_manager">`;
+                            }else {
+                                html = html + `<input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${mgrRoleGuid}" name="organization_manager" disabled>`;
+                            }
+                            html = html + `<label for="${users}_manager" class="checkbox-label">Manager</label>`;
+                            html = html + `<input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} value="${auditorRoleGuid}" name="organization_auditor" disabled >`;
+                            html = html + `<label for="${users}_auditor">Auditor</label>`;
+
+                            html = html + `</td>
                               <td class="user-info-td5">
                                 <label id="${roleGuid}"></label>
                               </td>
@@ -227,6 +239,9 @@
                     } else {
                         var html = "<tr><td colspan=4 class='table-no-data'>No Data.</td></tr>";
                         func.appendHtml(document.querySelector(".detailList"), html, "tbody", );
+                    }
+                    if(!myRoles.includes(SIDECAR_ROLE_ADMIN) && !myRoles.includes(SIDECAR_ROLE_ORG_MANAGER)){
+                        document.querySelector('.addSpace').style.display = 'none';
                     }
 
                     if (document.getElementById("loading")) {

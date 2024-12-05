@@ -31,6 +31,8 @@
 
      var SIDECAR_ROLE_ADMIN = [[${@environment.getProperty('sidecar.roleAdmin')}]];
      var SIDECAR_ROLE_USER = [[${@environment.getProperty('sidecar.roleUser')}]];
+     var SIDECAR_ROLE_ORG_MANAGER = [[${@environment.getProperty('sidecar.roleOrgManager')}]];
+     var SIDECAR_ROLE_ORG_USER = [[${@environment.getProperty('sidecar.roleOrgUser')}]];
      var SIDECAR_ROOT_NAMESPACE = [[${@environment.getProperty('sidecar.rootNamespace')}]];
      var SIDECAR_TARGET_CLUSTER = [[${@environment.getProperty('sidecar.targetCluster')}]];
      var SIDECAR_API_URL = [[${@environment.getProperty('sidecar.sidecarApiUrl')}]]
@@ -307,6 +309,7 @@
          ORGANIZATIONS: 'organizations'
      }
 
+     var myOrgRoles = [];
 </script>
 
 

@@ -65,8 +65,12 @@
 
         const userUpdate = {
             init(){
-                // nameSpace 정보 조회
-                func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/${sessionStorage.getItem('commonName')}`, 'application/json', userUpdate.draw);
+                if(sessionStorage.getItem("commonName") == null){
+                    func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, moveUserPrePage);
+                }else {
+                    // nameSpace 정보 조회
+                    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/${sessionStorage.getItem('commonName')}`, 'application/json', userUpdate.draw);
+                }
             },
 
             draw(data){

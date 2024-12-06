@@ -82,10 +82,18 @@
 
         const userDetail = {
             init(){
+                if( sessionStorage.getItem("commonName") == null){
+                    if(userAuthority == AUTH_CLUSTER_ADMIN) {
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, moveUserPrePage);
+                    }
+                    else {
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, moveUserPrePage);
+                    }
+                }else {
+                    func.loading();
+                    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/${sessionStorage.getItem('commonName')}`, 'application/json', userDetail.draw);
+                }
 
-                func.loading();
-
-                func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/${sessionStorage.getItem('commonName')}`, 'application/json', userDetail.draw);
             },
 
             draw(data){

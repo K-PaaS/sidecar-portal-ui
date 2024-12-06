@@ -339,6 +339,9 @@
             funcsc.postDataWithPopup('DELETE', `${funcsc.sidecarUrl}sidecar/apps/${sessionStorage.getItem('appGuid')}`, '', true, 'application/json', goToApps);
         }
         function initDetails(){
+            if(sessionStorage.getItem("appGuid") == null){
+                func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, goToApps);
+            }
             func.loading();
             document.querySelector('.orgTop').innerText = sessionStorage.getItem('org_name');
             document.getElementById("orgTitleDiv").removeChild(document.getElementById("orgListUl"));
@@ -350,6 +353,7 @@
         initDetails();
         window.onload = () => {
             initDetails();
+
         }
 
         function goToApps(){

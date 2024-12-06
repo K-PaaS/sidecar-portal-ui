@@ -82,13 +82,18 @@
             allItemCount: 0, //게시물 총 개수
             type: "user",
             users: "",
-            init(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.initNext);},
+            sessionNullCheck(){
+                if(sessionStorage.getItem("org_guid") == null || sessionStorage.getItem("org_name") == null || sessionStorage.getItem("space_guid") == null || sessionStorage.getItem("space_name") == null){
+                    func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, funcsc.movePageToOrgList);
+                }
+            },
+            init(){detail.sessionNullCheck(); funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.initNext);},
             initNext() {
                 func.nameLoad = detail.reset;
                 detail.load();
                 detail.eventUser();
             },
-            reset() {funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.resetNext);},
+            reset() {detail.sessionNullCheck(); funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.resetNext);},
             resetNext() {
                 func.removeHtml(document.querySelector(".listTable"));
                 detail.offset = 0;

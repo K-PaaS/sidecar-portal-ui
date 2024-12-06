@@ -106,13 +106,16 @@
                 delete_sb_guid : 0,
 
                 init(){
+                    if(sessionStorage.getItem("commonGuid") == null){
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, serviceDetail.movePageToServices);
+                    }else {
+                        func.loading();
 
-                    func.loading();
-
-                    serviceDetail.delete_si_guid = sessionStorage.getItem('commonGuid');
-                    //Detail
-                    funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem('space_guid')}&serviceInstanceNames=${sessionStorage.getItem('commonName')}`, 'application/json', serviceDetail.draw);
-                    func.nameLoad = this.movePageToServices;
+                        serviceDetail.delete_si_guid = sessionStorage.getItem('commonGuid');
+                        //Detail
+                        funcsc.loadDataSidecar('GET', `${funcsc.sidecarUrl}sidecar/serviceInstances/list?spaceGuids=${sessionStorage.getItem('space_guid')}&serviceInstanceNames=${sessionStorage.getItem('commonName')}`, 'application/json', serviceDetail.draw);
+                        func.nameLoad = this.movePageToServices;
+                    }
                 },
 
                 draw(data){

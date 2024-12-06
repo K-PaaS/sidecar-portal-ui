@@ -49,13 +49,13 @@
                 limit: 10,
                 total_results: 0,
                 delete_tg_guid : 0,
-                init(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), domain.initNext);},
+                init(){funcsc.getMyRole(SIDECAR_ROOT_NAMESPACE), domain.initNext);},
                 initNext() {
                     func.nameLoad = domain.reset;
                     domain.load();
                     domain.event();
                 },
-                reset(){funcsc.getMyRole(sessionStorage.getItem("org_guid"), domain.resetNext);},
+                reset(){funcsc.getMyRole(SIDECAR_ROOT_NAMESPACE, domain.resetNext);},
                 resetNext() {
                     func.removeHtml(document.querySelector(".listTable"));
                     domain.offset = 0;

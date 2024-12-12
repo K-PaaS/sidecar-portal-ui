@@ -100,12 +100,13 @@ const func = {
 	clusters(data){
 		if ( func.invisible > 1 ) return; // cluster, namespace 블필요 in sidecar
 		var html ='';
-		if (SIDECAR_TARGET_CLUSTER === "${data.items[i].clusterId}" ){  // only targetCluster in sidecar
-		    for(var i=0; i<=data.items.length-1; i++){
-			    html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
+		for(var i=0; i<=data.items.length-1; i++){
+		    if (SIDECAR_TARGET_CLUSTER == data.items[i].clusterId ){  // only targetCluster in sidecar
+		        html += `<li><a href="javascript:;" data-name="${data.items[i].clusterId}">${data.items[i].clusterName}</a></li>`;
 			};
-			document.getElementById("clusterListUl").innerHTML = html;
-		}
+	    }
+	    if (document.getElementById("clusterListUl"))
+		    document.getElementById("clusterListUl").innerHTML = html;
 
 
 
@@ -132,17 +133,23 @@ const func = {
     			    sessionStorage.removeItem('nameSpace');
     			    func.setUserAuthority(sessionStorage.getItem('cluster'), data.items);
     			    IS_RELOAD = true;
-    			    func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
+    			    func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/users/namespacesList`, 'application/json', func.namespaces);
     		    }, false);
 	    	};
 		}
 
-		func.loadData('GET', `${func.url}clusters/${sessionStorage.getItem('cluster')}/users/namespacesList`, 'application/json', func.namespaces);
+		func.loadData('GET', `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/users/namespacesList`, 'application/json', func.namespaces);
 
 	},
 
 	namespaces(data){
-		if ( func.invisible > 0 ) return; // namespace 블필요 in sidecar
+		if ( func.invisible > 0 ) {
+		    const elms = document.querySelectorAll('h3 ul#namespaceListUl');
+            elms.forEach((elm) => {
+                elm.style.setProperty('display', 'none');
+            });
+		    return; // namespace 블필요 in sidecar
+		}
 		func.nameData = data;
 
 		var html = '';
@@ -172,7 +179,7 @@ const func = {
 					func.loadData('GET', null, 'application/json', func.nameLoad);
 				}
 				else {
-					movePage(URI_CP_INDEX_URL);
+					movePage(URI_SIDECAR_INDEX_URL);
 				}
 			}, false);
 
@@ -183,7 +190,7 @@ const func = {
 					func.loadData('GET', null, 'application/json', func.nameLoad);
 				}
 				else {
-					movePage(URI_CP_INDEX_URL);
+					movePage(URI_SIDECAR_INDEX_URL);
 				}
 			}
 			if(IS_INDEX) {
@@ -495,6 +502,9 @@ const func = {
 						else {
 							callbackFunction(JSON.parse(request.responseText), list);
 						}
+					} else if(JSON.parse(request.responseText).httpStatusCode === 401){
+						sessionStorage.clear();
+						movePage(URI_CP_INACTIVE);
 					} else if(JSON.parse(request.responseText).httpStatusCode === 500){
 						sessionStorage.clear();
 						func.loginCheck();
@@ -700,3 +710,4 @@ const func = {
 		});
 	},
 }
+

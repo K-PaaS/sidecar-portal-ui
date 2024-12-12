@@ -98,7 +98,9 @@
                 delete_dest_guid : 0,
 
                 init(){
-
+                    if(sessionStorage.getItem("commonGuid") == null){
+                        func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, routeDetail.movePageToRoutes);
+                    }
                     func.loading();
 
                     routeDetail.delete_route_guid = sessionStorage.getItem('commonGuid');

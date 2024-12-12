@@ -72,6 +72,7 @@
     var sidecar_data;
 
     window.onload = () => {
+        func.invisible = 1;
         func.init(ASIDE_DP1.MANAGEMENTS, ASIDE_DP2.ORGANIZATIONS);
         callbackFuncNameLoad();
 
@@ -81,12 +82,19 @@
             allItemCount: 0, //게시물 총 개수
             type: "user",
             users: "",
-            init() {
+            sessionNullCheck(){
+                if(sessionStorage.getItem("org_guid") == null || sessionStorage.getItem("org_name") == null || sessionStorage.getItem("space_guid") == null || sessionStorage.getItem("space_name") == null){
+                    func.alertPopup('ERROR',  ALERT_POPUP_FAIL, true, MSG_CONFIRM, funcsc.movePageToOrgList);
+                }
+            },
+            init(){detail.sessionNullCheck(); funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.initNext);},
+            initNext() {
                 func.nameLoad = detail.reset;
                 detail.load();
                 detail.eventUser();
             },
-            reset() {
+            reset() {detail.sessionNullCheck(); funcsc.getMyRole(sessionStorage.getItem("org_guid"), detail.resetNext);},
+            resetNext() {
                 func.removeHtml(document.querySelector(".listTable"));
                 detail.offset = 0;
                 detail.load();
@@ -171,10 +179,16 @@
                                   <td class="user-info-td1">${account}</td>
                                   <td class="user-info-td2" id=${userId}>${userId}</td>
                                   <td class="user-info-td3">${serviceAccount}</td>
-                                  <td class="user-info-td4">
-                                    <input type="checkbox" id="${users}_developer" ${developerCheckbox} value="${roleGuid}" name="space_developer">
+                                  <td class="user-info-td4">`
+
+                                  if (myRoles.includes(SIDECAR_ROLE_ADMIN) || (myRoles.includes(SIDECAR_ROLE_ORG_MANAGER) && developerCheckbox == "checked")){
+                                    html = html + `<input type="checkbox" id="${users}_developer" ${developerCheckbox} value="${roleGuid}" name="space_developer">`;
+                                  }else {
+                                    html = html + `<input type="checkbox" id="${users}_developer" ${developerCheckbox} value="${roleGuid}" name="space_developer" disabled>`;
+                                  }
+                                  html = html + `
                                     <label for="${users}_developer" class="checkbox-label">Developer</label>
-                                    <input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${roleGuid}" name="space_manager">
+                                    <input type="checkbox" id="${users}_manager" ${managerCheckbox} value="${roleGuid}" name="space_manager" disabled>
                                     <label for="${users}_manager" class="checkbox-label"">Manager</label>
                                     <input type="checkbox" id="${users}_auditor" ${auditorrCheckbox} name="space_auditor" disabled >
                                     <label for="${users}_auditor">Auditor</label>
@@ -198,6 +212,10 @@
                         var html = "<tr><td colspan=4 class='table-no-data'>No Data.</td></tr>";
                         func.appendHtml(document.querySelector(".detailList"), html, "tbody",);
                     }
+                }
+                if(!myRoles.includes(SIDECAR_ROLE_ADMIN) ){
+                        document.querySelector('.addUser').style.display = 'none';
+                        document.querySelector('#deleteSpace').style.display = 'none';
                 }
 
                 if (document.getElementById("loading")) {
@@ -234,6 +252,7 @@
 					<dd>
 						<fieldset>
 							<select id="createName">`;
+			var tempUsers = [];
             for (var i = 0; i < sidecar_data.pagination.total_results; i++) {
                 var userAuthId = sidecar_data.resources[i].relationships.user.data.guid;
                 var split = userAuthId.split(":");
@@ -252,9 +271,12 @@
                             }
                         })
                         if (existUserIdx == 0) {
-                            html += `<option value=${serviceAccountName}>${userId}</option>`;
-                            flag = true;
-                            break;
+                            if(!tempUsers.includes(serviceAccountName)){
+                                html += `<option value=${serviceAccountName}>${userId}</option>`;
+                                tempUsers.push(serviceAccountName);
+                                flag = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -266,21 +288,11 @@
 						</fieldset>
 					</dd>
 				</dl>
-				<dl class="popup_add_user_dl">
-					<dt id="popup_add_user_dt">Type</dt>
-					<dd class="popup_add_user_dd" >
-					        <input type="radio" id="organization_user" name="organization" value="space_developer">
-                            <label for="organization_user">Developer</label>
-                            <input type="radio" id="organization_manager" name="organization" value="space_manager">
-                            <label for="organization_manager">Manager</label>
-                    </dd>
-				</dl>
 				<a class="confirm" href="javascript:;">` + BUTTON_ADD + `</a>
 				<a class="close" href="javascript:;">` + MSG_CLOSE + `</a>
 			</div>
 		</div>`;
             func.appendHtml(document.getElementById('wrap'), html, 'div');
-            console.log(`${func.url}clusters/${sessionStorage.getItem("cluster")}/namespaces/all/usersList?userType=user&searchName`);
 
             if (sessionStorage.getItem('users') == NAMESPACE_ALL_VALUE) {
                 document.getElementById('createName').selectedIndex = 0;
@@ -292,26 +304,13 @@
                 document.getElementById('wrap').removeChild(document.querySelector('.modal-wrap'));
             }, false);
             document.getElementById('modal').querySelector('.confirm').addEventListener('click', (e) => {
-                var check = false;
-                var organization = document.getElementsByName('organization');
-
-                for (var i = 0; i < organization.length; i++) {
-                    if (organization[i].checked) {
-                        check = true;
-                        break;
-                    }
-                }
                 if (!document.getElementById('createName').value || document.getElementById('createName').value == "notFound") {
                     //alert(ALERT_USER_SELECT);
                     func.alertPopup('', ALERT_USER_SELECT, true, MSG_CONFIRM, 'closed');
                     return;
-                } else if (!check) {
-                    func.alertPopup('', ALERT_USER_SELECT, true, MSG_CONFIRM, 'closed');
-                    //alert(ALERT_TYPE_SELECT);
-                    return;
                 } else {
                     var spaceGuid = sessionStorage.getItem("space_guid");
-                    var type = document.querySelector('input[type=radio][name=organization]:checked').value;
+                    var type = "space_developer";
                     var user = "system:serviceaccount:" + SIDECAR_ROOT_NAMESPACE + ":" + document.getElementById('createName').value;
                     var sendData = JSON.stringify({
                         "spaceGuid": spaceGuid,

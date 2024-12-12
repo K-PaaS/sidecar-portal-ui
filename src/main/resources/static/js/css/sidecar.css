@@ -85,7 +85,7 @@
 
 /* modal */
 .modal input#domainName,
-.modal input#hostNazme,
+.modal input#hostName,
 .modal input#path,
 .modal input#serviceInstanceName,
 .modal input#credentials,
@@ -114,4 +114,11 @@
 
 h3:hover ul#spaceListUl{
 	display: var(--display-style);
+}
+h3:hover ul#orgListUl{
+	display: var(--display-style);
+}
+input[type="checkbox"]:disabled + label {
+    pointer-events: none;
+    opacity: 0.5;
 }

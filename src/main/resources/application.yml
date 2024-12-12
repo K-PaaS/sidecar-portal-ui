@@ -34,10 +34,13 @@ keycloak:
       superAdminRole: cp-cluster-admin-role
 
 sidecar:
+  sidecarApiUrl: ${SIDECAR_API_URL}
   targetCluster: ${TARGET_CLUSTER}
   rootNamespace: ${SIDECAR_ROOTNAMESPACE}
   roleAdmin: ${SIDECAR_ROLEADMIN}
   roleUser: ${SIDECAR_ROLEUSER}
+  roleOrgManager: ${SIDECAR_ROLEORGMANAGER}
+  roleOrgUser: ${SIDECAR_ROLEORGUSER}
   portalUrl: ${SC_PORTAL_API_URI}
 
 cpApi:

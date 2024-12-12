@@ -53,7 +53,7 @@ public class IntroOverviewController {
      * @return the intro overview
      */
     @ApiOperation(value = "Intro overview 페이지 이동(Move Intro overview page)", nickname = "getIntroOverview")
-    @GetMapping(value = ConstantsUrl.URI_CP_INDEX_URL)
+    @GetMapping(value = org.kpaas.sidecar.portal.ui.common.ConstantsUrl.URI_SIDECAR_INDEX_URL)
     public String getIntroOverview() {
         return "index";
     }

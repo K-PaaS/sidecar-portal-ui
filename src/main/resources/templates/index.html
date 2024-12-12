@@ -14,8 +14,8 @@
                     <dd id="nameStatus">0</dd>
                 </dl>
                 <dl>
-                    <dt>Deployments</dt>
-                    <dd id="deployStatus">0</dd>
+                    <dt>Apps</dt>
+                    <dd id="appStatus">0</dd>
                 </dl>
                 <dl>
                     <dt>Pods</dt>
@@ -31,12 +31,11 @@
             <h4>Workloads</h4>
             <ul>
                 <li>
-                    <h5>Deployments</h5>
-                    <!-- doughnutChart -->
+                    <h5>Apps</h5>
                     <div>
-                        <canvas id="deploymentChart" style="height: 250px; max-width: 100%;"></canvas>
+                        <canvas id="appChart" style="height: 250px; max-width: 100%;"></canvas>
                     </div>
-                    <!--a onclick="movePage(URI_CP_WORKLOADS_DEPLOYMENTS)">more</a-->
+                    <!--a onclick="movePage(URI_CP_WORKLOADS_PODS)">more</a-->
                 </li>
                 <li>
                     <h5>Pods</h5>
@@ -44,13 +43,6 @@
                         <canvas id="podChart" style="height: 250px; max-width: 100%;"></canvas>
                     </div>
                     <!--a onclick="movePage(URI_CP_WORKLOADS_PODS)">more</a-->
-                </li>
-                <li>
-                    <h5>ReplicaSets</h5>
-                    <div>
-                        <canvas id="replicaSetChart" style="height: 250px; max-width: 100%;"></canvas>
-                    </div>
-                    <!--a onclick="movePage(URI_CP_WORKLOADS_REPLICASETS)">more</a-->
                 </li>
             </ul>
         </article>
@@ -80,8 +72,10 @@
 
     <script type="text/javascript">
         window.onload = () => {
+            func.invisible = 2;
             IS_INDEX = true;
             func.init(ASIDE_DP1.CLUSTERS, ASIDE_DP2.C_OVERVIEW);
+            funcsc.initNamespaces();
 
             const overview = {
                 init() {
@@ -91,22 +85,56 @@
 
                 load() {
                     func.loading();
+                    overview.overviews();
+                },
+                overviews() {
 
                     // nameSpace 정보 조회
-                    func.loadData('GET', `${func.url}clusters/' + SIDECAR_TARGET_CLUSTER + '/namespaces/${sessionStorage.getItem('space_guid')}/overview`, 'application/json', overview.draw);
+                    func.loadData(
+                        "GET",
+                        `${func.url}clusters/${SIDECAR_TARGET_CLUSTER}/namespaces/${sessionStorage.getItem('space_guid')}/overview`,
+                        "application/json",
+                        (e) => {overviewData=e; overview.apps();},
+                    );
+                },
+                apps() {
+                    // Apps 정보 조회
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/apps/customList?spaceGuid=${sessionStorage.getItem('space_guid')}`,
+                        "application/json",
+                        (e) => {apps=e; overview.users();},
+                    );
+                },
+                users() {
+                    // Users 정보 조회
+                    funcsc.loadDataSidecar(
+                        "GET",
+                        `${funcsc.sidecarUrl}sidecar/roles/list?spaceGuids=${sessionStorage.getItem("space_guid")}`,
+                        "application/json",
+                        (e) => {users=e.resources; overview.draw();},
+                    );
                 },
 
-                draw(data) {
-
-                    if (data.httpStatusCode == 200) {
+                draw() {
+                    if (overviewData.httpStatusCode == 200) {
                         // dstatus setting
-                        func.countUp(document.getElementById('nameStatus'), data.namespacesCount);
-                        func.countUp(document.getElementById('deployStatus'), data.deploymentsCount);
-                        func.countUp(document.getElementById('podStatus'), data.podsCount);
-                        func.countUp(document.getElementById('userStatus'), data.usersCount);
+                        func.countUp(document.getElementById('nameStatus'), overviewData.namespacesCount);
+                        func.countUp(document.getElementById('appStatus'), apps.length);
+                        func.countUp(document.getElementById('podStatus'), overviewData.podsCount);
 
-                        overview.workloadChart(data);
-                        overview.topChart(data);
+                        let usersAccount = [];
+                        for(let i=0; i<users.length; i++){
+                            if(!usersAccount.includes(users[i].relationships.user.data.guid)){
+                                usersAccount.push(users[i].relationships.user.data.guid);
+                            }
+                        }
+
+                        func.countUp(document.getElementById('userStatus'), usersAccount.length);
+
+                        overview.workloadChart(overviewData);
+                        overview.appChart();
+                        overview.topChart(overviewData);
 
                     }
                     document.getElementById('wrap').removeChild(document.getElementById('loading'));
@@ -121,7 +149,8 @@
                         {type: 'Failed', background: 'rgba(231, 76, 60, 0.4)'},
                         {type: 'Succeeded', background: 'rgba(142, 68, 173, 0.4)'},
                         {type: 'Pending', background: 'rgba(241, 196, 15, 0.4)'},
-                        {type: 'Unknown', background: 'rgba(189, 195, 199, 0.4)'}
+                        {type: 'Unknown', background: 'rgba(189, 195, 199, 0.4)'},
+                        {type: 'No data', background: 'rgba(237, 237, 237, 0.4)'}
                     ];
 
                     var otherBackgroundColor = [
@@ -129,10 +158,19 @@
                         'rgba(127, 140, 141 , 0.4)',
                         'rgba(52, 73, 94 , 0.4)',
                         'rgba(255, 205, 86, 0.4)',
+                        'rgba(161, 136, 127, 0.4)',
                         'rgba(161, 136, 127, 0.4)'];
 
-                    var dataId = ['deploymentChart', 'replicaSetChart', 'podChart'];
-                    var dataArr = [data.deploymentsUsage, data.replicaSetsUsage, data.podsUsage];
+                    var dataId = ['podChart'];
+                    if(data.podsUsage.length == 0){
+                    	var emptyData = {
+                    		type: "No data",
+                    		count: 1,
+                    		percent: 100
+                    	}
+                    	data.podsUsage[0]= emptyData;
+                    }
+                    var dataArr = [data.podsUsage];
 
 
                     for (var i = 0; i < dataId.length; i++) {
@@ -175,9 +213,13 @@
                                             label: function(tooltipItems, data) {
                                                 var item = tooltipItems.raw;
                                                 var label = item.type;
-                                                var label2 = "Percent : " + item.percent +  '%';
-                                                var label3 = "Count : "  + item.count;
-                                                return [label, label2, label3];
+                                                if (item.type == "No data"){
+                                                    return [label];
+                                                } else {
+                                                    var label2 = "Percent : " + item.percent +  '%';
+                                                    var label3 = "Count : "  + item.count;
+                                                    return [label, label2, label3];
+                                                }
                                             }
 
                                         }
@@ -191,6 +233,106 @@
                             config
                         );
                     };
+                },
+                appChart() {
+                    /* ChartJS
+            * -------
+            * Here we will create a few charts using ChartJS
+            */
+                    var backgroundColor = [
+                        {state: 'STARTED', background: 'rgba(54, 162, 235, 0.4)'},
+                        {state: 'STOPPED', background: 'rgba(255, 99, 132, 0.4)'},
+                    ];
+
+                    var dataId = 'appChart';
+                    var startedCnt = 0;
+                    var stoppedCnt = 0;
+
+                    for(var i = 0; i < apps.length; i++) {
+                        if (apps[i].state == "STARTED"){
+                            startedCnt++;
+                        } else if (apps[i].state == "STOPPED"){
+                            stoppedCnt++;
+                        }
+                    }
+                    var labels = [];
+                    var dataSet = [];
+                    var backgroundColor = [];
+                    var dataCount;
+                    var dataArr = [];
+                    if (stoppedCnt > 1 || startedCnt > 1){
+                        if (startedCnt > 0) {
+                            labels.push("Started");
+                            dataCount = {
+                        		type: "Started",
+                        		count: startedCnt
+                        	}
+                        	dataArr.push(dataCount);
+                            backgroundColor.push("rgba(54, 162, 235, 0.4)");
+                        }
+                        if (stoppedCnt > 0) {
+                            labels.push("Stopped");
+                            dataCount = {
+                        		type: "Stopped",
+                        		count: stoppedCnt
+                        	}
+                        	dataArr.push(dataCount);
+                            backgroundColor.push("rgba(255, 99, 132, 0.4)");
+                        }
+                    }
+                    else {
+                        labels.push("No data");
+                        dataCount = {
+                    		type: "No data",
+                    		count: 1
+                    	}
+                    	dataArr.push(dataCount);
+                        backgroundColor.push("rgba(237, 237, 237, 0.4)");
+                    }
+                    const data = {
+                        labels: labels,
+                        datasets: [{
+                            data: dataArr,
+                            backgroundColor: backgroundColor,
+                        hoverOffset: 0
+                        }]
+                    };
+                    var config = {
+                            type: 'doughnut',
+                            data: data,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                parsing: {
+                                    key: 'count'
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(tooltipItems, data) {
+                                                var item = tooltipItems.raw;
+                                                var label = item.type;
+                                                if (item.type == "No data"){
+                                                    return [label];
+                                                } else {
+                                                    var label2 = "Count : "  + item.count;
+                                                    return [label, label2];
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+
+
+                    new Chart(
+                        document.getElementById(dataId),
+                        config
+                    );
+
                 },
                 topChart(data) {
                     /* ChartJS
@@ -289,3 +431,4 @@
 </th:block>
 
 </html>
+

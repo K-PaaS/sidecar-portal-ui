@@ -82,7 +82,7 @@ $ gradle build
 <br>
 
 ## 개발 환경
-K-PaaS 사이드카 WEB UI의 개발 환경은 다음과 같습니다.
+K-PaaS 사이드카 Portal UI의 개발 환경은 다음과 같습니다.
 
 | Situation                      | Version |
 | ------------------------------ | ------- |
@@ -102,4 +102,4 @@ K-PaaS 사이드카 WEB UI의 개발 환경은 다음과 같습니다.
 <br>
 
 ## 라이선스
-K-PaaS 사이드카 WEB UI는 [Apache-2.0 License](http://www.apache.org/licenses/LICENSE-2.0)를 사용합니다.
+K-PaaS 사이드카 Portal UI는 [Apache-2.0 License](http://www.apache.org/licenses/LICENSE-2.0)를 사용합니다.

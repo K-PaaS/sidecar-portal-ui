@@ -17,16 +17,16 @@ private:
 keycloak:
   oauth:
     info:
-      uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/userinfo
+      uri: ${KEYCLOAK_URI}/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/userinfo
     token:
       check:
-        uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token/introspect
+        uri: ${KEYCLOAK_URI}/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token/introspect
       access:
-        uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token
+        uri: ${KEYCLOAK_URI}/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/token
     logout:
-      url: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/logout
+      url: ${KEYCLOAK_URI}/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/logout
     authorization:
-      uri: ${KEYCLOAK_URI}/auth/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/auth
+      uri: ${KEYCLOAK_URI}/realms/${KEYCLOAK_CP_REALM}/protocol/openid-connect/auth
     client:
       id: ${KEYCLOAK_CP_CLIENT_ID}
       secret: ${KEYCLOAK_CP_CLIENT_SECRET}

@@ -58,7 +58,10 @@ const funcsc = {
                 }else {
                     document.querySelector('.orgTop').innerText = MSG_NO_ORGS;
                     document.querySelector('.spaceTop').innerText = MSG_NO_SPACES;
-                    return;
+                    if (document.querySelector('.apps')){
+                        func.nameLoad();
+                        return;
+                    }
                 }
             };
 

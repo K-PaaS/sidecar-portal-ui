@@ -96,7 +96,7 @@
                             var trId = "tr" + i;
                             var initmem = instances[i].usage.mem/1024/1024;
                             var mem = Math.floor(initmem);
-                            var cpu = instances[i].usage.cpu;
+                            var cpu = Math.round(instances[i].usage.cpu*1000)/10
                             if (cpu == null){
                                 cpu = 0;
                             }
